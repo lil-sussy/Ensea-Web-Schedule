@@ -1,11 +1,10 @@
 import React, { Component }  from 'react';
 import './App.css';
-import WeekSchedule from "./DayCarousel.js";
+import WeekSchedule from "./DayCarousel";
 
 function App() {
-  const data = [ {day: 'monday', courses: [ { name: 'Syslin', begin: '8h', end: '10h', } ]},
+  const weekData = [ {day: 'monday', courses: [ { name: 'Syslin', begin: '8h', end: '10h', } ]},
       { day: 'tuesday', courses: [ {name: 'Syslin', begin: '8h', end: '10h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'}, {name: 'Syselec', begin: '10h', end: '12h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'}, {name: 'Syslin', begin: '13h30', end: '15h30', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'}, {name: 'Syslin', begin: '15h30', end: '17h30', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'}, {name: 'Syslin', begin: '17h30', end: '20h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'} ]},
-      { day: 'tuesday', courses: [ {name: 'Syslin', begin: '8h', end: '10h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'} ]},
       { day: 'wednesday', courses: [ {name: 'Syslin', begin: '8h', end: '10h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'} ]},
       { day: 'thursday', courses: [ {name: 'Syslin', begin: '8h', end: '10h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'} ]},
       { day: 'friday', courses: [ {name: 'Syslin', begin: '8h', end: '10h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'} ]},
@@ -26,7 +25,7 @@ function App() {
             </div>
           </div>
         </div>
-        <WeekSchedule data={data}/>
+        <WeekSchedule weekData={weekData}/>
       </header>
     </div>
   );
