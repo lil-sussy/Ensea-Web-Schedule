@@ -7,7 +7,7 @@
 .Logo {
   background: local;
   background-size: cover;
-  background-image: url('../Ressources/logo.png');
+  background-image: url('../public/logo.png');
 }
 
 .DayName {

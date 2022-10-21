@@ -91,7 +91,7 @@ let WeekSchedule = (props) => {
       p = p > 1 ? 1 : p;
       swiper.slides[index].style.transitionProperty = "transform"
       swiper.slides[index].style.transitionDuration = "0ms"
-      swiper.slides[index].style.transform = "scale(" + (0.8 + 0.2*(1-Math.abs(p))) + ") translateX(" + (p * 40) + "%)"
+      swiper.slides[index].style.transform = "scale(" + (0.8 + 0.2*(1-Math.abs(p))) + ") translateX(" + (p * 30) + "%)"
       swiper.slides[index].style.transitionProperty = "transform"
       swiper.slides[index].style.transitionDuration = "700ms"
     }
