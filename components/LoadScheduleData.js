@@ -3,27 +3,29 @@ import { app, database } from './firebaseConfig';
 
 
 const dbInstance = collection(database, 'notes');
-// const saveNote = () => {
-//   addDoc(dbInstance, {
-//       noteTitle: noteTitle,
-//       noteDesc: noteDesc
-//   })
-//       .then(() => {
-//           setNoteTitle('')
-//           setNoteDesc('')
-//       })
-// }
 
-// const getNotes = () => {
-//   getDocs(dbInstance)
-//       .then((data) => {
-//           console.log(data);
-//       })
-// }
+export const saveDB = (data) => {
+    addDoc(dbInstance, {
+        schedule: data,
+    })
+        .then(() => {
+            // setNoteTitle('')
+            // setNoteDesc('')
+            loadScheduleDataFromString(data)
+        })
+}
+
+export const loadSchedule = () => {
+    getDocs(dbInstance)
+        .then((data) => {
+            console.log(data);
+            loadScheduleDataFromString(data)
+        })
+}
 
 const schedule = []
 
-export default function loadSchedule(shceduleName) {
+export default function getSchedule(shceduleName) {
     return schedule
 }
 
