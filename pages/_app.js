@@ -1,8 +1,22 @@
-import '../pages/App.css';
+import App from 'next/app';
+import '../pages/main.css';
 import '../styles/globals.css';
 
-function MyApp({ Component, pageProps }) {
-  return <Component {...pageProps} />
-}
+export default class MyApp extends App {
+  static async getInitialProps({ Component, router, ctx }) {
+    let pageProps = {};
 
-export default MyApp
+    if (Component.getInitialProps) {
+      pageProps = await Component.getInitialProps(ctx);
+    }
+    return { pageProps };
+  }
+  
+  render() {
+    const { Component, pageProps } = this.props;
+
+    return (
+      <Component {...pageProps} />
+    );
+  }
+}
