@@ -1,5 +1,5 @@
 import { Server } from 'socket.io'
-import loadScheduleDataFromString from '../../components/LoadScheduleData'
+import saveDB from '../../components/LoadScheduleData'
 
 const SocketHandler = (req, res) => {
   if (res.socket.server.io) {
@@ -19,7 +19,7 @@ const SocketHandler = (req, res) => {
           // called for each packet received
           console.log('packet recieved type: %s, data: %s', type, data)
           if (data.includes('uwu-ade-weekly-shcedule')) {
-            loadScheduleDataFromString(data)
+            saveDB(data)
           }
           io.emit('data was loaded correctly. %s', msg);
       });

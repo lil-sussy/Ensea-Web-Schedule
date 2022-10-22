@@ -23,8 +23,7 @@ const socket = io('https://enseawebschedule.herokuapp.com', {
 socket.on("connect", () => {
     console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
     const engine = socket.io.engine;
-    console.log(engine)
-    socket.emit('uwu')
+    scraping()
 });
 
 socket.on("disconnect", () => {
@@ -52,7 +51,7 @@ function equalsPercent(a, b, percent) {
     return (a <= (b + b / percent) && a >= (b - b / percent))
 }
 
-(function() {
+const scraping = () => {
     let yearPannelPassed = false;
     let done = false;
     document.body.addEventListener('DOMContentLoaded', (event) => {
@@ -112,7 +111,7 @@ function equalsPercent(a, b, percent) {
             }
         })
     }, true);
-})();
+};
 /* packet recieved type: message, data: 2["uwu-ade-weekly-shcedule// CM Systèmes électroniques,1ère A ENSEA,DELACRESSONNIÈRE
  Bruno,Amphi Watteau,13h30 - 15h30, TD Analyse de Fourier 1A,1G1 TD3,FAUCARD Bastien,A111,15h30 - 17h30, Amphithéatre scolarité
   (capitalisation : réservé aux redoublants),1ère A ENSEA,1ère B ENSEA,2G1 TD1 (Info / Signal),2G1 TD2 (internationale),2G1 TD3 (Signal /
