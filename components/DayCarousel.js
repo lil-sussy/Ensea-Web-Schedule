@@ -27,7 +27,7 @@ let createDay = (dayData, focused) => {
   return (
     <SwiperSlide key={dayData.day} className={dayData.day}>
       <div className="DayContainer w-full h-full text-lg flex justify-center items-center">
-        <div className="DayAbsoluteContainer absolute left--1/4 top-0 backdrop-blur-sm w-96 h-full rounded-3xl">
+        <div className="DayAbsoluteContainer absolute left--1/4 top-0 backdrop-blur-sm w-80 h-full rounded-3xl">
           <div className="DayBackground rounded-3xl w-full h-full bg-white bg- opacity-70">
           </div>
           <div className="DayContent h-9/10 absolute top-2 flex justify-start">
