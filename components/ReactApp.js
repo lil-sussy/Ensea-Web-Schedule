@@ -1,5 +1,20 @@
 import WeekSchedule from "./DayCarousel";
 
+import nextSession from "next-session";
+
+const DEFAULT_SCHEDULE = "1G1 TP6";
+
+async function session(req, res) {
+  const session = await nextSession.getSession(req, res);
+  session.views = session.views ? session.views + 1 : 1;
+  session.lastSchedule = session.lastSchedule ? session.lastSchedule: DEFAULT_SCHEDULE;
+  // Also available under req.session:
+  // req.session.views = req.session.views ? req.session.views + 1 : 1;
+  res.send(
+    `In this session, you have visited this website ${session.views} time(s).`
+  );
+}
+
 function CreateReactAppEntryPoint() {
   const weekData = [ { date: '16/10/2022', day: 'lundi', courses: [ { name: 'Systèmes Linéaires', begin: '8h', end: '10h', teachers: 'M.Jebri', classes: '1G1 TD3', place: 'A211' } ]},
       { date: '17/10/2022', day: 'mardi', courses: [ {name: 'Systèmes Linéaires', begin: '8h', end: '10h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'}, {name: 'Systèmes électroniques', begin: '10h', end: '12h', teachers: 'M. Duperrier', classes: '1G1 TD3', place: 'A211'}, {name: 'Systèmes Linéaires', begin: '13h30', end: '15h30', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'}, {name: 'Systèmes Linéaires', begin: '15h30', end: '17h30', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'}, {name: 'Systèmes Linéaires', begin: '17h30', end: '20h', teachers: 'M. Jebri', classes: '1G1 TD3', place: 'A211'} ]},

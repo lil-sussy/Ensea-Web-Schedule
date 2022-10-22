@@ -5,6 +5,7 @@
   "dependencies": {
     "http": "latest",
     "next": "latest",
+    "next-session": "^4.0.5",
     "node-sass": "latest",
     "react": "latest",
     "react-dom": "latest",
