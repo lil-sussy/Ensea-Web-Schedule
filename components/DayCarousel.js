@@ -67,7 +67,7 @@ let createDay = (dayData, focused) => {
 }
 
 
-export default function WeekSchedule(props) {
+let WeekSchedule = (props) => {
   useEffect(() => {
   }, [])
   const daysList = [];
@@ -134,3 +134,5 @@ export default function WeekSchedule(props) {
   </Swiper>)
   return swiper;
 }
+
+export default WeekSchedule;
