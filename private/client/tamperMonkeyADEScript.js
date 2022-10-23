@@ -34,12 +34,12 @@ const socket = io('http://localhost:3000', {  // https://enseawebschedule.heroku
   }
 })
 
-socket.on('emit', (data) => {
+socket.on('packet', (data) => {
   console.log('succesfully emited data')
 })
 
 socket.on("disconnect", () => {
-  console.log("disconnected from socket %s", socket.id); // undefined
+  console.log("disconnected from socket");
 });
 
 
