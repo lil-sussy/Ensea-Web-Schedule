@@ -7,6 +7,7 @@ const SocketHandler = (req, res) => {
   } else {
     console.log('Socket is initializing')
     const io = new Server(res.socket.server, {
+      pingTimeout: 30000,
       secure: true,
     })
     res.socket.server.io = io
