@@ -5,10 +5,17 @@ import nextSession from "next-session"
 import loadSchedule from '../components/LoadScheduleData';
 import io from 'socket.io-client'
 import Head from 'next/head'
+import { promisifyStore } from 'next-session/lib/compat';
+import { collection, addDoc, getDocs } from 'firebase/firestore';
+import { app, database } from '../components/firebaseConfig';
 
 let socket
 
-const getSession = nextSession()
+const dbInstance = collection(database, 'sessions');
+
+const getSession = nextSession({
+  // store: promisifyStore(dbInstance)
+})
 
 function App({ views, lastSchedule }) {
   console.log('you have visited this website : ', views)

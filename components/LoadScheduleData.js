@@ -1,8 +1,7 @@
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { app, database } from './firebaseConfig';
 
-
-const dbInstance = collection(database, 'notes');
+const dbInstance = collection(database, 'schedules');
 
 export const saveDB = (data) => {
     addDoc(dbInstance, {
