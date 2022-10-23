@@ -5,113 +5,136 @@
 // @author       Nya UwU
 // @grant        GM_addStyle
 // @require      https://cdn.socket.io/3.1.3/socket.io.min.js
+// @require      https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js
 // @match         https://ade.ensea.fr/direct/index.jsp*
 //
 // ==/UserScript==
 
 // const socket = io('https://enseawebschedule.herokuapp.com', { secure: true, extraHeaders: { 'Access-Control-Allow-Origin': 'https://enseawebschedule.herokuapp.com/' } })
+
+
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
 
-const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
-    transports: ['websocket', 'polling', 'flashsocket'],
-    secure: true,
-    extraHeaders: {
-        'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
-    }
+// const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
+//   transports: ['websocket', 'polling', 'flashsocket'],
+//   secure: true,
+//   query: "tampermonkey extension",
+//   autoConnect: false,
+//   extraHeaders: {
+//     'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
+//   }
+// })
+const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
+  transports: ['websocket', 'polling', 'flashsocket'],
+  secure: false,
+  query: "tampermonkey extension",
+  autoConnect: false,
+  extraHeaders: {
+    'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
+  }
 })
 
-socket.on("connect", () => {
-    console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
-    const engine = socket.io.engine;
-    scraping()
-});
+socket.on('emit', (data) => {
+  console.log('succesfully emited data')
+})
 
 socket.on("disconnect", () => {
-    console.log("disconnected from socket %s", socket.id); // undefined
+  console.log("disconnected from socket %s", socket.id); // undefined
 });
 
 
 function delay(time) {
-    return new Promise(resolve => setTimeout(resolve, time));
+  return new Promise(resolve => setTimeout(resolve, time));
 }
 
 function getCourseData(number, callback) { // return the data of the {number} courses of the week
-    let xpath = document.evaluate('//*[@id="inner' + String(number) + '"]', document).iterateNext() // selecting the first element (course) in the displayed schedule
-    if (xpath == undefined || xpath == null || xpath.getAttribute('aria-label') == undefined) {
-        return
-    }
-    let weekPosition = xpath.parentNode.parentNode.style.left // absolute position in the schedule tab from the left
-    let data = xpath.getAttribute('aria-label').split(' null '); // the arialabel of the div containing schedule lesson info contains the informations of its children (everything to know about this course)
-    let err = data.length == 0
-    data = xpath.getAttribute('aria-label') // We only needed to see if the data was in the correct format but the entire string is sent as data
-    callback(weekPosition, data, err)
+  let xpath = document.evaluate('//*[@id="inner' + String(number) + '"]', document).iterateNext() // selecting the first element (course) in the displayed schedule
+  if (xpath == undefined || xpath == null || xpath.getAttribute('aria-label') == undefined) {
+    return
+  }
+  let weekPosition = xpath.parentNode.parentNode.style.left // absolute position in the schedule tab from the left
+  let data = xpath.getAttribute('aria-label').split(' null '); // the arialabel of the div containing schedule lesson info contains the informations of its children (everything to know about this course)
+  let err = data.length == 0
+  data = xpath.getAttribute('aria-label') // We only needed to see if the data was in the correct format but the entire string is sent as data
+  callback(weekPosition, data, err)
 }
-
+//*[@id="Direct Planning Tree_436"]
 function equalsPercent(a, b, percent) {
-    return (a <= (b + b / percent) && a >= (b - b / percent))
+  return (a <= (b + b / percent) && a >= (b - b / percent))
 }
 
-const scraping = () => {
-    let yearPannelPassed = false;
-    let done = false;
-    document.body.addEventListener('DOMContentLoaded', (event) => {
-        if (!yearPannelPassed) {
-            let yearSelection = document.evaluate('//*[@id="x-auto-16"]', document).iterateNext()
-            if (yearSelection == undefined || yearSelection == null || yearSelection.getAttribute('aria-label') == undefined) {
-                return
-            }
-            console.log(yearSelection)
-            yearSelection.click();
-            let okYearButton = document.evaluate('/html/body/div[2]/div[2]/div[1]/div/div/div/div/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button', document).iterateNext()
-            okYearButton.click();
-            yearPannelPassed = true;
-        } else {
-            let arrowTrainee = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[1]/table/tbody/tr/td[2]/div/div/div/img[2]', document).iterateNext()
-            if (!done && arrowTrainee != undefined && arrowTrainee != null) {
-                arrowTrainee.click()
-                let arrowFirstYear = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[1]/table/tbody/tr/td[2]/div/div/div/img[2]', document).iterateNext()
-                arrowFirstYear.click();
-                let TD3 = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[5]/table/tbody/tr/td[2]/div/div/div', document).iterateNext();
-                TD3.click();
-            }
-        }
-    })
-    document.body.addEventListener('click', (event) => {
+(function scrapingScheduleData() {
+  setTimeout(() => {  // Wait 1s instead of waiting for jquery.load()
+    $('document').ready(() => {  // Doesn't really work, elements are not loaded
+      $('#x-auto-16').ready(() => {  // The on('load') and .load(()=>) functions doenst work as well
+        const yearSelection = $('#x-auto-16')
+        yearSelection.click();
+        let okYearButton = document.evaluate('/html/body/div[2]/div[2]/div[1]/div/div/div/div/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button', document).iterateNext()
+        okYearButton.click();
+        console.log('1G1 TP6', $('#x-auto-230 .x-tree3-node-joint'))
+        setTimeout(() => {  // Wait 1s
+          let tp6 = $('#Direct\\ Planning\\ Tree_436')
+          console.log('clicking on tp6', tp6)
+          tp6.click();
+          // $('#x-auto-230 .x-tree3-node-joint').ready(() => {
+          //     const arrowTrainee = $('#x-auto-230 .x-tree3-node-joint');
+          //     console.log("dom ready, currently navigating through schedules, clicking :", arrowTrainee)
+          //     arrowTrainee.click()
+          //     let arrowFirstYear = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[1]/table/tbody/tr/td[2]/div/div/div/img[2]', document).iterateNext()
+          //     arrowFirstYear.click();
+          //     let TD3 = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[5]/table/tbody/tr/td[2]/div/div/div', document).iterateNext();
+          //     TD3.click();
+          // })
+        }, 1000)
+      })
+      document.addEventListener('close', (event) => {
+        socket.disconnect();
+      })
+      document.body.addEventListener('click', (event) => {
         getCourseData(0, (initialPosition, firstCourseData, err) => { // Get the data of the first course displayed in the week (usually on monday)
-            if (!err) { // Verifying if the scraped data are from the schedule page and not anything else
-                // We do the rest (create an interface and send informations to the server)
-                let data = [firstCourseData],
-                    courseIndex = 1 // index of xth lesson of the week
-                let dayIndex = -1
-                let leftTuesdayPos = document.evaluate('//*[@id="5"]', document).iterateNext().style.left
-                leftTuesdayPos = leftTuesdayPos.slice(0, leftTuesdayPos.length - 1) // removing 'px'
-                const DAY_SIZE = Number(leftTuesdayPos) - SIDE_BAR_SIZE // The width of a day in the displayed week tab
-                while (true) { // Get the rest of the course of the week
-                    getCourseData(courseIndex, (nposition, ndata, err) => {
-                        if (!err) {
-                            ndata = ndata.replaceAll(' null ', ',,') // Theses are parsers regex split :)
-                            if (!equalsPercent(nposition, dayIndex * DAY_SIZE, 5)) {
-                                dayIndex = nposition / DAY_SIZE;
-                                data.push(';-;' + dayIndex + ';-;' + ndata); // Data splitter after the first element
-                            } else {
-                                data.push(ndata + ";;")
-                            }
-                        }
-                    });
-                    if (courseIndex > data.length - 1) { // to avoid infinit loop when we got all the data
-                        data = 'uwu-ade-weekly-shcedule//' + String(data)
-                        console.log(data)
-                        socket.emit(data)
-                        socket.disconnect()
-                        console.log('succesfully sent data')
-                        return;
-                    }
-                    courseIndex++
+          if (!err) { // Verifying if the scraped data are from the schedule page and not anything else
+            // We do the rest (create an interface and send informations to the server)
+            let data = [firstCourseData],
+              courseIndex = 1 // index of xth lesson of the week
+            let dayIndex = -1
+            let leftTuesdayPos = document.evaluate('//*[@id="5"]', document).iterateNext().style.left
+            leftTuesdayPos = leftTuesdayPos.slice(0, leftTuesdayPos.length - 1) // removing 'px'
+            const DAY_SIZE = Number(leftTuesdayPos) - SIDE_BAR_SIZE // The width of a day in the displayed week tab
+            while (true) { // Get the rest of the course of the week
+              getCourseData(courseIndex, (nposition, ndata, err) => {
+                if (!err) {
+                  ndata = ndata.replaceAll(' null ', ',,') // Theses are parsers regex split :)
+                  if (!equalsPercent(nposition, dayIndex * DAY_SIZE, 5)) {
+                    dayIndex = nposition / DAY_SIZE;
+                    data.push(';-;' + dayIndex + ';-;' + ndata); // Data splitter after the first element
+                  } else {
+                    data.push(ndata + ";;")
+                  }
                 }
+              });
+              if (courseIndex > data.length - 1) { // to avoid infinit loop when we got all the data
+                data = 'uwu-ade-weekly-shcedule//' + String(data)
+                console.log(data)
+                socket.connect()
+                socket.on("connect", () => {
+                  console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
+                  const engine = socket.io.engine;
+                  engine.on("packet", (packet) => {
+                    console.log('packet received/sent : ', packet)
+                  })
+                  socket.emit(data)
+                  socket.disconnect()
+                });
+                return;
+              }
+              courseIndex++
             }
+          }
         })
-    }, true);
-};
+      }, true);
+    })
+  }, 1000)
+})();
 /* packet recieved type: message, data: 2["uwu-ade-weekly-shcedule// CM Systèmes électroniques,1ère A ENSEA,DELACRESSONNIÈRE
  Bruno,Amphi Watteau,13h30 - 15h30, TD Analyse de Fourier 1A,1G1 TD3,FAUCARD Bastien,A111,15h30 - 17h30, Amphithéatre scolarité
   (capitalisation : réservé aux redoublants),1ère A ENSEA,1ère B ENSEA,2G1 TD1 (Info / Signal),2G1 TD2 (internationale),2G1 TD3 (Signal /
