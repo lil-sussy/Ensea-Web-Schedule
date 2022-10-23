@@ -15,15 +15,6 @@
 
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
 
-// const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
-//   transports: ['websocket', 'polling', 'flashsocket'],
-//   secure: true,
-//   query: "tampermonkey extension",
-//   autoConnect: false,
-//   extraHeaders: {
-//     'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
-//   }
-// })
 
 function delay(time) {
   return new Promise(resolve => setTimeout(resolve, time));
@@ -46,9 +37,18 @@ function equalsPercent(a, b, percent) {
 }
 
 (function scrapingScheduleData() {
-  const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
+  // const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
+  //   transports: ['websocket', 'polling', 'flashsocket'],
+  //   secure: false,
+  //   query: "tampermonkey extension",
+  //   autoConnect: false,
+  //   extraHeaders: {
+  //     'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
+  //   }
+  // })
+  const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
     transports: ['websocket', 'polling', 'flashsocket'],
-    secure: false,
+    secure: true,
     query: "tampermonkey extension",
     autoConnect: false,
     extraHeaders: {
