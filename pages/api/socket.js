@@ -19,15 +19,19 @@ const SocketHandler = (req, res) => {
     })
     io.on('connection', function(socket) {
     
-      console.log('Client connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
+      console.log('Client connected to socket ', socket); // x8WIv7-mJelg7on_ALbx
     
       socket.conn.once("upgrade", () => {
           // called when the transport is upgraded (i.e. from HTTP long-polling to WebSocket)
       });
+
+      socket.on('connect_error', (err) => {
+        console.log(err)
+      })
     
       socket.conn.on("packet", ({ type, data }) => {
           // called for each packet received
-          console.log('packet recieved type: %s, data: %s', type, data)
+          console.log('packet recieved of type: %s, data: %s', type, data)
           if (data.includes('uwu-ade-weekly-shcedule')) {
             saveDB(data)
             socket.conn.emit('data was loaded correctly. %s', msg);
