@@ -29,6 +29,7 @@ function getCourseData(number, callback) { // return the data of the {number} co
   let data = xpath.getAttribute('aria-label').split(' null '); // the arialabel of the div containing schedule lesson info contains the informations of its children (everything to know about this course)
   let err = data.length == 0
   data = xpath.getAttribute('aria-label') // We only needed to see if the data was in the correct format but the entire string is sent as data
+
   callback(weekPosition, data, err)
 }
 //*[@id="Direct Planning Tree_436"]
@@ -53,7 +54,8 @@ function equalsPercent(a, b, percent) {
     autoConnect: false,
     extraHeaders: {
       'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
-    }
+    },
+    enabledTransports: ['ws', 'wss'],
   })
 
   socket.on('connect_error', (err) => {
@@ -88,7 +90,6 @@ function equalsPercent(a, b, percent) {
         }, 1000)
       })
       document.addEventListener('close', (event) => {
-        socket.disconnect();
       })
       document.body.addEventListener('click', (event) => {
         getCourseData(0, (initialPosition, firstCourseData, err) => { // Get the data of the first course displayed in the week (usually on monday)
@@ -102,8 +103,9 @@ function equalsPercent(a, b, percent) {
             const DAY_SIZE = Number(leftTuesdayPos) - SIDE_BAR_SIZE // The width of a day in the displayed week tab
             while (true) { // Get the rest of the course of the week
               getCourseData(courseIndex, (nposition, ndata, err) => {
-                if (!err) {
+                if (!err) {  // It seems courses data are seperated with <br> html element which are 'null' inside the aria label prop
                   ndata = ndata.replaceAll(' null ', ',,') // Theses are parsers regex split :)
+                  scheduleID = ndata.split(',,')[1]
                   if (!equalsPercent(nposition, dayIndex * DAY_SIZE, 5)) {
                     dayIndex = nposition / DAY_SIZE;
                     data.push(';-;' + dayIndex + ';-;' + ndata); // Data splitter after the first element
@@ -114,6 +116,7 @@ function equalsPercent(a, b, percent) {
               });
               if (courseIndex > data.length - 1) { // to avoid infinit loop when we got all the data
                 data = 'uwu-ade-weekly-shcedule//' + String(data)
+                console.log(data)
                 console.log('data succesfully retrieved. sending...')
                 socket.connect()
                 socket.on("connect", () => {

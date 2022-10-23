@@ -10,7 +10,7 @@ const SocketHandler = (req, res) => {
       // pingTimeout: 30000,
       secure: true,
     })
-    res.socket.server.io = io
+    // res.socket.server.io = io
     io.on('packet', (packet) => {
       console.log('received packet:', packet)
     })
