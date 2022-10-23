@@ -35,6 +35,7 @@ const SocketHandler = (req, res) => {
       });
     
       socket.conn.on("packetCreate", ({ type, data }) => {
+        console.log('packet sent of type : %s, data: ', type, data)
           // called for each packet sent
       });
     
