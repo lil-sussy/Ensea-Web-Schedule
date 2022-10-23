@@ -12,7 +12,7 @@
 // const socket = io('https://enseawebschedule.herokuapp.com', { secure: true, extraHeaders: { 'Access-Control-Allow-Origin': 'https://enseawebschedule.herokuapp.com/' } })
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
 
-const socket = io('https://enseawebschedule.herokuapp.com', {
+const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
     transports: ['websocket', 'polling', 'flashsocket'],
     secure: true,
     extraHeaders: {
@@ -55,12 +55,12 @@ const scraping = () => {
     let yearPannelPassed = false;
     let done = false;
     document.body.addEventListener('DOMContentLoaded', (event) => {
-        console.log(event)
         if (!yearPannelPassed) {
             let yearSelection = document.evaluate('//*[@id="x-auto-16"]', document).iterateNext()
             if (yearSelection == undefined || yearSelection == null || yearSelection.getAttribute('aria-label') == undefined) {
                 return
             }
+            console.log(yearSelection)
             yearSelection.click();
             let okYearButton = document.evaluate('/html/body/div[2]/div[2]/div[1]/div/div/div/div/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button', document).iterateNext()
             okYearButton.click();
@@ -75,7 +75,6 @@ const scraping = () => {
                 TD3.click();
             }
         }
-
     })
     document.body.addEventListener('click', (event) => {
         getCourseData(0, (initialPosition, firstCourseData, err) => { // Get the data of the first course displayed in the week (usually on monday)
@@ -103,6 +102,7 @@ const scraping = () => {
                         data = 'uwu-ade-weekly-shcedule//' + String(data)
                         console.log(data)
                         socket.emit(data)
+                        socket.disconnect()
                         console.log('succesfully sent data')
                         return;
                     }

@@ -6,7 +6,11 @@ const SocketHandler = (req, res) => {
     console.log('Socket is already running')
   } else {
     console.log('Socket is initializing')
-    const io = new Server(res.socket.server)
+    const io = new Server(res.socket.server, {
+      pingTimeout: 30000,
+      secure: true,
+    })
+    res.socket.server.io = io
     io.on('connection', function(socket) {
     
       console.log('Client connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
@@ -20,8 +24,11 @@ const SocketHandler = (req, res) => {
           console.log('packet recieved type: %s, data: %s', type, data)
           if (data.includes('uwu-ade-weekly-shcedule')) {
             saveDB(data)
+            socket.conn.emit('data was loaded correctly. %s', msg);
+          } else {
+            socket.conn.emit('Handshake failed, disconnection')
           }
-          io.emit('data was loaded correctly. %s', msg);
+          socket.disconnect()
       });
     
       socket.conn.on("packetCreate", ({ type, data }) => {
