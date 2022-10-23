@@ -4,7 +4,7 @@
 // @description  ADE onlinhe schedule data scrapper
 // @author       Nya UwU
 // @grant        GM_addStyle
-// @require      https://cdn.socket.io/3.1.3/socket.io.min.js
+// @require      https://cdn.socket.io/3.1.3/socket.io.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.min.js
 // @match         https://ade.ensea.fr/direct/index.jsp*
 //
@@ -24,24 +24,6 @@ const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is cons
 //     'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
 //   }
 // })
-const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
-  transports: ['websocket', 'polling', 'flashsocket'],
-  secure: false,
-  query: "tampermonkey extension",
-  autoConnect: false,
-  extraHeaders: {
-    'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
-  }
-})
-
-socket.on('packet', (data) => {
-  console.log('succesfully emited data')
-})
-
-socket.on("disconnect", () => {
-  console.log("disconnected from socket");
-});
-
 
 function delay(time) {
   return new Promise(resolve => setTimeout(resolve, time));
@@ -64,6 +46,27 @@ function equalsPercent(a, b, percent) {
 }
 
 (function scrapingScheduleData() {
+  const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
+    transports: ['websocket', 'polling', 'flashsocket'],
+    secure: false,
+    query: "tampermonkey extension",
+    autoConnect: false,
+    extraHeaders: {
+      'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
+    }
+  })
+
+  socket.on('connect_error', (err) => {
+    console.log(err)
+  })
+
+  socket.on('packet', (data) => {
+    console.log('succesfully emited data')
+  })
+
+  socket.on("disconnect", () => {
+    console.log("disconnected from socket");
+  });
   setTimeout(() => {  // Wait 1s instead of waiting for jquery.load()
     $('document').ready(() => {  // Doesn't really work, elements are not loaded
       $('#x-auto-16').ready(() => {  // The on('load') and .load(()=>) functions doenst work as well
@@ -73,9 +76,6 @@ function equalsPercent(a, b, percent) {
         okYearButton.click();
         console.log('1G1 TP6', $('#x-auto-230 .x-tree3-node-joint'))
         setTimeout(() => {  // Wait 1s
-          let tp6 = $('#Direct\\ Planning\\ Tree_436')
-          console.log('clicking on tp6', tp6)
-          tp6.click();
           // $('#x-auto-230 .x-tree3-node-joint').ready(() => {
           //     const arrowTrainee = $('#x-auto-230 .x-tree3-node-joint');
           //     console.log("dom ready, currently navigating through schedules, clicking :", arrowTrainee)
@@ -114,7 +114,7 @@ function equalsPercent(a, b, percent) {
               });
               if (courseIndex > data.length - 1) { // to avoid infinit loop when we got all the data
                 data = 'uwu-ade-weekly-shcedule//' + String(data)
-                console.log(data)
+                console.log('data succesfully retrieved. sending...')
                 socket.connect()
                 socket.on("connect", () => {
                   console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
