@@ -19,14 +19,14 @@ const getSession = nextSession({
 
 function App({ views, lastSchedule }) {
   console.log('you have visited this website : ', views)
-  const [isMounted, setIsMounted] = useState(false);
+  const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const socketInitializer = async () => {
-    await fetch('/api/socket')
-    socket = io()
+    // await fetch('/api/socket')
+    // socket = io()
 
-    socket.on('connect', () => {
-      console.log('connected')
-    })
+    // socket.on('connect', () => {
+    //   console.log('connected')
+    // })
   }
   useEffect(() => {
     setIsMounted(true);
@@ -64,12 +64,12 @@ function App({ views, lastSchedule }) {
 
 const DEFAULT_SCHEDULE = "1G1 TP6";
 
-indexPage.getInitialProps = async ({ req, res }) => {
+indexPage.getInitialProps = async ({ req, res }) => {  // Generate props on server side
   const session = await getSession(req, res); // make { autoCommit: false }: false and it will correctly redirect
-  session.views = session.views ? session.views + 1 : 1;
+  session.views = session.views ? session.views + 1 : 1;  // View counter
   session.lastSchedule = session.lastSchedule ? session.lastSchedule : DEFAULT_SCHEDULE;
   return {
-    views: session.views,
+    views: session.views,  // Informations passed in App constructor
     lastSchedule: session.lastSchedule
   };
 }
