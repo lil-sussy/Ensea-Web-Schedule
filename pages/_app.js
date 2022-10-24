@@ -3,7 +3,7 @@ import '../pages/main.css';
 import '../styles/globals.css';
 
 export default class MyApp extends App {
-  static async getInitialProps({ Component, router, ctx }) {
+  static async getInitialProps({ Component, router, ctx }) {  // Constructor of MyApp, called by nextjs
     let pageProps = {};
 
     if (Component.getInitialProps) {
@@ -13,9 +13,9 @@ export default class MyApp extends App {
   }
   
   render() {
-    const { Component, pageProps } = this.props;
+    const { Component, pageProps } = this.props;  // props initialized in constructor above
 
-    return (
+    return (  // Returning component its own props
       <Component {...pageProps} />
     );
   }

@@ -1,9 +1,9 @@
 import { Server } from 'socket.io'
 import saveDB from '../../components/LoadScheduleData'
 
-const SocketHandler = (req, res) => {
-  if (res.socket.server.io) {
-    console.log('Socket is already running')
+const SocketHandler = (req, res) => {  // Socket io of the server
+  if (res.socket.server.io) {  // Not used
+    console.log('Socket is already running')  // There is a lot of socket that are connected to socket io when a client is simply opening a page on a browser, this is ignored
   } else {
     console.log('Socket is initializing')
     const io = new Server(res.socket.server, {
@@ -19,7 +19,7 @@ const SocketHandler = (req, res) => {
     })
     io.on('connection', function(socket) {
     
-      console.log('Client connected to socket ', socket); // x8WIv7-mJelg7on_ALbx
+      console.log('Client connected to socket %s', socket.id); // x8WIv7-mJelg7on_ALbx
     
       socket.conn.once("upgrade", () => {
           // called when the transport is upgraded (i.e. from HTTP long-polling to WebSocket)
@@ -38,7 +38,6 @@ const SocketHandler = (req, res) => {
           } else {
             socket.conn.emit('Handshake failed, disconnection')
           }
-          socket.disconnect()
       });
     
       socket.conn.on("packetCreate", ({ type, data }) => {
@@ -51,6 +50,7 @@ const SocketHandler = (req, res) => {
       });
     
       socket.conn.on("close", (reason) => {
+        console.log("Connection closed %s", reason)
           // called when the underlying connection is closed
       });
       socket.on('disconnect', () => {

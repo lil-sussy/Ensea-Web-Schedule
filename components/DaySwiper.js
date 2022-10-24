@@ -3,7 +3,7 @@ import { Swiper, SwiperSlide, SwiperProps } from "swiper/react";
 import "swiper/swiper-bundle.min.css";
 
 import SwiperCore, { EffectCreative, EffectFlip, EffectCube, Navigation, Pagination } from "swiper";
-
+  // Other effects : EffectCreative, EffectCube. Navigation : Navigation
 import "swiper/css/effect-creative"
 SwiperCore.use([EffectFlip])
 
@@ -13,8 +13,8 @@ let createDay = (dayData, focused) => {
   const colors = ['red', 'orange,', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose' ]
   courses.map((course) => {
     let courseClasses = "Course h-full w-80 rounded-xl opacity-80";
-    const color = colors[Math.round(Math.random()*colors.length)]
-    courseClasses += " bg-"+color+"-100 begin-" + course.begin + " end-" + course.end + "";
+    const color = colors[Math.round(Math.random()*colors.length)]  // This does work
+    courseClasses += " bg-"+color+"-100 begin-" + course.begin + " end-" + course.end + "";  // but this doesnt work for some reasons, if there is too many courses, the colors aren't shown
     divCourses.push(
       <div key={course.begin} className={courseClasses}>
         <h3 className=""> {course.name} </h3>
@@ -77,36 +77,47 @@ export default function WeekSchedule(props) {
     else
       daysList.push(createDay(dayData, true))
   });
+  let animation_last_pos = -1;
+  const HUGE_DIFFERENTIAL = 10;  // 10px
   const NiceAnimation = (swiper) => {
     if (swiper.destroyed === true) {
       return
     }
-    const slideSize = swiper.size
-    const snapGrid = swiper.snapGrid
-    const swiperPos = -swiper.translate
+    const slideSize = swiper.size  // Taille d'une slide = taille du swiper width
+    const snapGrid = swiper.snapGrid  // Positions horizontales des slides
+    const swiperPos = -swiper.translate  // Actuel translation du swiper (position du centre du swiper)
+    animation_last_pos = swiperPos;
+    const dx = animation_last_pos === -1 ? 0 : Math.abs(swiperPos - animation_last_pos);  // Movement
     const maxIndex = swiper.slides.length
-    for (let index = 0; index < maxIndex; index++) {
-      let p = - (snapGrid[index] - swiperPos) / slideSize
-      p = p < -1 ? -1 : p;
-      p = p > 1 ? 1 : p;
-      swiper.slides[index].style.transitionProperty = "transform"
-      swiper.slides[index].style.transitionDuration = "0ms"
-      swiper.slides[index].style.transform = "scale(" + (0.8 + 0.2*(1-Math.abs(p))) + ") translateX(" + (p * 30) + "%)"
-      swiper.slides[index].style.transitionProperty = "transform"
-      swiper.slides[index].style.transitionDuration = "700ms"
+    for (let index = 0; index < maxIndex; index++) {  // parcours des slides
+      let p = - (snapGrid[index] - swiperPos) / slideSize  // Distance entre le centre du swiper et la slide normé par sa taille
+      p = p < -1 ? -1 : p;  // Normalisation du pourcentage entre 1 et -1
+      p = p > 1 ? 1 : p;  // Le pourcentage est l'avancement de la transition
+      // peut *être remplacer par animate.js
+      const z_index = 2 - Math.round(Math.abs(p));  // either 2 or 1
+      const scale = 0.8 + 0.2*(1-Math.abs(p));
+      const transX = p * 30;  // Relative
+      swiper.slides[index].style.z_index = z_index;  // Central slide should be in front of the others
+      swiper.slides[index].style.transform = "scale(" + scale + ") translateX(" + transX + "%)"
+      if (dx >= HUGE_DIFFERENTIAL) {  // Bigger than 10px
+        swiper.slides[index].style.transitionDuration = "1000ms"  // God that's smooth
+      } else {
+        swiper.slides[index].style.transitionDuration = "0ms"
+      }
     }
   }
-  const onInit = (swiper) => {
+  const onInit = (swiper) => {  // On swipper initialization
+    swiper.slides[index].style.transitionProperty = "transform"  // Transition of the end
+    swiper.slides[index].style.transitionDuration = "0ms"  // (Replacement transition)
     NiceAnimation(swiper)
-    const observer = new MutationObserver(function (mutations) {
+    const observer = new MutationObserver(function (mutations) {  // Style observer
       NiceAnimation(swiper)
     });
     const target = document.getElementsByClassName('swiper-wrapper');
     observer.observe(target[0], { attributes: true, attributeFilter: ['style'] });
   }
-  const onTransitionStart = (swiper) => {
+  const onTransitionStart = (swiper) => {  // This is called to late and so, doesn't work -> DELETE
     for (let index = 0; index < swiper.slides.length; index++) {
-      swiper.slides[index].style.transitionProperty = "transform"
       swiper.slides[index].style.transitionDuration = "1000ms"
     }
   }
@@ -124,7 +135,7 @@ export default function WeekSchedule(props) {
     navigation={false}
     loop={false}
     autoplay={false}
-    onTouchEnd={onTransitionStart}
+    onTransitionStart={onTransitionStart}
     onInit={onInit}
     pagination={{ clickable: true }}
   >
