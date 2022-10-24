@@ -15,12 +15,7 @@
 
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
 
-
-function delay(time) {
-  return new Promise(resolve => setTimeout(resolve, time));
-}
-
-function getCourseData(number, callback) { // return the data of the {number} courses of the week
+function getCourseData(number) { // return the data of the {number} courses of the week
   let xpath = document.evaluate('//*[@id="inner' + String(number) + '"]', document).iterateNext() // selecting the first element (course) in the displayed schedule
   if (xpath == undefined || xpath == null || xpath.getAttribute('aria-label') == undefined) {
     return
@@ -29,15 +24,13 @@ function getCourseData(number, callback) { // return the data of the {number} co
   let data = xpath.getAttribute('aria-label').split(' null '); // the arialabel of the div containing schedule lesson info contains the informations of its children (everything to know about this course)
   let err = data.length == 0
   data = xpath.getAttribute('aria-label') // We only needed to see if the data was in the correct format but the entire string is sent as data
-
-  callback(weekPosition, data, err)
-}
-//*[@id="Direct Planning Tree_436"]
-function equalsPercent(a, b, percent) {
-  return (a <= (b + b / percent) && a >= (b - b / percent))
+  if (err)
+    return null;
+  else
+    return data;
 }
 
-(function scrapingScheduleData() {
+function createSocketInstance() {
   // const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
   //   transports: ['websocket', 'polling', 'flashsocket'],
   //   secure: false,
@@ -57,40 +50,99 @@ function equalsPercent(a, b, percent) {
     },
     enabledTransports: ['ws', 'wss'],
   })
-
+  
   socket.on('connect_error', (err) => {
     console.log(err)
   })
-
+  
   socket.on('packet', (data) => {
     console.log('succesfully emited data')
   })
-
+  
   socket.on("disconnect", () => {
     console.log("disconnected from socket");
   });
-  setTimeout(() => {  // Wait 1s instead of waiting for jquery.load()
-    $('document').ready(() => {  // Doesn't really work, elements are not loaded
-      $('#x-auto-16').ready(() => {  // The on('load') and .load(()=>) functions doenst work as well
-        const yearSelection = $('#x-auto-16')
-        yearSelection.click();
-        let okYearButton = document.evaluate('/html/body/div[2]/div[2]/div[1]/div/div/div/div/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button', document).iterateNext()
-        okYearButton.click();
-        console.log('1G1 TP6', $('#x-auto-230 .x-tree3-node-joint'))
-        setTimeout(() => {  // Wait 1s
-          // $('#x-auto-230 .x-tree3-node-joint').ready(() => {
-          //     const arrowTrainee = $('#x-auto-230 .x-tree3-node-joint');
-          //     console.log("dom ready, currently navigating through schedules, clicking :", arrowTrainee)
-          //     arrowTrainee.click()
-          //     let arrowFirstYear = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[1]/table/tbody/tr/td[2]/div/div/div/img[2]', document).iterateNext()
-          //     arrowFirstYear.click();
-          //     let TD3 = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[5]/table/tbody/tr/td[2]/div/div/div', document).iterateNext();
-          //     TD3.click();
-          // })
-        }, 1000)
-      })
+  return socket;
+}
+
+function delay(time, callback) {
+  setTimeout(callback, time);
+}
+
+function init() {  // Initial navigation through ADE
+  $('#x-auto-16').ready(() => {  // The on('load') and .load(()=>) functions doenst work as well
+    const yearSelection = $('#x-auto-16')
+    yearSelection.click();
+    let okYearButton = document.evaluate('/html/body/div[2]/div[2]/div[1]/div/div/div/div/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button', document).iterateNext()
+    okYearButton.click();
+    console.log('1G1 TP6', $('#x-auto-230 .x-tree3-node-joint'))
+    delay(1000, () => {  // Wait 1s
+      week11.click();
+      // $('#x-auto-230 .x-tree3-node-joint').ready(() => {
+      //     const arrowTrainee = $('#x-auto-230 .x-tree3-node-joint');
+      //     console.log("dom ready, currently navigating through schedules, clicking :", arrowTrainee)
+      //     arrowTrainee.click()
+      //     let arrowFirstYear = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[1]/table/tbody/tr/td[2]/div/div/div/img[2]', document).iterateNext()
+      //     arrowFirstYear.click();
+      //     let TD3 = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[5]/table/tbody/tr/td[2]/div/div/div', document).iterateNext();
+      //     TD3.click();
+      // })
+    })
+  })
+}
+
+const _1G1_TP1 = $("#Direct\\ Planning\\ Tree_430 > div > span.x-tree3-node-text")
+const _1G1_TP2 = $("#Direct\\ Planning\\ Tree_431 > div > span.x-tree3-node-text")
+const _1G2_TP6 = $("#Direct\\ Planning\\ Tree_642 > div > span.x-tree3-node-text")
+const _1G3_TP1 = $("#Direct\\ Planning\\ Tree_454 > div > span.x-tree3-node-text")
+const _1G3_TP5 = $("#Direct\\ Planning\\ Tree_573 > div > span.x-tree3-node-text")
+
+const SP_GP2 = $("#Direct\\ Planning\\ Tree_544 > div > span.x-tree3-node-text")
+document.querySelector("#Direct\\ Planning\\ Tree_404")
+
+
+(function scrapingScheduleData() {
+  delay(1000, () => {  // Wait 1s instead of waiting for jquery.load()
+    init()
+    $('document').ready(() => {  // Doesn't really work, elements are not loaded at this point
       document.addEventListener('close', (event) => {
       })
+      const week1_ = $("#x-auto-174 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
+      const week11 = $("#x-auto-184 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
+      const week12 = $("#x-auto-185 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
+      const week47 = $("#x-auto-220 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")  // Hope that makes it clear, this is the plan :)
+
+      //must wait for user to be ready on a schedule
+      let coursesData = "";
+      for (let i = 174; i <= 220; i++) {  // yep !
+        const weekButton = $("#x-auto-"+i+" > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
+        weekButton.click()
+        const weekID = i - 174;  // The weekIDth week of the year
+        const monday = $("#x-auto-162 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
+        const friday = $("#x-auto-166 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
+        let weekCoursesData = "";
+        for (let j = 162; i <= 166; i++) {
+          const dayButton = $('#x-auto-'+i+' > tbody > tr:nth-child(2) > td.x-btn-mc > em > button')
+          dayButton.click()
+          const dayID = i - 162;  // monday:0 friday:4
+          let courseIndex = 0;
+          let dayCoursesData = ""
+          while (courseIndex != -1) {
+            courseIndex++;
+            courseData = getCourseData(courseIndex);  // Getting course data
+            if (courseData != null) {
+              courseData = courseData.replaceAll(' null ', ',,') // in aria label, <br> elements are null
+              scheduleID = courseData.split(',,')[1]  // Id of the course (the course classe)
+              dayCoursesData += ";; " + scheduleID + ";;" + courseData  // Separator of the courses of the same day
+            } else {
+              courseIndex = -1;
+            }
+          }
+          weekCoursesData += ';-;' + dayIndex + ';-;' + dayCoursesData; // Separator for different days of the same week
+        }
+        coursesData += weekCoursesData;
+      }
+
       document.body.addEventListener('click', (event) => {
         getCourseData(0, (initialPosition, firstCourseData, err) => { // Get the data of the first course displayed in the week (usually on monday)
           if (!err) { // Verifying if the scraped data are from the schedule page and not anything else
@@ -98,19 +150,15 @@ function equalsPercent(a, b, percent) {
             let data = [firstCourseData],
               courseIndex = 1 // index of xth lesson of the week
             let dayIndex = -1
-            let leftTuesdayPos = document.evaluate('//*[@id="5"]', document).iterateNext().style.left
-            leftTuesdayPos = leftTuesdayPos.slice(0, leftTuesdayPos.length - 1) // removing 'px'
-            const DAY_SIZE = Number(leftTuesdayPos) - SIDE_BAR_SIZE // The width of a day in the displayed week tab
             while (true) { // Get the rest of the course of the week
-              getCourseData(courseIndex, (nposition, ndata, err) => {
+              getCourseData(courseIndex, (courseLeftPosition, ndata, err) => {
                 if (!err) {  // It seems courses data are seperated with <br> html element which are 'null' inside the aria label prop
                   ndata = ndata.replaceAll(' null ', ',,') // Theses are parsers regex split :)
                   scheduleID = ndata.split(',,')[1]
-                  if (!equalsPercent(nposition, dayIndex * DAY_SIZE, 5)) {
-                    dayIndex = nposition / DAY_SIZE;
-                    data.push(';-;' + dayIndex + ';-;' + ndata); // Data splitter after the first element
+                  console.log(courseLeftPosition, '/', DAY_SIZE)
+                  if (courseLeftPosition % DAY_SIZE == 0) {  // If the lesson left pos is a multiple of tuesday left pos (should be the begining of another day)
                   } else {
-                    data.push(ndata + ";;")
+                    
                   }
                 }
               });
@@ -136,19 +184,11 @@ function equalsPercent(a, b, percent) {
         })
       }, true);
     })
-  }, 1000)
+  })
 })();
-/* packet recieved type: message, data: 2["uwu-ade-weekly-shcedule// CM Systèmes électroniques,1ère A ENSEA,DELACRESSONNIÈRE
- Bruno,Amphi Watteau,13h30 - 15h30, TD Analyse de Fourier 1A,1G1 TD3,FAUCARD Bastien,A111,15h30 - 17h30, Amphithéatre scolarité
-  (capitalisation : réservé aux redoublants),1ère A ENSEA,1ère B ENSEA,2G1 TD1 (Info / Signal),2G1 TD2 (internationale),2G1 TD3 (Signal /
-   Elec),2G2 TD1 (Info/ Elec),2G2 TD2 (Info/ Elec),2G2 TD3 (Info/ Autom),2G3 TD1 (Elec / Autom),2G3 TD2 (Signal / Info),TAUVEL Antoine,Amphi
-    Watteau,17h30 - 18h30, TD Systèmes électronique,1G1 TD3,DUPERRIER Cédric,A111,08h00 - 10h00, TD Systèmes linéaires,1G1 TD3,JEBRI Ayoub,A110,
-    10h00 - 12h00, CM Langage C,1ère A ENSEA,1ère B ENSEA,TAUVEL Antoine,Amphi Watteau,13h30 - 15h30, CM Electromagnétisme 1A,1ère A ENSEA,
-    TEMCAMANI Farid,Amphi Watteau,15h30 - 17h30, TD Anglais 1A S5,1G1 TD1,1G1 TD2,1G1 TD3,BEDIRA Sami,TOPCZYNSKI Magalie,ROMON Emmanuelle,HAOUES
-     Faiza,A206,A207,A208,A210,08h00 - 10h00, TDm Langage C,1G1 TD3,RENTON Guillaume,A205,08h00 - 12h00, CM Systèmes linéaires,1ère A ENSEA,
-     1ère B ENSEA,DJEMAI Mohamed,Amphi Watteau,08h00 - 10h00, CM Analyse de Fourier,1ère A ENSEA,NICOLAU Florentina,Amphi Watteau,10h00 - 12h00
-     , TD Allemand / Espagnol 1A S5,1G1 TD1,1G1 TD2,1G1 TD3,PAAPE Iris,FLINT LUH Stéphanie,CHIPI Eneko,GALDEANO Jean-François,MARINAS Ruth,A105
-     ,A107,A106,A208,A209,13h30 - 15h30, TD Systèmes électronique,1G1 TD3,DUPERRIER Cédric,A111,15h30 - 17h30"] */
+/* 
+uwu-ade-weekly-shcedule// TD BE Physique null 1G1 TD1 null DUPREY Quentin null A204 null 08h00 - 10h00,;-;NaN/1G1 TD1;-; TD BE Physique,,1G1 TD1,,DUPREY Quentin,,A204,,10h00 - 12h00,;-;NaN/1G1 TP1;-; TP Electronique Numérique,,1G1 TP1,,JOSSE Christian,,C303,,13h30 - 17h30,;-;NaN/1G1 TP2;-; TP Electronique Numérique,,1G1 TP2,,GERALDO Frédéric,,C304,,13h30 - 17h30,;-;NaN/1G1 TD2;-; TD BE Physique,,1G1 TD2,,FAYE Christian,,A201,,08h00 - 10h00,;-;NaN/1G1 TD2;-; TD BE Physique,,1G1 TD2,,FAYE Christian,,A201,,10h00 - 12h00,;-;NaN/1G1 TP4;-; TP Systèmes Electroniques,,1G1 TP4,,LAROCHE Christian,,C203,,13h30 - 17h30,;-;NaN/1G1 TD3;-; TD BE Physique,,1G1 TD3,,BOURDEL Emmanuelle,,A212,,08h00 - 10h00,;-;NaN/1G1 TD3;-; TD BE Physique,,1G1 TD3,,BOURDEL Emmanuelle,,A212,,10h00 - 12h00,;-;NaN/1G1 TP5;-; TP Systèmes Electroniques,,1G1 TP5,,QUINTANEL Sébastien,,C204,,13h30 - 17h30,;-;NaN/1G1 TP6;-; TP Systèmes Electroniques,,1G1 TP6,,DUPERRIER Cédric,,C205,,13h30 - 17h30,;-;NaN/1G2 TP1;-; TP Electronique Numérique,,1G2 TP1,,LAROCHE Christian,,C303,,08h00 - 12h00,;-;NaN/1G2 TD1;-; TD Probabilité 1A,,1G2 TD1,,AUGIER Adeline,,A201,,13h30 - 15h30,;-;NaN/1G2 TP2;-; TP Electronique Numérique,,1G2 TP2,,FIACK Laurent,,C304,,08h00 - 12h00,;-;NaN/1G2 TP3;-; TP Electronique Numérique,,1G2 TP3,,GERALDO Frédéric,,C305,,08h00 - 12h00,;-;NaN/1G2 TP3;-; TP Mathématiques 1A,,1G2 TP3,,HOUAS Heykel,,D065,,13h30 - 17h30,;-;NaN/1G2 TP4;-; TP Systèmes Electroniques,,1G2 TP4,,SABOURAUD-MULLER Carine,,C106,,08h00 - 12h00,;-;NaN/1G2 TP5;-; TP Systèmes Electroniques,,1G2 TP5,,DUPERRIER Cédric,,C204,,08h00 - 12h00,;-;NaN/1G2 TP6;-; TP Systèmes Electroniques,,1G2 TP6,,JOSSE Christian,,C205,,08h00 - 12h00,;-;NaN/1G1 TP3;-; TP Electronique Numérique,,1G1 TP3,,KARABERNOU Si Mahmoud,,C305,,13h30 - 17h30,;-;NaN/1G1 TD3;-; TD Probabilité 1A,,1G1 TD3,,AGGOUNE Woihida,,A110,,13h30 - 15h30,;-;NaN/1G1 TD3;-; TD Electromagnétisme,,1G1 TD3,,FAYE Christian,,A05,,15h30 - 17h30,;-;NaN/1G1 TP6;-; TP Conversion d'énergie en alternatif,,1G1 TP6,,DEL FRANCO Giovanni,,D267,,08h00 - 12h00,;-;NaN/1G2 TD1;-; TD Anglais 1A,,1G2 TD1,,1G2 TD2,,1G2 TD3,,BEDIRA Sami,,FEARON Mel,,TOPCZYNSKI Magalie,,ROMON Emmanuelle,,A206,,A207,,A208,,A209,,08h00 - 10h00,;-;NaN/1G2 TD1;-; TD Analyse complexe,,1G2 TD1,,DUPREY Quentin,,A304,,10h00 - 12h00,;-;NaN/1G2 TD1;-; TD Probabilité 1A,,1G2 TD1,,AUGIER Adeline,,A201,,13h30 - 15h30,;-;NaN/1G2 TD2;-; TD Probabilité 1A,,1G2 TD2,,AGGOUNE Woihida,,A211,,10h00 - 12h00,;-;NaN/1G2 TD2;-; TD Systèmes électroniques,,1G2 TD2,,DUPERRIER Cédric,,A211,,13h30 - 15h30,;-;NaN/1G2 TD2;-; TD Probabilité 1A,,1G2 TD2,,AGGOUNE Woihida,,A110,,15h30 - 17h30,;-;NaN/1G2 TD3;-; TD Systèmes électroniques,,1G2 TD3,,QUINTANEL Sébastien,,A203,,13h30 - 15h30,;-;NaN/1G1 TD1;-; TD Anglais 1A,,1G1 TD1,,1G1 TD2,,1G1 TD3,,BEDIRA Sami,,FEARON Mel,,TOPCZYNSKI Magalie,,ROMON Emmanuelle,,A206,,A207,,A208,,A210,,08h00 - 10h00,;-;NaN/1ère A ENSEA;-; CM Electromagnétisme 1A,,1ère A ENSEA,,TEMCAMANI Farid,,Amphi Watteau,,10h00 - 12h00,;-;NaN/1G1 TD1;-; TD Systèmes électroniques,,1G1 TD1,,DELACRESSONNIÈRE Bruno,,A108,,13h30 - 15h30,;-;NaN/1G1 TD2;-; TD Analyse complexe,,1G1 TD2,,DUPREY Quentin,,A304,,15h30 - 17h30,;-;NaN/1G1 TD3;-; TD Systèmes électroniques,,1G1 TD3,,DUPERRIER Cédric,,A211,,13h30 - 15h30,;-;NaN/1G1 TD3;-; TD Analyse complexe,,1G1 TD3,,SALIBA Charbel,,A112,,15h30 - 17h30,;-;NaN/1G2 TD1;-; TD BE Physique,,1G2 TD1,,BOURDEL Emmanuelle,,A204,,08h00 - 10h00,;-;NaN/1G2 TD1;-; TD BE Physique,,1G2 TD1,,BOURDEL Emmanuelle,,A204,,15h30 - 17h30,;-;NaN/1G2 TD2;-; TD BE Physique,,1G2 TD2,,FAYE Christian,,A205,,08h00 - 10h00,;-;NaN/1G2 TD2;-; TD BE Physique,,1G2 TD2,,FAYE Christian,,A205,,15h30 - 17h30,;-;NaN/1G2 TD3;-; TD BE Physique,,1G2 TD3,,TEMCAMANI Farid,,A201,,08h00 - 10h00,;-;NaN/1G2 TD3;-; TD Analyse complexe,,1G2 TD3,,DUPREY Quentin,,A109,,13h30 - 15h30,;-;NaN/1G2 TD3;-; TD BE Physique,,1G2 TD3,,TEMCAMANI Farid,,A210,,15h30 - 17h30,;-;NaN/1ère A ENSEA;-; CM Analyse complexe,,1ère A ENSEA,,DUPREY Quentin,,Amphi Watteau,,08h00 - 10h00,;-;NaN/1G1 TD1;-; TD Analyse complexe,,1G1 TD1,,DUPREY Quentin,,A108,,10h00 - 12h00,;-;NaN/1ère A ENSEA;-; CM Quantique 1A,,1ère A ENSEA,,DUPREY Quentin,,Amphi Watteau,,08h00 - 10h00,;-;NaN/1G1 TD1;-; TD Systèmes électroniques,,1G1 TD1,,DELACRESSONNIÈRE Bruno,,A108,,10h00 - 12h00,;-;NaN/1G1 TD1;-; TD Allemand / Espagnol 1A,,1G1 TD1,,1G1 TD2,,1G1 TD3,,PAAPE Iris,,FLINT LUH Stéphanie,,CHIPI Eneko,,GALDEANO Jean-François,,MARINAS Ruth,,A105,,A107,,A106,,A208,,A209,,13h30 - 15h30,;-;NaN/1G1 TD2;-; TD Systèmes électroniques,,1G1 TD2,,LAROCHE Christian,,A212,,10h00 - 12h00,;-;NaN/1G1 TD2;-; TD Systèmes électroniques,,1G1 TD2,,LAROCHE Christian,,A08,,15h30 - 17h30,;-;NaN/1G1 TD3;-; TD Systèmes électroniques,,1G1 TD3,,DUPERRIER Cédric,,A111,,10h00 - 12h00,;-;NaN/1G2 TD1;-; TD Systèmes électroniques,,1G2 TD1,,SABOURAUD-MULLER Carine,,A07,,10h00 - 12h00,;-;NaN/1G2 TD1;-; TD Systèmes électroniques,,1G2 TD1,,SABOURAUD-MULLER Carine,,A08,,13h30 - 15h30,;-;NaN/1G2 TD1;-; TD Allemand / Espagnol 1A,,1G2 TD1,,1G2 TD2,,1G2 TD3,,PAAPE Iris,,FLINT LUH Stéphanie,,CHIPI Eneko,,GALDEANO Jean-François,,MARINAS Ruth,,A105,,A107,,A106,,A208,,A209,,15h30 - 17h30,;-;NaN/1G2 TD3;-; TD Systèmes électroniques,,1G2 TD3,,QUINTANEL Sébastien,,A112,,10h00 - 12h00,;-;NaN/1G2 TD3;-; TD Probabilité 1A,,1G2 TD3,,AGGOUNE Woihida,,A201,,13h30 - 15h30
+*/
 // (function(window) {
 //     var last = +new Date();
 //     var delay = 100; // default delay
