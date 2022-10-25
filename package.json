@@ -22,7 +22,8 @@
     "dev": "next start",
     "build": "next build",
     "alt-start": "next start",
-    "start": "NODE_ENV=production next start",
+    "start": "next start",
+    "prod": "NODE_ENV=production next start",
     "export": "next export"
   },
   "eslintConfig": {

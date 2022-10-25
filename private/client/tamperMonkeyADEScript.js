@@ -178,10 +178,11 @@ async function sleep(time) {
               coursesData += '/-/' + weekID + '/-/' + weekCoursesData;
             }
             console.log('data fetched!')
-            console.log(coursesData);
             scrapperState.innerHtml = "ready";
-            data = 'uwu-ade-weekly-shcedule//' + String(data)
+            console.log(coursesData)
+            coursesData = 'uwu-ade-weekly-shcedule//' + String(coursesData)
             console.log('data succesfully retrieved. sending...')
+            socket = createSocketInstance()
             socket.connect()
             socket.on("connect", () => {
               console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
@@ -189,7 +190,7 @@ async function sleep(time) {
               engine.on("packet", (packet) => {
                 console.log('packet received/sent : ', packet)
               })
-              socket.emit(data)
+              socket.emit(coursesData)
               socket.disconnect()
             });
           });

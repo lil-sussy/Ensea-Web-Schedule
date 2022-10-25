@@ -21,12 +21,12 @@ function App({ views, lastSchedule }) {
   console.log('you have visited this website : ', views)
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const socketInitializer = async () => {
-    // await fetch('/api/socket')
-    // socket = io()
+    await fetch('/api/socket')
+    socket = io()
 
-    // socket.on('connect', () => {
-    //   console.log('connected')
-    // })
+    socket.on('connect', () => {
+      console.log('connected')
+    })
   }
   useEffect(() => {
     setIsMounted(true);
