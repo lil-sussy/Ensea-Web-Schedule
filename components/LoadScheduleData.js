@@ -14,8 +14,8 @@ const saveDB = async (data) => {
 
 const loadSchedule = async (classe) => {
   const scheduleData = []
-  const schedules = schedules.get(classe)
-  await schedules.foreach(async (classeSchedule) => {
+  const classeSchedules = schedules.get(classe)
+  await classeSchedules.foreach(async (classeSchedule) => {
     const docRef = doc(dbInstance, "schedules", classeSchedule)
     const courses = await getDocs(docRef)
       .then((data) => {

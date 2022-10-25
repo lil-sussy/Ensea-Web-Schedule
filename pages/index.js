@@ -18,7 +18,7 @@ const getSession = nextSession({
   // store: promisifyStore(dbInstance)
 })
 
-function App({ views, lastSchedule }) {
+function App({ views, weekData }) {
   console.log('you have visited this website : ', views)
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const socketInitializer = async () => {
@@ -37,8 +37,7 @@ function App({ views, lastSchedule }) {
   if (!isMounted) {
     return null;
   }
-  const [weekData, setWeekData] = useState(loadSchedule(lastSchedule))
-
+  
   return (
     <div className="App">
       <div className="ENSEABackground background bg-cover bg-center h-screen w-screen transition"></div>
@@ -69,6 +68,7 @@ indexPage.getInitialProps = async ({ req, res }) => {  // Generate props on serv
   const session = await getSession(req, res); // make { autoCommit: false }: false and it will correctly redirect
   session.views = session.views ? session.views + 1 : 1;  // View counter
   session.lastSchedule = session.lastSchedule ? session.lastSchedule : DEFAULT_SCHEDULE;
+  const schedule = loadSchedule(session.lastSchedule)
   return {
     views: session.views,  // Informations passed in App constructor
     lastSchedule: session.lastSchedule
