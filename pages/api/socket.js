@@ -18,6 +18,7 @@ const SocketHandler = (req, res) => {  // Socket io of the server
       console.log(err)
     })
     io.on('connection', function(socket) {
+      loadScheduleDataFromString('fdfsfds')
     
       console.log('Client connected to socket %s', socket.id); // x8WIv7-mJelg7on_ALbx
     
@@ -31,7 +32,7 @@ const SocketHandler = (req, res) => {  // Socket io of the server
     
       socket.conn.on("packet", ({ type, data }) => {
           // called for each packet received
-          console.log('packet recieved of type: %s, data: %s', type, data)
+          console.log('packet recieved of type: %s, data: %s', type, data.slice(0, 30))
           if (data.includes('uwu-ade-weekly-shcedule')) {
             loadScheduleDataFromString(data)
             socket.conn.emit('data was loaded correctly. %s', msg);
