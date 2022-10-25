@@ -109,7 +109,6 @@ const _1G1_TP2 = $("#Direct\\ Planning\\ Tree_431 > div > span.x-tree3-node-text
 const _1G2_TP6 = $("#Direct\\ Planning\\ Tree_642 > div > span.x-tree3-node-text")
 const _1G3_TP1 = $("#Direct\\ Planning\\ Tree_454 > div > span.x-tree3-node-text")
 const _1G3_TP5 = $("#Direct\\ Planning\\ Tree_573 > div > span.x-tree3-node-text")
-
 const SP_GP2 = $("#Direct\\ Planning\\ Tree_544 > div > span.x-tree3-node-text")
 */
 
@@ -166,13 +165,13 @@ async function sleep(time) {
                 const dayID = day - 162;  // monday:0 friday:4
                 let courseIndex = 0;
                 let dayCoursesData = ""
-                const test = await sleep(200);
+                const test = await sleep(100);
                 while (courseIndex != -1) {  // Fetching until there is no course left
                   courseIndex++;
-                  courseData = getCourseData(courseIndex);  // Getting course data
+                  let courseData = getCourseData(courseIndex);  // Getting course data
                   if (courseData != null) {
                     courseData = courseData.replaceAll(' null ', ',,') // in aria label, <br> elements are null
-                    scheduleID = courseData.split(',,')[1]  // Id of the course (the course classe)
+                    const scheduleID = courseData.split(',,')[1]  // Id of the course (the course classe)
                     dayCoursesData += ";; " + scheduleID + ";;" + courseData  // Separator of the courses of the same day
                   } else {
                     courseIndex = -1;
@@ -199,34 +198,6 @@ async function sleep(time) {
             });
           });
         });  // Delay 200ms
-  
-        document.body.addEventListener('click', (event) => {
-          getCourseData(0, (initialPosition, firstCourseData, err) => { // Get the data of the first course displayed in the week (usually on monday)
-            if (!err) { // Verifying if the scraped data are from the schedule page and not anything else
-              // We do the rest (create an interface and send informations to the server)
-              let data = [firstCourseData],
-                courseIndex = 1 // index of xth lesson of the week
-              let dayIndex = -1
-              while (true) { // Get the rest of the course of the week
-                getCourseData(courseIndex, (courseLeftPosition, ndata, err) => {
-                  if (!err) {  // It seems courses data are seperated with <br> html element which are 'null' inside the aria label prop
-                    ndata = ndata.replaceAll(' null ', ',,') // Theses are parsers regex split :)
-                    scheduleID = ndata.split(',,')[1]
-                    console.log(courseLeftPosition, '/', DAY_SIZE)
-                    if (courseLeftPosition % DAY_SIZE == 0) {  // If the lesson left pos is a multiple of tuesday left pos (should be the begining of another day)
-                    } else {
-                      
-                    }
-                  }
-                });
-                if (courseIndex > data.length - 1) { // to avoid infinit loop when we got all the data
-                  return;
-                }
-                courseIndex++
-              }
-            }
-          })
-        }, true);
       })  // Wait 500ms
     })
   })
@@ -235,5 +206,4 @@ async function sleep(time) {
 uwu-ade-weekly-shcedule// TD BE Physique null 1G1 TD1 null DUPREY Quentin null A204 null 08h00 - 10h00,;-;NaN/1G1 TD1;-; TD BE Physique,,1G1 TD1,,DUPREY Quentin,,A204,,10h00 - 12h00,;-;NaN/1G1 TP1;-; TP Electronique Numérique,,1G1 TP1,,JOSSE Christian,,C303,,13h30 - 17h30,;-;NaN/1G1 TP2;-; TP Electronique Numérique,,1G1 TP2,,GERALDO Frédéric,,C304,,13h30 - 17h30,;-;NaN/1G1 TD2;-; TD BE Physique,,1G1 TD2,,FAYE Christian,,A201,,08h00 - 10h00,;-;NaN/1G1 TD2;-; TD BE Physique,,1G1 TD2,,FAYE Christian,,A201,,10h00 - 12h00,;-;NaN/1G1 TP4;-; TP Systèmes Electroniques,,1G1 TP4,,LAROCHE Christian,,C203,,13h30 - 17h30,;-;NaN/1G1 TD3;-; TD BE Physique,,1G1 TD3,,BOURDEL Emmanuelle,,A212,,08h00 - 10h00,;-;NaN/1G1 TD3;-; TD BE Physique,,1G1 TD3,,BOURDEL Emmanuelle,,A212,,10h00 - 12h00,;-;NaN/1G1 TP5;-; TP Systèmes Electroniques,,1G1 TP5,,QUINTANEL Sébastien,,C204,,13h30 - 17h30,;-;NaN/1G1 TP6;-; TP Systèmes Electroniques,,1G1 TP6,,DUPERRIER Cédric,,C205,,13h30 - 17h30,;-;NaN/1G2 TP1;-; TP Electronique Numérique,,1G2 TP1,,LAROCHE Christian,,C303,,08h00 - 12h00,;-;NaN/1G2 TD1;-; TD Probabilité 1A,,1G2 TD1,,AUGIER Adeline,,A201,,13h30 - 15h30,;-;NaN/1G2 TP2;-; TP Electronique Numérique,,1G2 TP2,,FIACK Laurent,,C304,,08h00 - 12h00,;-;NaN/1G2 TP3;-; TP Electronique Numérique,,1G2 TP3,,GERALDO Frédéric,,C305,,08h00 - 12h00,;-;NaN/1G2 TP3;-; TP Mathématiques 1A,,1G2 TP3,,HOUAS Heykel,,D065,,13h30 - 17h30,;-;NaN/1G2 TP4;-; TP Systèmes Electroniques,,1G2 TP4,,SABOURAUD-MULLER Carine,,C106,,08h00 - 12h00,;-;NaN/1G2 TP5;-; TP Systèmes Electroniques,,1G2 TP5,,DUPERRIER Cédric,,C204,,08h00 - 12h00,;-;NaN/1G2 TP6;-; TP Systèmes Electroniques,,1G2 TP6,,JOSSE Christian,,C205,,08h00 - 12h00,;-;NaN/1G1 TP3;-; TP Electronique Numérique,,1G1 TP3,,KARABERNOU Si Mahmoud,,C305,,13h30 - 17h30,;-;NaN/1G1 TD3;-; TD Probabilité 1A,,1G1 TD3,,AGGOUNE Woihida,,A110,,13h30 - 15h30,;-;NaN/1G1 TD3;-; TD Electromagnétisme,,1G1 TD3,,FAYE Christian,,A05,,15h30 - 17h30,;-;NaN/1G1 TP6;-; TP Conversion d'énergie en alternatif,,1G1 TP6,,DEL FRANCO Giovanni,,D267,,08h00 - 12h00,;-;NaN/1G2 TD1;-; TD Anglais 1A,,1G2 TD1,,1G2 TD2,,1G2 TD3,,BEDIRA Sami,,FEARON Mel,,TOPCZYNSKI Magalie,,ROMON Emmanuelle,,A206,,A207,,A208,,A209,,08h00 - 10h00,;-;NaN/1G2 TD1;-; TD Analyse complexe,,1G2 TD1,,DUPREY Quentin,,A304,,10h00 - 12h00,;-;NaN/1G2 TD1;-; TD Probabilité 1A,,1G2 TD1,,AUGIER Adeline,,A201,,13h30 - 15h30,;-;NaN/1G2 TD2;-; TD Probabilité 1A,,1G2 TD2,,AGGOUNE Woihida,,A211,,10h00 - 12h00,;-;NaN/1G2 TD2;-; TD Systèmes électroniques,,1G2 TD2,,DUPERRIER Cédric,,A211,,13h30 - 15h30,;-;NaN/1G2 TD2;-; TD Probabilité 1A,,1G2 TD2,,AGGOUNE Woihida,,A110,,15h30 - 17h30,;-;NaN/1G2 TD3;-; TD Systèmes électroniques,,1G2 TD3,,QUINTANEL Sébastien,,A203,,13h30 - 15h30,;-;NaN/1G1 TD1;-; TD Anglais 1A,,1G1 TD1,,1G1 TD2,,1G1 TD3,,BEDIRA Sami,,FEARON Mel,,TOPCZYNSKI Magalie,,ROMON Emmanuelle,,A206,,A207,,A208,,A210,,08h00 - 10h00,;-;NaN/1ère A ENSEA;-; CM Electromagnétisme 1A,,1ère A ENSEA,,TEMCAMANI Farid,,Amphi Watteau,,10h00 - 12h00,;-;NaN/1G1 TD1;-; TD Systèmes électroniques,,1G1 TD1,,DELACRESSONNIÈRE Bruno,,A108,,13h30 - 15h30,;-;NaN/1G1 TD2;-; TD Analyse complexe,,1G1 TD2,,DUPREY Quentin,,A304,,15h30 - 17h30,;-;NaN/1G1 TD3;-; TD Systèmes électroniques,,1G1 TD3,,DUPERRIER Cédric,,A211,,13h30 - 15h30,;-;NaN/1G1 TD3;-; TD Analyse complexe,,1G1 TD3,,SALIBA Charbel,,A112,,15h30 - 17h30,;-;NaN/1G2 TD1;-; TD BE Physique,,1G2 TD1,,BOURDEL Emmanuelle,,A204,,08h00 - 10h00,;-;NaN/1G2 TD1;-; TD BE Physique,,1G2 TD1,,BOURDEL Emmanuelle,,A204,,15h30 - 17h30,;-;NaN/1G2 TD2;-; TD BE Physique,,1G2 TD2,,FAYE Christian,,A205,,08h00 - 10h00,;-;NaN/1G2 TD2;-; TD BE Physique,,1G2 TD2,,FAYE Christian,,A205,,15h30 - 17h30,;-;NaN/1G2 TD3;-; TD BE Physique,,1G2 TD3,,TEMCAMANI Farid,,A201,,08h00 - 10h00,;-;NaN/1G2 TD3;-; TD Analyse complexe,,1G2 TD3,,DUPREY Quentin,,A109,,13h30 - 15h30,;-;NaN/1G2 TD3;-; TD BE Physique,,1G2 TD3,,TEMCAMANI Farid,,A210,,15h30 - 17h30,;-;NaN/1ère A ENSEA;-; CM Analyse complexe,,1ère A ENSEA,,DUPREY Quentin,,Amphi Watteau,,08h00 - 10h00,;-;NaN/1G1 TD1;-; TD Analyse complexe,,1G1 TD1,,DUPREY Quentin,,A108,,10h00 - 12h00,;-;NaN/1ère A ENSEA;-; CM Quantique 1A,,1ère A ENSEA,,DUPREY Quentin,,Amphi Watteau,,08h00 - 10h00,;-;NaN/1G1 TD1;-; TD Systèmes électroniques,,1G1 TD1,,DELACRESSONNIÈRE Bruno,,A108,,10h00 - 12h00,;-;NaN/1G1 TD1;-; TD Allemand / Espagnol 1A,,1G1 TD1,,1G1 TD2,,1G1 TD3,,PAAPE Iris,,FLINT LUH Stéphanie,,CHIPI Eneko,,GALDEANO Jean-François,,MARINAS Ruth,,A105,,A107,,A106,,A208,,A209,,13h30 - 15h30,;-;NaN/1G1 TD2;-; TD Systèmes électroniques,,1G1 TD2,,LAROCHE Christian,,A212,,10h00 - 12h00,;-;NaN/1G1 TD2;-; TD Systèmes électroniques,,1G1 TD2,,LAROCHE Christian,,A08,,15h30 - 17h30,;-;NaN/1G1 TD3;-; TD Systèmes électroniques,,1G1 TD3,,DUPERRIER Cédric,,A111,,10h00 - 12h00,;-;NaN/1G2 TD1;-; TD Systèmes électroniques,,1G2 TD1,,SABOURAUD-MULLER Carine,,A07,,10h00 - 12h00,;-;NaN/1G2 TD1;-; TD Systèmes électroniques,,1G2 TD1,,SABOURAUD-MULLER Carine,,A08,,13h30 - 15h30,;-;NaN/1G2 TD1;-; TD Allemand / Espagnol 1A,,1G2 TD1,,1G2 TD2,,1G2 TD3,,PAAPE Iris,,FLINT LUH Stéphanie,,CHIPI Eneko,,GALDEANO Jean-François,,MARINAS Ruth,,A105,,A107,,A106,,A208,,A209,,15h30 - 17h30,;-;NaN/1G2 TD3;-; TD Systèmes électroniques,,1G2 TD3,,QUINTANEL Sébastien,,A112,,10h00 - 12h00,;-;NaN/1G2 TD3;-; TD Probabilité 1A,,1G2 TD3,,AGGOUNE Woihida,,A201,,13h30 - 15h30
 */
 /*
-
 */
