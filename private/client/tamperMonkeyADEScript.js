@@ -39,8 +39,12 @@ function createSocketInstance() {
     console.log(err)
   })
   
-  socket.on('packet', (data) => {
-    console.log('succesfully emited data')
+  socket.on('packet', ({ type, data }) => {
+    console.log('Packet received of type %s : %s', type, data)
+  })
+
+  socket.on("packetCreate", (packet) => {
+    console.log("Successfully emited packet")
   })
   
   socket.on("disconnect", () => {
@@ -126,6 +130,7 @@ async function sleep(time) {
 }
 
 (function scrapingScheduleData() {
+  const socket = createSocketInstance()
   delay(1000, () => {  // Wait 1s instead of waiting for jquery.load()
     $('document').ready(() => {  // Doesn't really work, elements are not loaded at this point
       init();
@@ -182,7 +187,6 @@ async function sleep(time) {
             console.log(coursesData)
             coursesData = 'uwu-ade-weekly-shcedule//' + String(coursesData)
             console.log('data succesfully retrieved. sending...')
-            socket = createSocketInstance()
             socket.connect()
             socket.on("connect", () => {
               console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
