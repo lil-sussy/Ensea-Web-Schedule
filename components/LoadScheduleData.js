@@ -36,7 +36,7 @@ function removeSpaces(str) {
   return str.slice(begin, str.length - end)
 }
 
-function loadScheduleDataFromString(data) {
+export function loadScheduleDataFromString(data) {
   const headlength = "2['uwu-ade-weekly-shcedule// ".length // Replace char ' with char "
   const taillength = "']".length // removing the bracket at the end
   data = data.slice(headlength, data.length - taillength)

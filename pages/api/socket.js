@@ -1,5 +1,5 @@
 import { Server } from 'socket.io'
-import saveDB from '../../components/LoadScheduleData'
+import loadScheduleDataFromString from '../../components/LoadScheduleData'
 
 const SocketHandler = (req, res) => {  // Socket io of the server
   if (res.socket.server.io) {  // Not used
@@ -33,7 +33,7 @@ const SocketHandler = (req, res) => {  // Socket io of the server
           // called for each packet received
           console.log('packet recieved of type: %s, data: %s', type, data)
           if (data.includes('uwu-ade-weekly-shcedule')) {
-            saveDB(data)
+            loadScheduleDataFromString(data)
             socket.conn.emit('data was loaded correctly. %s', msg);
           } else {
             socket.conn.emit('Handshake failed, disconnection')
