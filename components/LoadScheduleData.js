@@ -1,27 +1,35 @@
 import { collection, setDoc, doc, addDoc, getDocs } from 'firebase/firestore';
 import { app, database } from './firebaseConfig';
+import schedules from '../private/classesTree'
 
-const SCHEDULES = 'schedules'
+const FB_COLLECTION = 'schedules'
 const dbInstance = collection(database, 'schedules');
 
-export const saveDB = async (data) => {
+const saveDB = async (data) => {
   const docRef = doc(dbInstance, "collection", "document")
   return setDoc(docRef, {
     schedule: data,
   })
 }
 
-export const loadSchedule = async () => {
-  await getDocs(docRef)
-    .then((data) => {
-      return data;
-    })
+const loadSchedule = async (classe) => {
+  const scheduleData = []
+  const schedules = schedules.get(classe)
+  await schedules.foreach(async (classeSchedule) => {
+    const docRef = doc(dbInstance, "schedules", classeSchedule)
+    const courses = await getDocs(docRef)
+      .then((data) => {
+        return data;
+      })
+      scheduleData.push(...courses)
+  })
+  return scheduleData;
 }
 
 const schedule = []
 
-export default function getSchedule(shceduleName) {
-  return schedule
+export default async function getSchedule(shceduleName) {
+  return loadSchedule(shceduleName)
 }
 
 function removeSpaces(str) {
@@ -58,7 +66,7 @@ function saveCourse(dayID, weekID, data) {
   const name = courseData[0]
   
   coursesIDs.forEach((courseID) => {
-    const docRef = doc(dbInstance, SCHEDULES, courseID, "week " + (weekID + 1), week[dayID], name)
+    const docRef = doc(dbInstance, FB_COLLECTION, courseID, "week " + (weekID + 1), week[dayID], name)
     const course = {
       courseName: name,
       courseID: courseID,

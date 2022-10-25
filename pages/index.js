@@ -11,7 +11,8 @@ import { app, database } from '../components/firebaseConfig';
 
 let socket
 
-const dbInstance = collection(database, 'sessions');
+const sessionCollection = collection(database, 'sessions');
+const schedulesCollection = collection(database, 'schedules');
 
 const getSession = nextSession({
   // store: promisifyStore(dbInstance)
@@ -32,12 +33,12 @@ function App({ views, lastSchedule }) {
     setIsMounted(true);
     socketInitializer()
   }, [])
-
+  
   if (!isMounted) {
     return null;
   }
+  const [weekData, setWeekData] = useState(loadSchedule(lastSchedule))
 
-  const weekData = loadSchedule(lastSchedule)
   return (
     <div className="App">
       <div className="ENSEABackground background bg-cover bg-center h-screen w-screen transition"></div>
