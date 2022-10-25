@@ -169,10 +169,10 @@ async function sleep(time) {
                 const test = await sleep(200);
                 while (courseIndex != -1) {  // Fetching until there is no course left
                   courseIndex++;
-                  courseData = getCourseData(courseIndex);  // Getting course data
+                  let courseData = getCourseData(courseIndex);  // Getting course data
                   if (courseData != null) {
                     courseData = courseData.replaceAll(' null ', ',,') // in aria label, <br> elements are null
-                    scheduleID = courseData.split(',,')[1]  // Id of the course (the course classe)
+                    const scheduleID = courseData.split(',,')[1]  // Id of the course (the course classe)
                     dayCoursesData += ";; " + scheduleID + ";;" + courseData  // Separator of the courses of the same day
                   } else {
                     courseIndex = -1;
@@ -199,34 +199,6 @@ async function sleep(time) {
             });
           });
         });  // Delay 200ms
-  
-        document.body.addEventListener('click', (event) => {
-          getCourseData(0, (initialPosition, firstCourseData, err) => { // Get the data of the first course displayed in the week (usually on monday)
-            if (!err) { // Verifying if the scraped data are from the schedule page and not anything else
-              // We do the rest (create an interface and send informations to the server)
-              let data = [firstCourseData],
-                courseIndex = 1 // index of xth lesson of the week
-              let dayIndex = -1
-              while (true) { // Get the rest of the course of the week
-                getCourseData(courseIndex, (courseLeftPosition, ndata, err) => {
-                  if (!err) {  // It seems courses data are seperated with <br> html element which are 'null' inside the aria label prop
-                    ndata = ndata.replaceAll(' null ', ',,') // Theses are parsers regex split :)
-                    scheduleID = ndata.split(',,')[1]
-                    console.log(courseLeftPosition, '/', DAY_SIZE)
-                    if (courseLeftPosition % DAY_SIZE == 0) {  // If the lesson left pos is a multiple of tuesday left pos (should be the begining of another day)
-                    } else {
-                      
-                    }
-                  }
-                });
-                if (courseIndex > data.length - 1) { // to avoid infinit loop when we got all the data
-                  return;
-                }
-                courseIndex++
-              }
-            }
-          })
-        }, true);
       })  // Wait 500ms
     })
   })
