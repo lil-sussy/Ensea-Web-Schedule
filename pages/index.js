@@ -9,14 +9,9 @@ import { promisifyStore } from 'next-session/lib/compat';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { app, database } from '../components/firebaseConfig';
 
-let socket
+import loadScheduleDataFromString from '../components/LoadScheduleData'
 
-const sessionCollection = collection(database, 'sessions');
-const schedulesCollection = collection(database, 'schedules');
-
-const getSession = nextSession({
-  // store: promisifyStore(dbInstance)
-})
+let socket  // Unused
 
 function App({ views, weekData }) {
   console.log('you have visited this website : ', views)
@@ -24,7 +19,7 @@ function App({ views, weekData }) {
   const socketInitializer = async () => {
     await fetch('/api/socket')
     socket = io()
-
+    
     socket.on('connect', () => {
       console.log('connected')
     })
@@ -37,7 +32,6 @@ function App({ views, weekData }) {
   if (!isMounted) {
     return null;
   }
-  
   return (
     <div className="App">
       <div className="ENSEABackground background bg-cover bg-center h-screen w-screen transition"></div>
@@ -65,14 +59,6 @@ function App({ views, weekData }) {
 const DEFAULT_SCHEDULE = "1G1 TP6";
 
 indexPage.getInitialProps = async ({ req, res }) => {  // Generate props on server side
-  const session = await getSession(req, res); // make { autoCommit: false }: false and it will correctly redirect
-  session.views = session.views ? session.views + 1 : 1;  // View counter
-  session.lastSchedule = session.lastSchedule ? session.lastSchedule : DEFAULT_SCHEDULE;
-  const schedule = loadSchedule(session.lastSchedule)
-  return {
-    views: session.views,  // Informations passed in App constructor
-    lastSchedule: session.lastSchedule
-  };
 }
 
 export default function indexPage(pageProps) {
