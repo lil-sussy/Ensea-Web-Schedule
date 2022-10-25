@@ -1,4 +1,4 @@
-import { collection, doc, addDoc, getDocs } from 'firebase/firestore';
+import { collection, setDoc, doc, addDoc, getDocs } from 'firebase/firestore';
 import { app, database } from './firebaseConfig';
 
 const SCHEDULES = 'schedules'
@@ -48,6 +48,7 @@ export function loadScheduleDataFromString(data) {
       weekID = Number(weeksData[parseWeekIndex])
     } else {
       const daysData = weeksData[parseWeekIndex].split(';-;')
+      const courseIDs = new Map();
       for (let parseDayIndex = 0; i < daysData.length; i++) {  // Days
         if (parseDayIndex % 2 === 0) {
           dayID = Number(daysData[parseDayIndex])
@@ -66,7 +67,10 @@ export function loadScheduleDataFromString(data) {
                 }
               }
               const hours = datat[data.length -1].split(' - ')  // Last element : 8h00 - 12h00
-              const docRef = doc(dbInstance, SCHEDULES, courseID, weekID+1, dayID)
+              courseIndex = courseIDs.get(courseID) === undefined ? 0 : courseIDs.get(courseID)
+              courseIndex += 1;
+              courseIDs.set(courseID, courseIndex)
+              const docRef = doc(dbInstance, SCHEDULES, courseID, weekID+1, dayID, courseIndex)
               const course = {
                 courseID: courseID,
                 begin: hours[0],
