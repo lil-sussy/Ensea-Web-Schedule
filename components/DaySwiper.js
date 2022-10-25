@@ -71,6 +71,8 @@ export default function WeekSchedule(props) {
   useEffect(() => {
   }, [])
   const daysList = [];
+  if (props.weekData == undefined)
+    return;
   props.weekData.map((dayData) => {
     if (dayData.day !== "tuesday")
       daysList.push(createDay(dayData))
