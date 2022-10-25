@@ -1,4 +1,4 @@
-export const schedules = new Map();  // Exported
+const schedules = new Map();  // Exported
 
 //1ère A G1
 schedules.set('1G1 TP1', ["1G1 TD1", "1ère A ENSEA"])
@@ -41,3 +41,5 @@ schedules.set('1DA TP4', ["1DA TD2", "1ère DA", "1DAVN"])
 
 //1ère DC
 schedules.set('1DC TP1', ["1DC TP1", "1ère DC"])
+
+export default schedules
