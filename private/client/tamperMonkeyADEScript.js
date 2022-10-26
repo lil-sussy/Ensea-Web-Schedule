@@ -12,28 +12,34 @@
 
 // const socket = io('https://enseawebschedule.herokuapp.com', { secure: true, extraHeaders: { 'Access-Control-Allow-Origin': 'https://enseawebschedule.herokuapp.com/' } })
 
+/*
+Known issues
+  Do not use a small screen
+  Do not have a slow internet connection
+*/
+
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
 
 function createSocketInstance() {
-  // const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
-  //   transports: ['websocket', 'polling', 'flashsocket'],
-  //   secure: false,
-  //   query: "tampermonkey extension",
-  //   autoConnect: false,
-  //   extraHeaders: {
-  //     'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
-  //   }
-  // })
-  const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
+  const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
     transports: ['websocket', 'polling', 'flashsocket'],
-    secure: true,
-    query: "ADE client browser scrapper",
+    secure: false,
+    query: "tampermonkey extension",
     autoConnect: false,
     extraHeaders: {
       'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
-    },
-    enabledTransports: ['ws', 'wss'],
+    }
   })
+  // const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
+  //   transports: ['websocket', 'polling', 'flashsocket'],
+  //   secure: true,
+  //   query: "ADE client browser scrapper",
+  //   autoConnect: false,
+  //   extraHeaders: {
+  //     'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
+  //   },
+  //   enabledTransports: ['ws', 'wss'],
+  // })
   
   socket.on('connect_error', (err) => {
     console.log(err)

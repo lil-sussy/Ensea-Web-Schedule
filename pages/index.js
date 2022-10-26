@@ -2,33 +2,29 @@ import { useState, useEffect } from 'react';
 import React from 'react';
 import WeekSchedule from '../components/DaySwiper';
 import nextSession from "next-session"
-import loadSchedule from '../components/LoadScheduleData';
-import io from 'socket.io-client'
 import Head from 'next/head'
 import { promisifyStore } from 'next-session/lib/compat';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { app, database } from '../components/firebaseConfig';
+import loadSchedule from '../components/CloudSchedule';
 
-import loadScheduleDataFromString from '../components/LoadScheduleData'
-
-let socket  // Unused
+let socket
 
 function App({ views, weekData }) {
   console.log('you have visited this website : ', views)
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
-  const socketInitializer = async () => {
-    await fetch('/api/socket')
-    socket = io()
-    
-    socket.on('connect', () => {
-      console.log('connected')
-    })
-  }
   useEffect(() => {
     setIsMounted(true);
     socketInitializer()
   }, [])
-  
+  const socketInitializer = async () => {
+    // await fetch('/api/socket')
+    // socket = io()
+
+    // socket.on('connect', () => {
+    //   console.log('connected')
+    // })
+  }
   if (!isMounted) {
     return null;
   }
@@ -59,6 +55,16 @@ function App({ views, weekData }) {
 const DEFAULT_SCHEDULE = "1G1 TP6";
 
 indexPage.getInitialProps = async ({ req, res }) => {  // Generate props on server side
+  const sessionCollection = collection(database, 'sessions');
+  const schedulesCollection = collection(database, 'schedules');
+  const session = nextSession(req, res); // make { autoCommit: false }: false and it will correctly redirect
+  session.views = session.views ? session.views + 1 : 1;  // View counter
+  session.lastSchedule = session.lastSchedule ? session.lastSchedule : DEFAULT_SCHEDULE;
+  const schedule = loadSchedule(session.lastSchedule)
+  return {
+    views: session.views,  // Informations passed in App constructor
+    schedule: schedule
+  };
 }
 
 export default function indexPage(pageProps) {
