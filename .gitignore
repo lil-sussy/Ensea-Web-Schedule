@@ -25,4 +25,8 @@ yarn-debug.log*
 yarn-error.log*
 =======
 node_modules
+<<<<<<< HEAD
 >>>>>>> 9d279d1 (Major UI Update)
+=======
+.next
+>>>>>>> 94d6f43 (WTF)
