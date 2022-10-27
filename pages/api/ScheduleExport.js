@@ -1,5 +1,6 @@
 import { collection, setDoc, doc, addDoc, getDocs } from 'firebase/firestore';
 import { app, database } from '../../components/firebaseConfig';
+import scheduleTree from '../../private/classesTree';
 
 const FB_COLLECTION = 'schedules'
 const dbInstance = collection(database, FB_COLLECTION);
@@ -20,41 +21,47 @@ function removeSlashes(str) {
   str.slice()
 }
 
-function hasNumber(myString) {
-  return /\d/.test(myString);
+const AMPHI_WATTEAU = "Amphi Watteau"
+function isPlace(myString) {  // Place like C203 or amphitheater :3
+  return /([A-Z])\d*/.test(myString) || myString === AMPHI_WATTEAU;
 }
 
-function saveCourse(dayID, weekID, data) {
-  if (data.length  == 0) {
+function isClasseName(information) {
+  return scheduleTree.has(information)
+}
+
+function saveCourse(dayID, weekID, courseData) {
+  if (courseData.length  == 0) {
     return
   }
-  const coursesIDs = [];
-  const courseData = [];
-  let dataBeginIndex = 1;  // First element being the course Name
-  while(hasNumber(data[dataBeginIndex])) {
-    coursesIDs.push(removeSpaces(data[dataBeginIndex]))
-    dataBeginIndex++;
-  }
-  for (let dataIndex = 0; dataIndex < data.length - 1; dataIndex++) {  // Courses
-    if (data.length > 0) {
-      courseData.push(data[dataIndex])
+  const hours = courseData[courseData.length - 1].split(' - ')  // Last element : 8h00 - 12h00
+  const name = courseData[0]
+
+  const teachers = [], places = [], classes = []
+  for (let i = 1; i < courseData.length -1; i++) {  // Ignoring first and last element
+    const information = removeSpaces(courseData[i])
+    if (isClasseName(information)) {
+      classes.push(information)
+    } else if (isPlace(information)) {
+      places.push(information)
+    } else {
+      teachers.push(information)
     }
   }
   const week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
-  const hours = data[data.length - 1].split(' - ')  // Last element : 8h00 - 12h00
-  const name = courseData[0]
   if(name != undefined && !name.includes('/')) { // Then it's a propper name and it will crash firebase
     console.log('Cloud saving new course data at %s / %s / %s', ("week " + (weekID + 1)), week[dayID], name)
     weekID += 1
-    const docRef = doc(dbInstance, "week "+(weekID + 1) + "/"+week[dayID] + "/" + name)
+    const docRef = doc(dbInstance, "week"+weekID + "/"+week[dayID] + "/" + name)
     const course = {
-      classes: coursesIDs,
+      classes: classes,
       day: week[dayID],
       week: weekID,
       lesson: name,
       begin: hours[0],
       end: hours[1],
-      courseData: courseData,
+      teachers: teachers,
+      place: places,
     }
     setDoc(docRef, course)
   }

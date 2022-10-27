@@ -4,7 +4,7 @@
 // @description  ADE onlinhe schedule data scrapper
 // @author       Nya UwU
 // @grant        GM_addStyle
-// @require      https://cdn.socket.io/3.1.3/socket.io.js
+// @require      https://cdn.socket.io/4.5.3/socket.io.js
 // @require      https://ajax.googleapis.com/ajax/libs/jquery/3.6.0/jquery.js
 // @match         https://ade.ensea.fr/direct/index.jsp*
 //
@@ -21,19 +21,21 @@ Known issues
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
 
 function createSocketInstance() {
-  const socket = io('http://localhost:3000', {  // https://enseawebschedule.herokuapp.com
+  const socket = io('http://localhost:3001', { 
     transports: ['websocket', 'polling', 'flashsocket'],
-    secure: false,
-    query: "tampermonkey extension",
+    path: 'cloudData',
+    secure: true,
+    query: "ADE_client_browser_scrapper",
     autoConnect: false,
     extraHeaders: {
       'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
-    }
+    },
+    enabledTransports: ['ws', 'wss'],
   })
   // const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
   //   transports: ['websocket', 'polling', 'flashsocket'],
   //   secure: true,
-  //   query: "ADE client browser scrapper",
+  //   query: "ADE_client_browser_scrapper",
   //   autoConnect: false,
   //   extraHeaders: {
   //     'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
@@ -136,6 +138,7 @@ async function sleep(time) {
 
 (function scrapingScheduleData() {
   const socket = createSocketInstance()
+  socket.connect()
   delay(1000, () => {  // Wait 1s instead of waiting for jquery.load()
     $('document').ready(() => {  // Doesn't really work, elements are not loaded at this point
       init();
@@ -192,6 +195,7 @@ async function sleep(time) {
             console.log(coursesData)
             coursesData = 'uwu-ade-weekly-shcedule//' + String(coursesData)
             console.log('data succesfully retrieved. sending...')
+            
             socket.connect()
             socket.on("connect", () => {
               console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx

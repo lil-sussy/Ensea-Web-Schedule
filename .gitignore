@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 # See https://help.github.com/articles/ignoring-files/ for more about ignoring files.
 
 # dependencies
@@ -22,3 +23,10 @@
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
+=======
+node_modules
+<<<<<<< HEAD
+>>>>>>> 9d279d1 (Major UI Update)
+=======
+.next
+>>>>>>> 94d6f43 (WTF)
