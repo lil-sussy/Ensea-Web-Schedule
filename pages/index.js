@@ -7,10 +7,14 @@ import { promisifyStore } from 'next-session/lib/compat';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { app, database } from '../components/firebaseConfig';
 import loadSchedule from '../components/CloudSchedule';
+import io from 'socket.io-client'
+import Image from 'next/image'
+import background from '../public/background2k.png'
+import logo from '../public/logo.png'
 
 let socket
 
-function App({ views, weekData }) {
+function App({ views, schedule }) {
   console.log('you have visited this website : ', views)
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   useEffect(() => {
@@ -30,22 +34,35 @@ function App({ views, weekData }) {
   }
   return (
     <div className="App">
-      <div className="ENSEABackground background bg-cover bg-center h-screen w-screen transition"></div>
-      <header className="AppContainer text-zinc-800 w-full h-full App-header -translate-x-1/2 absolute left-1/2 top-0">
-        <div className="Logo rounded-full mx-auto my-4 w-20 h-20 shadow-xl" alt=""></div>
-        <div className="SelectionsContainer mx-auto font backdrop-blur-sm w-3/4 h-20 flex-col align-center justify-center rounded-xl">
-          <div className="Selections text-2xl w-full h-full bg-white rounded-xl opacity-75">
-            <div className="ClasseSelection h-1/2 justify-center align-center text-center">
+      <div className="ENSEABackground bg-local bg-center h-screen w-screen transition"
+        style={{ backgroundImage: ('url(' + background.src + ')') }}
+        alt="Picture of the ensea school in Cergy in black and white with hand drawing appearance"></div>
+      <header className="AppContainer text-zinc-800 w-full h-full -translate-x-1/2 absolute left-1/2 top-0">
+        <div className="Header h-24 w-full top-0 left-0 backdrop-blur-sm">
+          <div className="absolute z-0 left-0 top-0 w-full h-full bg-white opacity-75">
+            <div className="h-full w-full">
+              <img src={logo.src}
+              alt="Logo of projet Athena"
+              className="Logo shadow-0 h-full w-72 mx-auto"></img>
+            </div>
+          </div>
+        </div>
+        <div className="SelectionsContainer h-10 my-3 mx-auto font backdrop-blur-sm w-3/4 flex-col align-center justify-center rounded-xl">
+          <div className="ClassSelection text-2xl w-full h-full bg-white rounded-xl opacity-85">
+            <div className="ClasseSelectionLabel h-1/2 justify-center align-center text-center">
               <h4>1G1 TD3</h4>
             </div>
-            <hr></hr>
-            <div className="WeekSelection h-1/2 justify-center align-center text-center">
+          </div>
+        </div>
+        <div className="SelectionsContainer h-10 my-3 mx-auto font backdrop-blur-sm w-3/4 flex-col align-center justify-center rounded-xl">
+          <div className="WeekSelection text-2xl w-full h-full bg-white rounded-xl opacity-75">
+            <div className="WeekSelectionLabel h-1/2 justify-center align-center text-center">
               <h4>Semaine 9</h4>
             </div>
           </div>
         </div>
-        <div className="WeekScheduleContainer my-1/20 w-full h-3/4">
-          <WeekSchedule weekData={weekData} />
+        <div className="WeekScheduleContainer w-full h-2/3">
+          <WeekSchedule schedule={schedule} />
         </div>
       </header>
     </div>
@@ -60,7 +77,7 @@ indexPage.getInitialProps = async ({ req, res }) => {  // Generate props on serv
   const session = nextSession(req, res); // make { autoCommit: false }: false and it will correctly redirect
   session.views = session.views ? session.views + 1 : 1;  // View counter
   session.lastSchedule = session.lastSchedule ? session.lastSchedule : DEFAULT_SCHEDULE;
-  const schedule = loadSchedule(session.lastSchedule)
+  const schedule = await loadSchedule(session.lastSchedule)
   return {
     views: session.views,  // Informations passed in App constructor
     schedule: schedule

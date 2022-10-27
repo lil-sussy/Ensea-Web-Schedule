@@ -1,51 +1,28 @@
 {
   "name": "ews",
-  "version": "0.1.0",
+  "version": "0.1.9",
   "private": true,
+  "scripts": {
+    "dev": "next dev",
+    "build": "next build",
+    "start": "next start",
+    "lint": "next lint"
+  },
   "dependencies": {
-    "connect-session-firebase": "^5.13.0",
-    "eslint": "^8.26.0",
-    "eslint-config-next": "^13.0.0",
     "firebase": "^9.12.1",
-    "next": "^13.0.0",
+    "next": "13.0.0",
     "next-session": "^4.0.5",
-    "node-sass": "^7.0.3",
-    "react": "^18.2.0",
-    "react-dom": "^18.2.0",
+    "react": "18.2.0",
+    "react-dom": "18.2.0",
     "socket.io": "^4.5.3",
     "socket.io-client": "^4.5.3",
     "swiper": "^8.4.4",
     "web-vitals": "^3.0.4"
   },
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "alt-start": "next start",
-    "test": "next dev",
-    "start": "NODE_ENV=production next start",
-    "export": "next export"
-  },
-  "eslintConfig": {
-    "extends": [
-      "react-app",
-      "react-app/jest"
-    ]
-  },
-  "browserslist": {
-    "production": [
-      ">0.2%",
-      "not dead",
-      "not op_mini all"
-    ],
-    "development": [
-      "last 1 chrome version",
-      "last 1 firefox version",
-      "last 1 safari version"
-    ]
-  },
   "devDependencies": {
     "autoprefixer": "^10.4.12",
+    "eslint-config-next": "13.0.0",
     "postcss": "^8.4.18",
-    "tailwindcss": "^3.2.0"
+    "tailwindcss": "^3.2.1"
   }
 }
