@@ -43,7 +43,7 @@ function App({ views, schedule }) {
             <div className="h-full w-full">
               <img src={logo.src}
               alt="Logo of projet Athena"
-              className="Logo shadow-0 h-full w-72 mx-auto"></img>
+              className="Logo shadow-0 my-1 mb-1 w-72 mx-auto"></img>
             </div>
           </div>
         </div>
