@@ -1,6 +1,6 @@
 @import url('https://fontlibrary.org//face/cmu-serif');
 
-.CourseInfo::before {
+.Course hr ::before {
   content: '';
   width: 100%;
   height: 100%;
