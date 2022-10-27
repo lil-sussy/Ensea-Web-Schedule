@@ -10,26 +10,27 @@ const saveDB = async (data) => {
 }
 
 const loadSchedule = async (classe) => {
-  const clouds = [collection(database, 'schedules/week12/Monday'), collection(database, 'schedules/week12/Tuesday'),
-  collection(database, 'schedules/week12/Wednesday'), collection(database, 'schedules/week12/Thursday'),
-  collection(database, 'schedules/week12/Friday')]
-  const finalSchedule = []
+  const weekSchedules = []
   const classeSchedules = scheduleTree.get(classe)
   classeSchedules.push(classe)
-  for (let dayIndex = 0; dayIndex < 5; dayIndex++) {
-    const cloud = clouds[dayIndex]
-    const dayData = []
-    for (let i = 0; i < classeSchedules.length; i++) {
-      const classe = classeSchedules[i]
-      const q = query(cloud, where("classes", "array-contains", classe))
+  for (let i = 0; i < classeSchedules.length; i++) {
+    const classe = classeSchedules[i]
+    const cloud = collection(database, 'schedules/trainees/' + classe)
+    const finalSchedule = []
+    for (let weekIndex = 1; weekIndex < 100; weekIndex++) {  // Week iteration
+      const weekID = weekIndex
+      console.log(weekIndex)
+      const dayData = []
+      const q = query(cloud, where("week", "array-contains", weekID))
       const querySnapshot = await getDocs(q);
       querySnapshot.forEach((course) => {
         dayData.push(course.data())
       })
     }
     finalSchedule.push(dayData)
+    weekSchedules.push(finalSchedule)
   }
-  return finalSchedule;
+  return weekSchedules;  // Returns every schedule of the year for this classe
 }
 
 export default loadSchedule

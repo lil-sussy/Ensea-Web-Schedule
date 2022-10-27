@@ -17,9 +17,6 @@ function removeSpaces(str) {
   return str.slice(begin, str.length - end)
 }
 
-function removeSlashes(str) {
-  str.slice()
-}
 
 const AMPHI_WATTEAU = "Amphi Watteau"
 function isPlace(myString) {  // Place like C203 or amphitheater :3
@@ -48,11 +45,9 @@ function saveCourse(dayID, weekID, courseData) {
       teachers.push(information)
     }
   }
-  const week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
+  const week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
   if(name != undefined && !name.includes('/')) { // Then it's a propper name and it will crash firebase
-    console.log('Cloud saving new course data at %s / %s / %s', ("week " + (weekID + 1)), week[dayID], name)
     weekID += 1
-    const docRef = doc(dbInstance, "week"+weekID + "/"+week[dayID] + "/" + name)
     const course = {
       classes: classes,
       day: week[dayID],
@@ -63,7 +58,13 @@ function saveCourse(dayID, weekID, courseData) {
       teachers: teachers,
       place: places,
     }
-    setDoc(docRef, course)
+    for (let i = 0; i < classes.length; i++){
+      const classe = classes[i]
+      console.log('Cloud saving new course data at %s / %s / %s', ("week " + (weekID + 1)), week[dayID], name)
+      const docRef = doc(dbInstance, "trainees" + "/" + classe + "/" + name)
+      setDoc(docRef, course)
+    }
+    return course
   }
 }
 
@@ -74,6 +75,7 @@ export default function loadScheduleDataFromString(data) {
   data = data.slice(headlength, data.length - taillength)
   const weeksData = data.split('/-/')
   let weekID; let dayID; let courseID;
+  const classesSchedule = new Map()
   for (let parseWeekIndex = 0; parseWeekIndex < weeksData.length; parseWeekIndex++) {  // Weeks
     if (parseWeekIndex % 2 === 1) {  // First element is "" the second is the weekID third is data and so on...
       weekID = Number(weeksData[parseWeekIndex])

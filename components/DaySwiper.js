@@ -10,25 +10,41 @@ SwiperCore.use([EffectFlip])
 let createDay = (actualDay, dayData) => {
   const courses = dayData;
   const divCourses = [];
-  const colorsRGBs = new Map(); colorsRGBs.set('green', 'rgba(220, 252, 231, 0.7)'); colorsRGBs.set('emerald', 'rgba(209, 250, 229, 0.7)'); colorsRGBs.set('lime', 'rgba(246, 252, 203, 0.7)'); colorsRGBs.set('teal', 'rgba(204, 251, 241, 0.7)'); colorsRGBs.set('cyan', 'rgba(207, 250, 254, 0.7)'); colorsRGBs.set('sky', 'rgba(224, 242, 254, 0.7)'); colorsRGBs.set('blue', 'rgba(219, 234, 254, 0.7)'); colorsRGBs.set('indigo', 'rgba(224, 242, 254, 0.7)'); colorsRGBs.set('violet', 'rgba(237, 233, 254, 0.7)'); colorsRGBs.set('purple', 'rgba(243, 232, 255, 0.7)'); colorsRGBs.set('fushia', 'rgba(250, 232, 252, 0.7)'); colorsRGBs.set('pink', 'rgba(252, 231, 243, 0.7)'); colorsRGBs.set('rose', 'rgba(255, 228, 230, 0.7)'); colorsRGBs.set('yellow', 'rgba(254, 259, 195, 0.7)'); colorsRGBs.set('amber', 'rgba(254, 243, 199, 0.7)'); colorsRGBs.set('orange', 'rgba(255, 237, 213, 0.7)'); colorsRGBs.set('red', 'rgba(254, 226, 266, 0.7)')
+  const colorsRGBAs = new Map(); colorsRGBAs.set('green', 'rgba(220, 252, 231, 0.7)'); colorsRGBAs.set('emerald', 'rgba(209, 250, 229, 0.7)'); colorsRGBAs.set('lime', 'rgba(246, 252, 203, 0.7)'); colorsRGBAs.set('teal', 'rgba(204, 251, 241, 0.7)'); colorsRGBAs.set('cyan', 'rgba(207, 250, 254, 0.7)'); colorsRGBAs.set('sky', 'rgba(224, 242, 254, 0.7)'); colorsRGBAs.set('blue', 'rgba(219, 234, 254, 0.7)'); colorsRGBAs.set('indigo', 'rgba(224, 242, 254, 0.7)'); colorsRGBAs.set('violet', 'rgba(237, 233, 254, 0.7)'); colorsRGBAs.set('purple', 'rgba(243, 232, 255, 0.7)'); colorsRGBAs.set('fushia', 'rgba(250, 232, 252, 0.7)'); colorsRGBAs.set('pink', 'rgba(252, 231, 243, 0.7)'); colorsRGBAs.set('rose', 'rgba(255, 228, 230, 0.7)'); colorsRGBAs.set('yellow', 'rgba(254, 259, 195, 0.7)'); colorsRGBAs.set('amber', 'rgba(254, 243, 199, 0.7)'); colorsRGBAs.set('orange', 'rgba(255, 237, 213, 0.7)'); colorsRGBAs.set('red', 'rgba(254, 226, 266, 0.7)')
+  const colorsRGBs = new Map(); colorsRGBs.set('green', 'rgba(220, 252, 231)'); colorsRGBs.set('emerald', 'rgba(209, 250, 229)'); colorsRGBs.set('lime', 'rgba(246, 252, 203)'); colorsRGBs.set('teal', 'rgba(204, 251, 241)'); colorsRGBs.set('cyan', 'rgba(207, 250, 254)'); colorsRGBs.set('sky', 'rgba(224, 242, 254)'); colorsRGBs.set('blue', 'rgba(219, 234, 254)'); colorsRGBs.set('indigo', 'rgba(224, 242, 254)'); colorsRGBs.set('violet', 'rgba(237, 233, 254)'); colorsRGBs.set('purple', 'rgba(243, 232, 255)'); colorsRGBs.set('fushia', 'rgba(250, 232, 252)'); colorsRGBs.set('pink', 'rgba(252, 231, 243)'); colorsRGBs.set('rose', 'rgba(255, 228, 230)'); colorsRGBs.set('yellow', 'rgba(254, 259, 195)'); colorsRGBs.set('amber', 'rgba(254, 243, 199)'); colorsRGBs.set('orange', 'rgba(255, 237, 213)'); colorsRGBs.set('red', 'rgba(254, 226, 266)')
   const colors = ['red', 'orange,', 'amber', 'yellow', 'lime', 'green', 'emerald', 'teal', 'cyan', 'sky', 'blue', 'indigo', 'violet', 'purple', 'fuchsia', 'pink', 'rose' ]
   for (let i = 0; i < courses.length; i++) {
     const course = courses[i]
-    let courseClasses = "Course h-full w-64 rounded-xl";
+    let courseClasses = "Course opacity-80 p-2 h-full w-64 rounded-xl";
     const color = colors[Math.round(Math.random()*colors.length)]  // This does work
-    courseClasses += " begin-" + course.begin + " end-" + course.end + "";  // but this doesnt work for some reasons, if there is too many courses, the colors aren't shown
-    const courseStyle = colorsRGBs.get(color)
+    courseClasses += " bg-"+color+"-100 begin-" + course.begin + " end-" + course.end + "";  // but this doesnt work for some reasons, if there is too many courses, the colors aren't shown
+    const colorRGB = colorsRGBs.get(color)
+    const colorRGBA = colorsRGBAs.get(color)
     divCourses.push(
-      <div style={{backgroundColor: courseStyle}} key={course.begin} className={courseClasses} >
-        <div className="CoursHeader flex flex-row justify-center items-center">
-          <h3 className="CourseInfo w-5/6 "> {course.lesson} </h3>
-          <hr></hr>
-          <h4 className="CourseInfo w-1/6 text-sm"> {course.place} </h4>
+      <div style={{backgroundColor: colorRGBA}} key={course.begin} className={courseClasses} >
+        <div className="CoursHeader opacity-90 w-full h-6 inline-grid grid-cols-6">
+          <div className="CourseInfo relative text-start w-full h-full whitespace-nowrap col-span-4 ">
+            <div className="TextGradient absolute right-0 top-0 w-full h-6"
+              style={{background: 'linear-gradient(to right, transparent 85%, '+colorRGB+' 95%)'}}></div>
+            <div className="overflow-hidden">{course.lesson}</div>
+          </div>
+          <div className="CourseInfo relative text-end w-full h-full whitespace-nowrap col-span-2">
+            <div className="TextGradient absolute right-0 top-0 w-full h-6"
+              style={{background: 'linear-gradient(to right, transparent 85%, '+colorRGB+' 95%)'}}></div>
+            <div className="overflow-hidden">{course.place}</div>
+          </div>
         </div>
-        <div className="CourseContent flex flex-row justify-center">
-          <h4 className="CourseInfo w-3/4 text-sm"> {course.teachers} </h4>
-          <hr></hr>
-          <h4 className="CourseInfo w-1/4 text-sm"> {course.classes} </h4>
+        <div className="CourseContent opacity-90 w-full h-6 inline-grid grid-cols-4">
+          <div className="CourseInfo text-start col-span-3 w-full text-sm relative whitespace-nowrap">
+            <div className="TextGradient absolute right-0 top-0 w-full h-5"
+              style={{background: 'linear-gradient(to right, transparent 85%, '+colorRGB+' 95%)'}}></div>
+            <div className="overflow-hidden"> {course.teachers} </div>
+          </div>
+          <div className="CourseInfo text-end col-span-1 w-full text-sm relative whitespace-nowrap">
+            <div className="TextGradient absolute right-0 top-0 w-full h-5"
+              style={{background: 'linear-gradient(to right, transparent 85%, '+colorRGB+' 95%)'}}></div>
+            <div className="overflow-hidden"> {course.classes} </div>
+          </div>
         </div>
       </div>
     );
@@ -37,7 +53,7 @@ let createDay = (actualDay, dayData) => {
     <SwiperSlide key={actualDay} className={actualDay}>
       <div className="DayContainer w-full h-full text-lg flex justify-center items-center">
         <div className="DayAbsoluteContainer absolute left--1/4 top-0 backdrop-blur-sm w-80 h-full rounded-3xl">
-          <div className="DayBackground rounded-3xl w-full h-full bg-white bg- opacity-70">
+          <div className="DayBackground rounded-3xl w-full h-full bg-white bg- opacity-80">
           </div>
           <div className="DayContent h-9/10 absolute top-2 flex justify-start">
             <div className="Hours inline-grid w-12 h-full">
@@ -82,7 +98,6 @@ export default function WeekSchedule(props) {
   const daysList = [];
   if (props.schedule == undefined)
     return;
-    console.log(props.schedule)
   for (let i = 0; i < props.schedule.length; i++) {
     const week = ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday', 'Sunday']
     daysList.push(createDay(week[i], props.schedule[i]))
@@ -112,7 +127,7 @@ export default function WeekSchedule(props) {
       if (dx >= HUGE_DIFFERENTIAL) {  // Bigger than 10px
         swiper.slides[index].style.transitionDuration = "1500ms"  // God that's smooth
       } else {
-        swiper.slides[index].style.transitionDuration = "100ms"
+        swiper.slides[index].style.transitionDuration = "10ms"
       }
     }
   }

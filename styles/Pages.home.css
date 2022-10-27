@@ -1,17 +1,8 @@
 @import url('https://fontlibrary.org//face/cmu-serif');
 
-.Course hr ::before {
-  content: '';
-  width: 100%;
-  height: 100%;
-  position: absolute;
-  left: 0px;
-  top: 0px;
-  background: linear-gradient(transparent 150px, white)
-}
-
 .Hour {
   grid-row: auto;
+  transform: translateY(-26%);
 }
 
 .DayName {
