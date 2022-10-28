@@ -70,7 +70,7 @@ function saveCourse(dayID, weekID, courseData) {
 
 export default function loadScheduleDataFromString(data) {
   console.log("Saving newly received schedules data on the cloud ...")
-  const headlength = "2['uwu-ade-weekly-shcedule//".length // Replace char ' with char "
+  const headlength = "2['uwu-ade-weekly-shcedule//".length
   const taillength = "']".length // removing the bracket at the end
   data = data.slice(headlength, data.length - taillength)
   const weeksData = data.split('/-/')
