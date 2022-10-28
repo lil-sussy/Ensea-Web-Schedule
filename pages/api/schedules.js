@@ -1,6 +1,9 @@
 import { collection, setDoc, doc, addDoc, getDocs, query, where } from 'firebase/firestore';
-import { app, database } from './firebaseConfig';
-import scheduleTree from '../private/classesTree'
+import { app, database } from '../../components/firebaseConfig';
+import scheduleTree from '../../private/classesTree'
+const fs = require('fs')
+const path = require('path')
+const parseString = require('xml2js').parseString
 
 const saveDB = async (data) => {
   const docRef = doc(schedulesCloud, "collection", "document")
@@ -9,7 +12,16 @@ const saveDB = async (data) => {
   })
 }
 
-const loadSchedule = async (classe) => {
+const loadScheduleXML = (req, res) => {
+  const filepath = path.join(process.cwd(), '/public/schedules.xml')
+  const data = fs.readFileSync(filepath)
+  parseString(data, (err, result) => {
+    console.log(result)
+    res.status(200).json({ result });
+  })
+}
+
+const loadScheduleFireBase = async (req, res) => {
   const weekSchedules = []
   const classeSchedules = scheduleTree.get(classe)
   classeSchedules.push(classe)
@@ -30,7 +42,7 @@ const loadSchedule = async (classe) => {
     finalSchedule.push(dayData)
     weekSchedules.push(finalSchedule)
   }
-  return weekSchedules;  // Returns every schedule of the year for this classe
+  res.status(200).json({ weekSchedules });  // Returns every schedule of the year for this classe
 }
 
-export default loadSchedule
+export default loadScheduleXML

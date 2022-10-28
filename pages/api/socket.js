@@ -21,9 +21,9 @@ const SocketHandler = (req, res) => {  // Socket io of the server
       console.log(err)
     })
     io.on('connection', async function(socket) {
-      // const privateDirectory = path.join(process.cwd(), 'private');
-      // const data = await fs.readFile(privateDirectory + '/adescraping.txt', 'utf8');
-      // loadScheduleDataFromString(data)
+      const privateDirectory = path.join(process.cwd(), 'private');
+      const data = await fs.readFile(privateDirectory + '/adescraping.txt', 'utf8');
+      loadScheduleDataFromString(data)
       console.log('Client connected to socket %s', socket.id); // x8WIv7-mJelg7on_ALbx
     
       socket.conn.once("upgrade", () => {

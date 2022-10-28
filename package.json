@@ -17,7 +17,8 @@
     "socket.io": "^4.5.3",
     "socket.io-client": "^4.5.3",
     "swiper": "^8.4.4",
-    "web-vitals": "^3.0.4"
+    "web-vitals": "^3.0.4",
+    "xml2js": "^0.4.23"
   },
   "devDependencies": {
     "autoprefixer": "^10.4.12",

@@ -6,7 +6,6 @@ import Head from 'next/head'
 import { promisifyStore } from 'next-session/lib/compat';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { app, database } from '../components/firebaseConfig';
-import loadSchedule from '../components/CloudSchedule';
 import io from 'socket.io-client'
 import Image from 'next/image'
 import background from '../public/background2k.png'
@@ -14,7 +13,7 @@ import logo from '../public/logo.png'
 
 let socket
 
-function App({ views, schedule }) {
+function App({ views, lastSchedule }) {
   console.log('you have visited this website : ', views)
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   useEffect(() => {
@@ -22,12 +21,12 @@ function App({ views, schedule }) {
     socketInitializer()
   }, [])
   const socketInitializer = async () => {
-    // await fetch('/api/socket')
-    // socket = io()
+    await fetch('/api/socket')
+    socket = io()
 
-    // socket.on('connect', () => {
-    //   console.log('connected')
-    // })
+    socket.on('connect', () => {
+      console.log('connected')
+    })
   }
   if (!isMounted) {
     return null;
@@ -42,8 +41,8 @@ function App({ views, schedule }) {
           <div className="absolute z-0 left-0 top-0 w-full h-full bg-white opacity-90">
             <div className="h-full w-full">
               <img src={logo.src}
-              alt="Logo of projet Athena"
-              className="Logo shadow-0 my-1 mb-1 w-72 mx-auto"></img>
+                alt="Logo of projet Athena"
+                className="Logo shadow-0 my-1 mb-1 w-72 mx-auto"></img>
             </div>
           </div>
         </div>
@@ -62,7 +61,7 @@ function App({ views, schedule }) {
           </div>
         </div>
         <div className="WeekScheduleContainer w-full h-2/3">
-          <WeekSchedule schedule={schedule} />
+          <WeekSchedule lastSchedule={lastSchedule} />
         </div>
       </header>
     </div>
@@ -77,49 +76,11 @@ indexPage.getInitialProps = async ({ req, res }) => {  // Generate props on serv
   const session = nextSession(req, res); // make { autoCommit: false }: false and it will correctly redirect
   session.views = session.views ? session.views + 1 : 1;  // View counter
   session.lastSchedule = session.lastSchedule ? session.lastSchedule : DEFAULT_SCHEDULE;
-  const schedule = await loadSchedule(session.lastSchedule)
-  const currentWeek = getWeek()
-  console.log(currentWeek)
   return {
     views: session.views,  // Informations passed in App constructor
-    schedule: schedule
+    lastSchedule: session.lastSchedule
   };
 }
-
-/**
- * Returns the week number for this date.  dowOffset is the day of week the week
- * "starts" on for your locale - it can be from 0 to 6. If dowOffset is 1 (Monday),
- * the week returned is the ISO 8601 week number.
- * @param int dowOffset
- * @return int
- */
-const getWeek = function (dowOffset) {
-  /*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
-  
-      dowOffset = typeof(dowOffset) == 'number' ? dowOffset : 0; //default dowOffset to zero
-      const newYear = new Date(this.getFullYear(),0,1);
-      let day = newYear.getDay() - dowOffset; //the day of week the year begins on
-      day = (day >= 0 ? day : day + 7);
-      const daynum = Math.floor((this.getTime() - newYear.getTime() - 
-      (this.getTimezoneOffset()-newYear.getTimezoneOffset())*60000)/86400000) + 1;
-      let weeknum;
-      //if the year starts before the middle of a week
-      if(day < 4) {
-          weeknum = Math.floor((daynum+day-1)/7) + 1;
-          if(weeknum > 52) {
-              const nYear = new Date(this.getFullYear() + 1,0,1);
-              let nday = nYear.getDay() - dowOffset;
-              nday = nday >= 0 ? nday : nday + 7;
-              /*if the next year starts before the middle of
-                the week, it is week #1 of that year*/
-              weeknum = nday < 4 ? 1 : 53;
-          }
-      }
-      else {
-          weeknum = Math.floor((daynum+day-1)/7);
-      }
-      return weeknum;
-  };
 
 export default function indexPage(pageProps) {
   return (
