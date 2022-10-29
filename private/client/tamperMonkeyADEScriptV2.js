@@ -21,14 +21,14 @@ Known issues
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
 
 function createSocketInstance() {
-  const socket = io('http://localhost:3001', { 
+  const socket = io('http://localhost:3001', {
     transports: ['websocket', 'polling', 'flashsocket'],
     path: 'cloudData',
     secure: true,
     query: "ADE_client_browser_scrapper",
     autoConnect: false,
     extraHeaders: {
-      'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
+      'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',  // Required or the request will be blocked by chrome
     },
     enabledTransports: ['ws', 'wss'],
   })
@@ -42,11 +42,11 @@ function createSocketInstance() {
   //   },
   //   enabledTransports: ['ws', 'wss'],
   // })
-  
+
   socket.on('connect_error', (err) => {
     console.log(err)
   })
-  
+
   socket.on('packet', ({ type, data }) => {
     console.log('Packet received of type %s : %s', type, data)
   })
@@ -54,7 +54,7 @@ function createSocketInstance() {
   socket.on("packetCreate", (packet) => {
     console.log("Successfully emited packet")
   })
-  
+
   socket.on("disconnect", () => {
     console.log("disconnected from socket");
   });
@@ -109,7 +109,7 @@ function settingupInterface() {
               To start, please select a schedule and hit fetch data. \
             </h3> \
           </div>'
-        $('body').append(htmlButton);
+  $('body').append(htmlButton);
 }
 /*
 const _1G1_TP1 = $("#Direct\\ Planning\\ Tree_430 > div > span.x-tree3-node-text")
@@ -121,14 +121,14 @@ const SP_GP2 = $("#Direct\\ Planning\\ Tree_544 > div > span.x-tree3-node-text")
 */
 
 function getCourseData(number) { // return the data of the {number} courses of the week
-  const course = $('#inner'+number)[0] // the numberth element (course) in the displayed schedule
+  const course = $('#inner' + number)[0] // the numberth element (course) in the displayed schedule
   if (course == undefined || course == null || course.getAttribute('aria-label') == undefined) {
     return null;
   }
   let data = course.getAttribute('aria-label').split(' null '); // the arialabel of the div containing schedule lesson info contains the informations of its children (everything to know about this course)
-  if(data.length == 0)
+  if (data.length == 0)
     return null;
-  data = course.getAttribute('aria-label') // We only needed to see if the data was in the correct format but the entire string is sent as data
+  data = course.getAttribute('aria-label').split(' null ') // We only needed to see if the data was in the correct format but the entire string is sent as data
   return data;
 }
 
@@ -138,7 +138,6 @@ async function sleep(time) {
 
 (function scrapingScheduleData() {
   const socket = createSocketInstance()
-  socket.connect()
   delay(1000, () => {  // Wait 1s instead of waiting for jquery.load()
     $('document').ready(() => {  // Doesn't really work, elements are not loaded at this point
       init();
@@ -155,47 +154,65 @@ async function sleep(time) {
           const week11 = $("#x-auto-184 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
           const week12 = $("#x-auto-185 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
           const week47 = $("#x-auto-220 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")  // Hope that makes it clear, this is the plan :)
-    
+
           console.log(scrapperState)
-          let coursesData = "";
+          const coursesData = { weeks: [] };
           scrapperStart.addEventListener('click', async () => {
             console.log("fetching data...")
-            scrapperState.innerHtml = "please wait...";
+            scrapperState.innerHTML = "please wait...";
             for (let week = 174; week <= 220; week++) {  // yep !
-              const weekButton = $("#x-auto-"+week+" > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
+              const weekButton = $("#x-auto-" + week + " > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
               weekButton.click()
               const weekID = week - 174;  // The weekIDth week of the year
               const monday = $("#x-auto-162 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
               const friday = $("#x-auto-166 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
-              let weekCoursesData = "";
+              const weekCoursesData = { weekID: weekID + 1, days: [] };  // Index 0 being first week (week1)
               for (let day = 162; day <= 166; day++) {
-                const dayButton = $('#x-auto-'+day+' > tbody > tr:nth-child(2) > td.x-btn-mc > em > button')
+                const dayButton = $('#x-auto-' + day + ' > tbody > tr:nth-child(2) > td.x-btn-mc > em > button')
                 dayButton.click()
                 const dayID = day - 162;  // monday:0 friday:4
                 let courseIndex = 0;
-                let dayCoursesData = ""
-                const test = await sleep(100);
+                const test = await sleep(200);
+                const dayCoursesData = { dayID: dayID, courses: [] }
                 while (courseIndex != -1) {  // Fetching until there is no course left
                   courseIndex++;
                   let courseData = getCourseData(courseIndex);  // Getting course data
                   if (courseData != null) {
-                    courseData = courseData.replaceAll(' null ', ',,') // in aria label, <br> elements are null
-                    const scheduleID = courseData.split(',,')[1]  // Id of the course (the course classe)
-                    dayCoursesData += ";; " + scheduleID + ";;" + courseData  // Separator of the courses of the same day
+                    const courseDataSaved = {
+                      name: courseData[0],
+                      weekID: weekID + 1,
+                      dayID: dayID,
+                      data: []
+                    }
+                    for (let i = 0; i < courseData.length; i++) {
+                      courseDataSaved.data.push(courseData[i])
+                    }
+                    dayCoursesData.courses.push(courseDataSaved)
                   } else {
                     courseIndex = -1;
                   }
                 }
-                weekCoursesData += ';-;' + dayID + ';-;' + dayCoursesData; // Separator for different days of the same week
+                weekCoursesData.days.push(dayCoursesData)
               }
-              coursesData += '/-/' + weekID + '/-/' + weekCoursesData;
+              $.post('http://localhost:3000/api/schedules', JSON.stringify(weekCoursesData), (data, status) => {
+                console.log(data);
+                console.log(status);
+                console.log('Data succesfully sent');
+              })
+              coursesData.weeks.push(weekCoursesData)
             }
             console.log('data fetched!')
-            scrapperState.innerHtml = "ready";
-            console.log(coursesData)
-            coursesData = 'uwu-ade-weekly-shcedule//' + String(coursesData)
+            scrapperState.innerHTML = "ready";
+            console.log(JSON.stringify(coursesData))
             console.log('data succesfully retrieved. sending...')
-            
+            // $.ajax({
+            //   type: "POST",
+            //   url: 'http://localhost:3000/api/schedules',
+            //   headers: { 'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp' },  // Required or it will be blocked by chrome
+            //   data: coursesData,
+            // });
+
+            coursesData = 'uwu-ade-weekly-shcedule//' + String(coursesData)
             socket.connect()
             socket.on("connect", () => {
               console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx

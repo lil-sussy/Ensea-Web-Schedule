@@ -1,6 +1,6 @@
 import { collection, setDoc, doc, addDoc, getDocs } from 'firebase/firestore';
-import { app, database } from '../../components/firebaseConfig';
-import scheduleTree from '../../private/classesTree';
+import { firebase, database } from './firebaseConfig';
+import scheduleTree from '../private/classesTree';
 const xml2js = require('xml2js')
 const fs = require('fs')
 const path = require('path')
@@ -23,7 +23,7 @@ function removeSpaces(str) {
 
 const AMPHI_WATTEAU = "Amphi Watteau"
 function isPlace(myString) {  // Place like C203 or amphitheater :3
-  return /([A-Z])\d*/.test(myString) || myString === AMPHI_WATTEAU;
+  return /[A-Z]+[0-9][0-9]*/.test(myString) || myString === AMPHI_WATTEAU;
 }
 
 function isClasseName(information) {
@@ -32,14 +32,14 @@ function isClasseName(information) {
 
 const SCHOOL_YEAR = 2022
 function parseCourse(dayID, weekID, courseData) {
-  if (courseData.length  == 0) {
+  if (courseData.length == 0) {
     return
   }
-  const hours = courseData[courseData.length - 1].split(' - ')  // Last element : 8h00 - 12h00
   const name = courseData[0]
+  const hours = courseData[courseData.length - 1].split(' - ')  // Last element : 8h00 - 12h00
 
   const teachers = [], places = [], classes = []
-  for (let i = 1; i < courseData.length -1; i++) {  // Ignoring first and last element
+  for (let i = 1; i < courseData.length - 1; i++) {  // Ignoring first and last element
     const information = removeSpaces(courseData[i])
     if (isClasseName(information)) {
       classes.push(information)
@@ -50,31 +50,55 @@ function parseCourse(dayID, weekID, courseData) {
     }
   }
   const week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-  if(name != undefined) { // Then it's a propper name and it will crash firebase
+  if (name != undefined) { // Then it's a propper name and it will crash firebase
     weekID += 1  // Week 0 being Week 1
-    const dayOfYear = (weekID - 1)*7 +1
+    const dayOfYear = (weekID - 1) * 7 + 1
     const date = new Date(SCHOOL_YEAR, 0, dayOfYear)
-    console.log(classes)
     const course = {
-        name: name,
-        classes: classes,
-        dayOfWeek: week[dayID],
-        date: date.toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit'}),
-        week: weekID,
-        begin: hours[0],
-        end: hours[1],
-        teachers: teachers,
-        place: places,
+      name: name,
+      classes: classes,
+      dayOfWeek: week[dayID],
+      date: date.toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit' }),
+      week: weekID,
+      begin: hours[0],
+      end: hours[1],
+      teachers: teachers,
+      place: places,
     }
-    for (let i = 0; i < classes.length; i++){
+    for (let i = 0; i < classes.length; i++) {
       const classe = classes[i]
     }
     return { classes, course }
   }
 }
 
-export default function loadScheduleDataFromString(data) {
+export default function loadSchedules(weekID: number, classes: any[]) {
+  const rawfilepath = path.join(process.cwd(), '/private/schedules.json')
+  const rawdata = fs.readFileSync(rawfilepath)
+  const data = JSON.parse(String(rawdata))
+  const finalSchedule = []
+  for (let weekIndex = 0; weekIndex < data.length; weekIndex++) {
+    const week = data[weekIndex]
+    for (let dayIndex = 0; dayIndex < week.days.length; dayIndex++) {
+      const day = week.days[dayIndex]
+      for (let courseIndex = 0; courseIndex < day.courses.length; courseIndex++) {
+        const courseData = day.courses[courseIndex]
+        const course = parseCourse(courseData.dayID, courseData.weekID, courseData.data);
+        for (let i = 0; i < course.classes.length; i++) {
+          if (classes.includes(course.classes[i])) {
+            finalSchedule.push(course)
+          }
+        }
+      }
+    }
+  }
+  return finalSchedule
+}
+
+function loadScheduleDataFromString(data) {
   console.log("Saving newly received schedules data on the cloud ...")
+  console.log(JSON.parse(data));
+
   const headlength = "2['uwu-ade-weekly-shcedule//".length
   const taillength = "']".length // removing the bracket at the end
   data = data.slice(headlength, data.length - taillength)
@@ -114,35 +138,30 @@ export default function loadScheduleDataFromString(data) {
   const builder = new xml2js.Builder()
   const schedules = []
   classesSchedule.forEach((schedule, classe) => {
-    // String(classe).normalize("NFD").replace(/[\u0300-\u036f]/g, "")
-    // const courses = 
-    // for (let i = 0; i < schedule.length; i++) {
-    //   const course = 
-    // }
     console.log(schedule)
     const classeSchedule = {
-        classeSchedule: {
-          name: classe,
-          schedule: { course: schedule }  // It's weird but every element of the list will have the name "course"
-        }
+      classeSchedule: {
+        name: classe,
+        schedule: { course: schedule }  // It's weird but every element of the list will have the name "course"
       }
+    }
     schedules.push(classeSchedule)  // Removing weird french accents
   })
   const xmldata = builder.buildObject(schedules)
-  const filepath = path.join(process.cwd(), '/public/schedules.xml')
+  const filepath = path.join(process.cwd(), '/private/schedules.xml')
   fs.writeFileSync(filepath, xmldata)
   console.log("Data succesfully saved")
 }
 
 function saveCourseFireBase(dayID, weekID, courseData) {
-  if (courseData.length  == 0) {
+  if (courseData.length == 0) {
     return
   }
   const hours = courseData[courseData.length - 1].split(' - ')  // Last element : 8h00 - 12h00
   const name = courseData[0]
 
   const teachers = [], places = [], classes = []
-  for (let i = 1; i < courseData.length -1; i++) {  // Ignoring first and last element
+  for (let i = 1; i < courseData.length - 1; i++) {  // Ignoring first and last element
     const information = removeSpaces(courseData[i])
     if (isClasseName(information)) {
       classes.push(information)
@@ -153,7 +172,7 @@ function saveCourseFireBase(dayID, weekID, courseData) {
     }
   }
   const week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-  if(name != undefined && !name.includes('/')) { // Then it's a propper name and it will crash firebase
+  if (name != undefined && !name.includes('/')) { // Then it's a propper name and it will crash firebase
     weekID += 1
     const course = {
       classes: classes,
@@ -165,7 +184,7 @@ function saveCourseFireBase(dayID, weekID, courseData) {
       teachers: teachers,
       place: places,
     }
-    for (let i = 0; i < classes.length; i++){
+    for (let i = 0; i < classes.length; i++) {
       const classe = classes[i]
       console.log('Cloud saving new course data at %s / %s / %s', ("week " + (weekID + 1)), week[dayID], name)
       const docRef = doc(dbInstance, "trainees" + "/" + classe + "/" + name)

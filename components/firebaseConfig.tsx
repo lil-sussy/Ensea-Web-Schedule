@@ -20,8 +20,8 @@ const firebaseConfig = {
 };
 
 
-export const fireBase = initializeApp(firebaseConfig);
-export const database = getFirestore(fireBase);
+export const firebase = initializeApp(firebaseConfig);
+export const database = getFirestore(firebase);
 // export const analytics = getAnalytics(fireBase);
 
 /* eslint-disable no-undef */
