@@ -6,56 +6,80 @@ import Head from 'next/head'
 import { promisifyStore } from 'next-session/lib/compat';
 import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { firebase, database } from '../components/firebaseConfig';
-import io from 'socket.io-client'
-import Image from 'next/image'
 import background from '../public/background2k.png'
 import logo from '../public/logo.png'
 
-let socket
+/// app/layout.tsx
+import localFont from '@next/font/local'
+
+/*
+<link href="http://fonts.cdnfonts.com/css/academy-engraved-let" rel="stylesheet">
+*/
+/*
+<link href="http://db.onlinewebfonts.com/c/06bac77bab58bc871a4d97b66f9a1af0?family=Marianne" rel="stylesheet" type="text/css"/>
+*/
+
+// Font files can be colocated inside of `app`
+
 
 function App({ views, lastSchedule }) {
   console.log('you have visited this website : ', views)
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   useEffect(() => {
     setIsMounted(true);
-    socketInitializer()
   }, [])
-  const socketInitializer = async () => {
-    // await fetch('/api/socket')
-    // socket = io()
-
-    // socket.on('connect', () => {
-    //   console.log('connected')
-    // })
-  }
   if (!isMounted) {
     return null;
   }
   return (
-    <div className="App">
-      <img className="ENSEABackground bg-local bg-center h-screen w-screen transition"
-        style={{ backgroundImage: ('url(' + background.src + ')') }}
-        alt="Picture of the ensea school in Cergy in black and white with hand drawing appearance"></img>
-      <header className="AppContainer text-zinc-800 w-full h-full -translate-x-1/2 absolute left-1/2 top-0">
-        <div className="Header h-24 w-full top-0 left-0 backdrop-blur-sm">
-          <div className="absolute z-0 left-0 top-0 w-full h-full bg-white opacity-90">
-            <div className="h-full w-full">
+    <div className="App font-semibold font-marianne">
+      <div className="BackgroundENSEA bg-cover h-screen w-screen transition
+      blur-sm "
+        style={{ backgroundImage: ('url(' + background.src + ')') }}>
+        <div className="w-full h-full bg-opacity-30 bg-white"></div>
+      </div>
+      <header className="AppContainer text-zinc-800 w-full h-full
+      -translate-x-1/2 absolute left-1/2 top-0">
+        <div className="Header relative w-full top-0 left-0 backdrop-blur-xl">
+          <div className="z-20 w-full mx-auto bg-white bg-opacity-10">
+            <div className="BurgerMenuContainer absolute top-0 left:0 mx-2 
+            h-full w-10 flex-row flex justify-center items-center">
+              <div className="BurgerMenu w-6 h-7 flex justify-evenly 
+              items-center flex-col">
+                <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
+                <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
+                <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
+                <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
+              </div>
+            </div>
+            <div className="h-full w-full py-1 pb-1">
               <img src={logo.src}
                 alt="Logo of projet Athena"
-                className="Logo shadow-0 my-1 mb-1 w-72 mx-auto"></img>
+                className="Logo bg-local bg-cover shadow-0 my-auto w-60 mx-auto"></img>
             </div>
           </div>
         </div>
-        <div className="SelectionsContainer h-10 my-3 mx-auto font backdrop-blur-sm w-3/4 flex-col align-center justify-center rounded-xl">
-          <div className="ClassSelection text-2xl w-full h-full bg-white rounded-xl opacity-70">
-            <div className="ClasseSelectionLabel h-1/2 justify-center align-center text-center">
-              <h4>1G1 TD3</h4>
+        <div className="SelectionsContainer relative from-main-orange 
+        to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center">
+          <div className="WhiteBorder bg-white w-full h-1"></div>
+          <div className="ClassSelection w-full h-full">
+            <div className="SearchBarContainer h-full w-full flex justify-center 
+            items-center">
+              <div className="SearchBar h-[40%] text-white text-2xl w-2/3  
+              rounded-lg border-white border-[1px] justify-center align-center 
+              text-center font-academyLET font-medium leading-9">
+                1G1 TD3
+              </div>
             </div>
           </div>
+          <div className="WhiteBorder h-1 absolute bottom-0 left-0 bg-white 
+          w-full"></div>
         </div>
-        <div className="SelectionsContainer h-10 my-3 mx-auto font backdrop-blur-sm w-3/4 flex-col align-center justify-center rounded-xl">
-          <div className="WeekSelection text-2xl w-full h-full bg-white rounded-xl opacity-70">
-            <div className="WeekSelectionLabel h-1/2 justify-center align-center text-center">
+        <div className="SelectionsContainer mb-2 h-8 mx-auto font w-36 bg-white
+        flex-col align-center justify-center rounded-lg -translate-y-1/2 ">
+          <div className="WeekSelection w-full h-full">
+            <div className="WeekSelectionLabel text-[1.3rem] justify-center align-center 
+            text-center text-gray-600">
               <h4>Semaine 9</h4>
             </div>
           </div>

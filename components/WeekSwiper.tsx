@@ -2,6 +2,9 @@ import { useState, useEffect, useMemo } from "react";
 import { Swiper, SwiperSlide, SwiperProps } from "swiper/react";
 import "swiper/swiper-bundle.min.css";
 import useSWR, { SWRConfig } from 'swr'
+import 'swiper/css';
+import 'swiper/css/navigation';
+import 'swiper/css/pagination';
 
 import SwiperCore, { EffectCreative, EffectFlip, EffectCube, Navigation, Pagination } from "swiper";
 // Other effects : EffectCreative, EffectCube. Navigation : Navigation
@@ -39,13 +42,13 @@ export default function WeekSchedule(props) {
 
   const { daysList, onTransitionStart, onInit } = initWeekSchedule(data, week, currentWeek)
   const swiper = (<Swiper
-    className="WeekSchedule w-full h-full mb-6"
+    modules={ [ Pagination, Navigation ]  }
+    className="WeekSchedule w-full h-full"
     enabled={true}
     direction="horizontal"
     spaceBetween={0}
     centeredSlides={true}
     cssMode={false}
-    modules={[Pagination]}
     slidesPerView={1}
     speed={1000}
     touchRatio={1.5}
@@ -79,9 +82,13 @@ function initWeekSchedule(data: any, weekDates: Date[], currentWeek: number) {
   }
   const daysList = []
   for (let i = 0; i < 7; i++) {
-    console.log(weekSchedule.get(WEEK[i]));
-    
-    daysList.push(DaySlide(WEEK[i], weekDates[i], weekSchedule.get(WEEK[i])))
+    const name = WEEK[i]
+    const data = weekSchedule.get(name)
+    if ((name === "Samedi" || name === "Dimanche") && data == undefined) {
+
+    } else {
+      daysList.push(DaySlide(name, weekDates[i], data))
+    }
   }
   let animation_last_pos = -1;
   const HUGE_DIFFERENTIAL = 10;  // 10px
@@ -108,7 +115,7 @@ function initWeekSchedule(data: any, weekDates: Date[], currentWeek: number) {
       if (dx >= HUGE_DIFFERENTIAL) {  // Bigger than 10px
         swiper.slides[index].style.transitionDuration = "1500ms"  // God that's smooth
       } else {
-        swiper.slides[index].style.transitionDuration = "100ms"
+        swiper.slides[index].style.transitionDuration = "1000ms"
       }
     }
   }

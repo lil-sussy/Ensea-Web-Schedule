@@ -1,7 +1,6 @@
 import { collection, setDoc, doc, addDoc, getDocs } from 'firebase/firestore';
 import { firebase, database } from './firebaseConfig';
 import scheduleTree from '../private/classesTree';
-const xml2js = require('xml2js')
 const fs = require('fs')
 const path = require('path')
 
