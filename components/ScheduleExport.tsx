@@ -7,7 +7,7 @@ const path = require('path')
 const FB_COLLECTION = 'schedules'
 const dbInstance = collection(database, FB_COLLECTION);
 
-function removeSpaces(str) {
+function removeSpaces(str: String) {
   let begin = 0
   let end = 0
   while (String(str).charAt(begin) === ' ') {
@@ -25,12 +25,12 @@ function isPlace(myString) {  // Place like C203 or amphitheater :3
   return /[A-Z]+[0-9][0-9]*/.test(myString) || myString === AMPHI_WATTEAU;
 }
 
-function isClasseName(information) {
+function isClasseName(information: any) {
   return scheduleTree.has(information)
 }
 
 const SCHOOL_YEAR = 2022
-function parseCourse(dayID, weekID, courseData) {
+function parseCourse(dayID: number, weekID: number, courseData: any) {
   if (courseData.length == 0) {
     return
   }

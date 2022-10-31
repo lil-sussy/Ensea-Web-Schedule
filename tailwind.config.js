@@ -25,7 +25,10 @@ module.exports = {
         '27': 'repeat(27, 3.7037%)',
       },
       backdropBlur: {
-        'xs': '1px'
+        'xs': '1px',
+      },
+      blur: {
+        'xs': '1px',
       },
       spacing: {
         '0.25': '0.0625rem',
@@ -41,6 +44,9 @@ module.exports = {
       fontFamily: {
         academySTD: ["Academy Engraved STD", "sans-serif"],  // Imported in global.css
         academyLET: ["Academy Engraved LET", "sans-serif"],  // Imported in global.css
+        bloggerSans: ["Blogger Sans", "sans-serif"],
+        Cabin: ['Cabin'],
+        Cabin: ['Cabin Medium'],
         marianne: ["Marianne", "sans-serif"],
         poppins: ["Poppins", "sans-serif"],
         adelia: ["ADELIA", "cursive"],

@@ -4,39 +4,65 @@
 
 
 /*
-<link href="http://fonts.cdnfonts.com/css/academy-engraved-let" rel="stylesheet">
-*/
-/*
-<link href="http://db.onlinewebfonts.com/c/06bac77bab58bc871a4d97b66f9a1af0?family=Marianne" rel="stylesheet" type="text/css"/>
-*/
-/* @import url(http://db.onlinewebfonts.com/c/3c471385717f118ae2efdeabbdc50824?family=Academy+Engraved+LET.css); */
-@import url(http://db.onlinewebfonts.com/c/06bac77bab58bc871a4d97b66f9a1af0?family=Marianne);
-
-/*
       www.OnlineWebFonts.Com 
       You must credit the author Copy this link on your web 
       <div>Font made from <a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>is licensed by CC BY 3.0</div>
       OR
       <a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>
 */
-@font-face {font-family: "Academy Engraved LET";
-  src: url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.eot"); /* IE9*/
-  src: url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.eot?#iefix") format("embedded-opentype"), /* IE6-IE8 */
-  url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.woff2") format("woff2"), /* chrome firefox */
-  url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.woff") format("woff"), /* chrome firefox */
-  url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.ttf") format("truetype"), /* chrome firefox opera Safari, Android, iOS 4.2+*/
-  url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.svg#Academy Engraved LET") format("svg"); /* iOS 4.1- */
+@font-face {
+  font-family: "Academy Engraved LET";
+  src: url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.eot");
+  /* IE9*/
+  src: url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.eot?#iefix") format("embedded-opentype"),
+    /* IE6-IE8 */
+    url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.woff2") format("woff2"),
+    /* chrome firefox */
+    url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.woff") format("woff"),
+    /* chrome firefox */
+    url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.ttf") format("truetype"),
+    /* chrome firefox opera Safari, Android, iOS 4.2+*/
+    url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.svg#Academy Engraved LET") format("svg");
+  /* iOS 4.1- */
 }
 
-body {
-  margin: 0;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  font-weight: 300;
-  font-family: Marianne, 'Courier New';
+@font-face {
+  font-family: "Marianne";
+  src: url("http://db.onlinewebfonts.com/t/06bac77bab58bc871a4d97b66f9a1af0.eot");
+  /* IE9*/
+  src: url("http://db.onlinewebfonts.com/t/06bac77bab58bc871a4d97b66f9a1af0.eot?#iefix") format("embedded-opentype"),
+    /* IE6-IE8 */
+    url("http://db.onlinewebfonts.com/t/06bac77bab58bc871a4d97b66f9a1af0.woff2") format("woff2"),
+    /* chrome firefox */
+    url("http://db.onlinewebfonts.com/t/06bac77bab58bc871a4d97b66f9a1af0.woff") format("woff"),
+    /* chrome firefox */
+    url("http://db.onlinewebfonts.com/t/06bac77bab58bc871a4d97b66f9a1af0.ttf") format("truetype"),
+    /* chrome firefox opera Safari, Android, iOS 4.2+*/
+    url("http://db.onlinewebfonts.com/t/06bac77bab58bc871a4d97b66f9a1af0.svg#Marianne") format("svg");
+  /* iOS 4.1- */
 }
 
-code {
-  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-    monospace;
+@font-face {
+  font-family: "Marianne";
+  font-weight: 800;
+  src: url('../public/Marianne-Bold.otf');
+}
+
+@font-face {
+  font-family: "Cabin";
+  src: url("//db.onlinewebfonts.com/t/846b1aef0646dfd6de1ae64f1d6a8991.eot");
+  src: url("//db.onlinewebfonts.com/t/846b1aef0646dfd6de1ae64f1d6a8991.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/846b1aef0646dfd6de1ae64f1d6a8991.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/846b1aef0646dfd6de1ae64f1d6a8991.woff") format("woff"), url("//db.onlinewebfonts.com/t/846b1aef0646dfd6de1ae64f1d6a8991.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/846b1aef0646dfd6de1ae64f1d6a8991.svg#Cabin") format("svg");
+}
+
+@font-face {
+  font-family: "Cabin Medium";
+  src: url("//db.onlinewebfonts.com/t/f0e29f0b7216880f8cc891a7cfe6ef81.eot");
+  src: url("//db.onlinewebfonts.com/t/f0e29f0b7216880f8cc891a7cfe6ef81.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/f0e29f0b7216880f8cc891a7cfe6ef81.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/f0e29f0b7216880f8cc891a7cfe6ef81.woff") format("woff"), url("//db.onlinewebfonts.com/t/f0e29f0b7216880f8cc891a7cfe6ef81.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/f0e29f0b7216880f8cc891a7cfe6ef81.svg#Cabin") format("svg");
+}
+
+@font-face {
+  font-family: "Cabin";
+  font-style: italic;
+  src: url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.eot");
+  src: url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.woff") format("woff"), url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.svg#Cabin") format("svg");
 }

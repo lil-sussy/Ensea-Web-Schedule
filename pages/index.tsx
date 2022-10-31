@@ -34,14 +34,14 @@ function App({ views, lastSchedule }) {
   return (
     <div className="App font-semibold font-marianne">
       <div className="BackgroundENSEA bg-cover h-screen w-screen transition
-      blur-sm "
+      blur-[2px] "
         style={{ backgroundImage: ('url(' + background.src + ')') }}>
         <div className="w-full h-full bg-opacity-30 bg-white"></div>
       </div>
       <header className="AppContainer text-zinc-800 w-full h-full
       -translate-x-1/2 absolute left-1/2 top-0">
-        <div className="Header relative w-full top-0 left-0 backdrop-blur-xl">
-          <div className="z-20 w-full mx-auto bg-white bg-opacity-10">
+        <div className="Header relative w-full top-0 left-0 backdrop-blur-sm">
+          <div className="z-20 w-full mx-auto bg-white bg-opacity-[20%]">
             <div className="BurgerMenuContainer absolute top-0 left:0 mx-2 
             h-full w-10 flex-row flex justify-center items-center">
               <div className="BurgerMenu w-6 h-7 flex justify-evenly 
@@ -68,23 +68,23 @@ function App({ views, lastSchedule }) {
               <div className="SearchBar h-[40%] text-white text-2xl w-2/3  
               rounded-lg border-white border-[1px] justify-center align-center 
               text-center font-academyLET font-medium leading-9">
-                1G1 TD3
+                1G1 TP6
               </div>
             </div>
           </div>
           <div className="WhiteBorder h-1 absolute bottom-0 left-0 bg-white 
           w-full"></div>
         </div>
-        <div className="SelectionsContainer mb-2 h-8 mx-auto font w-36 bg-white
+        <div className="SelectionsContainer mb-2 h-8 mx-auto w-36 bg-white
         flex-col align-center justify-center rounded-lg -translate-y-1/2 ">
           <div className="WeekSelection w-full h-full">
             <div className="WeekSelectionLabel text-[1.3rem] justify-center align-center 
-            text-center text-gray-600">
+            text-center text-gray-700 font-bold">
               <h4>Semaine 9</h4>
             </div>
           </div>
         </div>
-        <div className="WeekScheduleContainer w-full h-2/3">
+        <div className="WeekScheduleContainer w-full h-[69%]">
           <WeekSchedule lastSchedule={lastSchedule} />
         </div>
       </header>

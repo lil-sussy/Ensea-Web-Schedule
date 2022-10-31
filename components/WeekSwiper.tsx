@@ -13,7 +13,7 @@ SwiperCore.use([EffectFlip])
 
 import DaySlide from './DaySlide'
 
-export default function WeekSchedule(props) {
+export default function WeekSchedule(props: any) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
     return data
@@ -39,8 +39,30 @@ export default function WeekSchedule(props) {
   if (!isMounted) {
     return null;
   }
+  const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+  const weekSchedule = new Map()
+  const classeSchedule = data.totalSchedule
+  for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {
+    const course = classeSchedule[scheduleIndex].course
+    const weekID = Number(course.week)
+    if (weekID == currentWeek) { 
+      const dayID = course.dayOfWeek
+      const dayCourses = weekSchedule.get(dayID) == undefined ? [] : weekSchedule.get(dayID) 
+      dayCourses.push(course)
+      weekSchedule.set(dayID, dayCourses)
+    }
+  }
+  const daysList = []
+  for (let i = 0; i < 7; i++) {
+    const name = WEEK[i]
+    const data = weekSchedule.get(name)
+    if ((name === "Samedi" || name === "Dimanche") && data == undefined) {
 
-  const { daysList, onTransitionStart, onInit } = initWeekSchedule(data, week, currentWeek)
+    } else {
+      daysList.push(DaySlide(name, week[i], data))
+    }
+  }
+  const { onTransitionStart, onInit } = initSwiper()
   const swiper = (<Swiper
     modules={ [ Pagination, Navigation ]  }
     className="WeekSchedule w-full h-full"
@@ -66,33 +88,10 @@ export default function WeekSchedule(props) {
   return swiper;
 }
 
-function initWeekSchedule(data: any, weekDates: Date[], currentWeek: number) {
-  const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-  const weekSchedule = new Map()
-  const classeSchedule = data.totalSchedule
-  for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {
-    const course = classeSchedule[scheduleIndex].course
-    const weekID = Number(course.week)
-    if (weekID == currentWeek) { 
-      const dayID = course.dayOfWeek
-      const dayCourses = weekSchedule.get(dayID) == undefined ? [] : weekSchedule.get(dayID) 
-      dayCourses.push(course)
-      weekSchedule.set(dayID, dayCourses)
-    }
-  }
-  const daysList = []
-  for (let i = 0; i < 7; i++) {
-    const name = WEEK[i]
-    const data = weekSchedule.get(name)
-    if ((name === "Samedi" || name === "Dimanche") && data == undefined) {
-
-    } else {
-      daysList.push(DaySlide(name, weekDates[i], data))
-    }
-  }
+function initSwiper() {
   let animation_last_pos = -1;
   const HUGE_DIFFERENTIAL = 10;  // 10px
-  const NiceAnimation = (swiper) => {
+  const NiceAnimation = (swiper: any) => {
     if (swiper.destroyed === true) {
       return
     }
@@ -109,7 +108,7 @@ function initWeekSchedule(data: any, weekDates: Date[], currentWeek: number) {
       // peut *être remplacer par animate.js
       const z_index = 2 - Math.round(Math.abs(p));  // either 2 or 1
       const scale = 0.8 + 0.2 * (1 - Math.abs(p));
-      const transX = p * 30;  // Relative
+      const transX = p * 35;  // Relative
       swiper.slides[index].style.z_index = z_index;  // Central slide should be in front of the others
       swiper.slides[index].style.transform = "scale(" + scale + ") translateX(" + transX + "%)"
       if (dx >= HUGE_DIFFERENTIAL) {  // Bigger than 10px
@@ -119,7 +118,7 @@ function initWeekSchedule(data: any, weekDates: Date[], currentWeek: number) {
       }
     }
   }
-  const onInit = (swiper) => {  // On swipper initialization
+  const onInit = (swiper: any) => {  // On swipper initialization
     NiceAnimation(swiper)
     const observer = new MutationObserver(function (mutations) {  // Style observer
       NiceAnimation(swiper)
@@ -132,7 +131,7 @@ function initWeekSchedule(data: any, weekDates: Date[], currentWeek: number) {
       swiper.slides[index].style.transitionDuration = "1000ms"
     }
   }
-  return { daysList, onInit, onTransitionStart }
+  return { onInit, onTransitionStart }
 }
 
 // https://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
@@ -145,15 +144,21 @@ function dateDiffInDays(preceding: Date, date: Date) {
   return Math.floor((utc2 - utc1) / _MS_PER_DAY);
 }
 
+function getMondayOfDate(date: Date) {
+  const mondayOfTheMonth = date.getDate() - date.getDay() +1
+  return new Date(new Date(date).setDate(mondayOfTheMonth))
+}
+
 // https://bobbyhadz.com/blog/javascript-get-monday-of-current-week#:~:text=function%20getMondayOfCurrentWeek()%20%7B%20const%20today,Mon%20Jan%2017%202022%20console.
 function getSchoolWeek(today: Date, schoolBeginDay: Date) {
-  const diff = dateDiffInDays(schoolBeginDay, today)
-  const first = today.getDate() - today.getDay() + 1;
-  const monday = new Date(today.setDate(first));
+  const mondayOfTheMonth = today.getDate() - today.getDay() + 1;
+  const monday = new Date(new Date(today).setDate(mondayOfTheMonth))
   const week = [monday]
   for (let i = 1; i < 7; i++) {
-    week.push(new Date(today.setDate(first + i)))
+    const day = new Date(new Date(today).setDate(mondayOfTheMonth + i))
+    week.push(day)
   }
+  const diff = dateDiffInDays(schoolBeginDay, today)
   return { week: week, weekID: Math.floor(diff/7) + 1 }
 }
 

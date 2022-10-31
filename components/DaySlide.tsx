@@ -32,7 +32,7 @@ let DaySlide = (actualDay: String, date: Date, dayData: any) => {
                   style={{
                     background: 'linear-gradient(to right,\
                   transparent 85%, #ffeeff 95%)' }}></div>
-                <div className="overflow-hidden font-bold text-sm">{course.name}</div>
+                <div className="overflow-hidden font-bold text-sm drop-shadow-sm">{course.name}</div>
               </div>
               <div className="CourseInfo relative text-start w-full h-full whitespace-nowrap col-span-1">
                 <div className="TextGradient absolute right-0 top-0 w-full h-6"
@@ -42,7 +42,7 @@ let DaySlide = (actualDay: String, date: Date, dayData: any) => {
                 <div className="overflow-hidden">{course.place+ " "}</div>
               </div>
             </div>
-            <div className="CourseContent opacity-90 w-full h-6 mx-2
+            <div className="CourseContent opacity-90 w-full h-6 mx-2 font-Cabin
               inline-grid grid-cols-4">
               <div className="CourseInfo text-start col-span-3 w-full 
                 relative whitespace-nowrap">
@@ -93,9 +93,9 @@ let DaySlide = (actualDay: String, date: Date, dayData: any) => {
     <SwiperSlide key={actualDay as Key}>
       <div className="DayContainer w-full h-full text-lg flex 
       justify-center items-center">
-        <div className="DayAbsoluteContainer absolute top-0 py-2
-        w-72 h-full rounded-xl border-main-purple border-[1px] bg-white">
-          <div className="DayContent h-[85%] absolute top-2 flex
+        <div className="DayAbsoluteContainer absolute top-0 py-2 drop-shadow-md
+        w-72 h-[95%] rounded-xl border-main-purple border-[1px] bg-white">
+          <div className="DayContent h-[89%] absolute top-2 flex
           justify-start">
             {courseHourWrappers.map((div) => div)}
             <div className="CoursesContainer inline-grid grid-rows-27 w-60
@@ -103,7 +103,6 @@ let DaySlide = (actualDay: String, date: Date, dayData: any) => {
               {divCourses.map((div) => div)}
             </div>
           </div>
-        </div>
           <div className="DayName absolute flex 
           justify-center items-center flex-col text-center w-full 
           bottom-0 h-[0.1428]">
@@ -111,10 +110,11 @@ let DaySlide = (actualDay: String, date: Date, dayData: any) => {
             translate-y-3">
               {actualDay.toUpperCase()}
             </h2>
-            <h4 className="text-sm font-normal text-gray-600 font-academyLET">
-              {date.toLocaleString([], { year: 'numeric', month: '2-digit', day: '2-digit' })}
+            <h4 className="text-xs font-normal mt-[0.1rem] text-gray-600 font-marianne">
+              {date.toLocaleString("fr-FR", { year: 'numeric', month: '2-digit', day: '2-digit' })}
             </h4>
           </div>
+        </div>
       </div>
     </SwiperSlide>
   );
