@@ -47,6 +47,7 @@ module.exports = {
         bloggerSans: ["Blogger Sans", "sans-serif"],
         Cabin: ['Cabin'],
         Cabin: ['Cabin Medium'],
+        Chango: ['Chango, cursive'],
         marianne: ["Marianne", "sans-serif"],
         poppins: ["Poppins", "sans-serif"],
         adelia: ["ADELIA", "cursive"],

@@ -2,6 +2,17 @@
 @tailwind components;
 @tailwind utilities;
 
+@layer components {
+  .ButtonNav {
+    @apply bg-clip-text bg-gradient-to-bl from-main-orange text-transparent to-main-orange text-3xl font-bold font-marianne absolute
+  }
+  .NavNext {
+    @apply right-0 -top-0.5
+  }
+  .NavPrev {
+    @apply left-0 -top-0.5
+  }
+}
 
 /*
       www.OnlineWebFonts.Com 
@@ -65,4 +76,23 @@
   font-style: italic;
   src: url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.eot");
   src: url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.woff") format("woff"), url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/5568f147bb1f439360dd828c107bd23f.svg#Cabin") format("svg");
+}
+
+/* latin-ext */
+@font-face {
+  font-family: 'Chango';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chango/v21/2V0cKI0OB5U7WaJCxne5fFU.woff2) format('woff2');
+  unicode-range: U+0100-024F, U+0259, U+1E00-1EFF, U+2020, U+20A0-20AB, U+20AD-20CF, U+2113, U+2C60-2C7F, U+A720-A7FF;
+}
+/* latin */
+@font-face {
+  font-family: 'Chango';
+  font-style: normal;
+  font-weight: 400;
+  font-display: swap;
+  src: url(https://fonts.gstatic.com/s/chango/v21/2V0cKI0OB5U7WaJCyHe5.woff2) format('woff2');
+  unicode-range: U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+2000-206F, U+2074, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
 }

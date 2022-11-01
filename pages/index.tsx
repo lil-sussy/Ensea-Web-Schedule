@@ -1,6 +1,6 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import React from 'react';
-import WeekSchedule from '../components/WeekSwiper';
+import WeekSchedule from '../components/DaySwiper';
 import nextSession from "next-session"
 import Head from 'next/head'
 import { promisifyStore } from 'next-session/lib/compat';
@@ -8,26 +8,36 @@ import { collection, addDoc, getDocs } from 'firebase/firestore';
 import { firebase, database } from '../components/firebaseConfig';
 import background from '../public/background2k.png'
 import logo from '../public/logo.png'
+import WeekSelectionSwiper from '../components/WeekSelectionSlider'
 
-/// app/layout.tsx
-import localFont from '@next/font/local'
-
-/*
-<link href="http://fonts.cdnfonts.com/css/academy-engraved-let" rel="stylesheet">
-*/
-/*
-<link href="http://db.onlinewebfonts.com/c/06bac77bab58bc871a4d97b66f9a1af0?family=Marianne" rel="stylesheet" type="text/css"/>
-*/
-
-// Font files can be colocated inside of `app`
-
+// app/layout.tsx
+import useSWR, { SWRConfig } from 'swr'
 
 function App({ views, lastSchedule }) {
   console.log('you have visited this website : ', views)
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
+  const [ currentWeek, setCurrentWeek ] = useState(1)
   useEffect(() => {
     setIsMounted(true);
+    setCurrentWeek(getWeekID(new Date()))  // the first weekID is set to be today's week
   }, [])
+  const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
+    return data
+  })
+  const config = useMemo(  // Apparently this might be useful
+    () => ({
+      headers: {
+        classe: lastSchedule,
+        week: currentWeek,
+        'Content-Type': 'application/json',
+      },
+    }),
+    [lastSchedule, currentWeek]
+  );
+  const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
+  if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
+  if (!data) return <p>loading...</p>
+
   if (!isMounted) {
     return null;
   }
@@ -44,7 +54,7 @@ function App({ views, lastSchedule }) {
           <div className="z-20 w-full mx-auto bg-white bg-opacity-[20%]">
             <div className="BurgerMenuContainer absolute top-0 left:0 mx-2 
             h-full w-10 flex-row flex justify-center items-center">
-              <div className="BurgerMenu w-6 h-7 flex justify-evenly 
+              <div className="BurgerMenu w-6 h-8 flex justify-evenly 
               items-center flex-col">
                 <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
                 <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
@@ -75,17 +85,9 @@ function App({ views, lastSchedule }) {
           <div className="WhiteBorder h-1 absolute bottom-0 left-0 bg-white 
           w-full"></div>
         </div>
-        <div className="SelectionsContainer mb-2 h-8 mx-auto w-36 bg-white
-        flex-col align-center justify-center rounded-lg -translate-y-1/2 ">
-          <div className="WeekSelection w-full h-full">
-            <div className="WeekSelectionLabel text-[1.3rem] justify-center align-center 
-            text-center text-gray-700 font-bold">
-              <h4>Semaine 9</h4>
-            </div>
-          </div>
-        </div>
+        <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek}/>
         <div className="WeekScheduleContainer w-full h-[69%]">
-          <WeekSchedule lastSchedule={lastSchedule} />
+          <WeekSchedule data={data} currentWeek={currentWeek} />
         </div>
       </header>
     </div>
@@ -122,3 +124,74 @@ export default function indexPage(pageProps) {
     </React.StrictMode>
   );
 }
+
+// https://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
+function dateDiffInDays(preceding: Date, date: Date) {
+  const _MS_PER_DAY = 1000 * 60 * 60 * 24;
+  // Discard the time and time-zone information.
+  const utc1 = Date.UTC(preceding.getFullYear(), preceding.getMonth(), preceding.getDate());
+  const utc2 = Date.UTC(date.getFullYear(), date.getMonth(), date.getDate());
+
+  return Math.floor((utc2 - utc1) / _MS_PER_DAY);
+}
+
+export function getMondayOfDate(date: Date) {
+  const mondayOfTheMonth = date.getDate() - date.getDay() +1
+  return new Date(new Date(date).setDate(mondayOfTheMonth))
+}
+
+export function getWeekByID(weekID: number) {
+  const time = ((weekID - 1) * 7 + 1)*24*60*60*1000
+  const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = new Date('29 Aug 2022 02:00:00 GMT')  // First monday of first week, France is in GMT+2 zone
+  const mondayInTheMonth = new Date(FIRST_MONDAY_OF_THE_SCHOOL_YEAR.getTime() + time)
+  const monday = new Date(mondayInTheMonth)
+  const week = [monday]
+  for (let i = 1; i < 7; i++) {
+    const day = new Date(monday.getTime() + 24*60*60*1000*i)
+    week.push(day)
+  }
+  return week
+}
+
+// https://bobbyhadz.com/blog/javascript-get-monday-of-current-week#:~:text=function%20getMondayOfCurrentWeek()%20%7B%20const%20today,Mon%20Jan%2017%202022%20console.
+export function getWeekID(day: Date) {
+  const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = new Date('29 Aug 2022 02:00:00 GMT')  // First monday of first week, France is in GMT+2 zone
+  const diff = dateDiffInDays(FIRST_MONDAY_OF_THE_SCHOOL_YEAR, new Date())
+  return Math.floor(Math.abs(diff)/7) + 1 
+}
+
+/**
+ * https://stackoverflow.com/questions/9045868/javascript-date-getweek
+ * Returns the week number for this date.  dowOffset is the day of week the week
+ * "starts" on for your locale - it can be from 0 to 6. If dowOffset is 1 (Monday),
+ * the week returned is the ISO 8601 week number.
+ * @param int dowOffset
+ * @return int
+ */
+function getWeek(today: Date, dowOffset: number) {
+  /*getWeek() was developed by Nick Baicoianu at MeanFreePath: http://www.meanfreepath.com */
+
+  dowOffset = typeof (dowOffset) == 'number' ? dowOffset : 0; //default dowOffset to zero
+  const newYear = new Date(today.getFullYear(), 0, 1);
+  let day = newYear.getDay() - dowOffset; //the day of week the year begins on
+  day = (day >= 0 ? day : day + 7);
+  const daynum = Math.floor((today.getTime() - newYear.getTime() -
+    (today.getTimezoneOffset() - newYear.getTimezoneOffset()) * 60000) / 86400000) + 1;
+  let weeknum;
+  //if the year starts before the middle of a week
+  if (day < 4) {
+    weeknum = Math.floor((daynum + day - 1) / 7) + 1;
+    if (weeknum > 52) {
+      const nYear = new Date(today.getFullYear() + 1, 0, 1);
+      let nday = nYear.getDay() - dowOffset;
+      nday = nday >= 0 ? nday : nday + 7;
+      /*if the next year starts before the middle of
+        the week, it is week #1 of that year*/
+      weeknum = nday < 4 ? 1 : 53;
+    }
+  }
+  else {
+    weeknum = Math.floor((daynum + day - 1) / 7);
+  }
+  return weeknum;
+};

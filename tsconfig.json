@@ -22,8 +22,10 @@
   "include": [
     "next-env.d.ts",
     "**/*.ts",
-    "**/*.tsx"
-, "private/client.js", "components/WeekSwiper.tsx"  ],
+    "**/*.tsx",
+    "private/client.js",
+    "components/DaySwiper.tsx"
+  ],
   "exclude": [
     "node_modules"
   ]

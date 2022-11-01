@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, Attributes, Key } from 'react';
 import { Swiper, SwiperSlide, SwiperProps } from "swiper/react";
 import "swiper/swiper-bundle.min.css";
 
-let DaySlide = (actualDay: String, date: Date, dayData: any) => {
+let DaySlide = ({ actualDay, date, dayData }) => {
   const courses = dayData;
   const courseHourWrappers = [];
   const divCourses = [];
@@ -16,53 +16,56 @@ let DaySlide = (actualDay: String, date: Date, dayData: any) => {
       const rowEnd = (endHour - 6) * 2 + (course.end.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 6am + if half hour
       divCourses.push(
         <div key={course.begin} className={
-          "Course w-full  text-gray-700 \
+          "Course w-full  text-gray-700 outline-2 outline-white\
           rounded-md  bg-gradient-to-b p-2 font-marianne\
           from-third-purple to-third-purple "+
           "row-start-" + rowBegin + " row-end-" + rowEnd + " "  // This doesnt work for some reasons
           + " text-xs font-normal text-start"}
-          style={{ gridRowStart: rowBegin, gridRowEnd: rowEnd,
-            backgroundClip: '',  }}>
-            <div className="CourseHeader w-full h-1/2 inline-grid 
-              grid-cols-6 bg-opacity-40">
-              <div className="CourseInfo relative text-start w-full 
+          style={{
+            gridRowStart: rowBegin, gridRowEnd: rowEnd,
+            backgroundClip: '',
+          }}>
+          <div className="CourseHeader w-full h-1/2 inline-grid 
+              grid-cols-6">
+            <div className="CourseInfo relative text-start w-full 
                 h-full whitespace-nowrap col-span-5 ">
-                <div className="TextGradient absolute right-0 top-0 
+              <div className="TextGradient absolute top-0 
                   w-full h-6"
-                  style={{
-                    background: 'linear-gradient(to right,\
+                style={{
+                  background: 'linear-gradient(to right,\
                   transparent 85%, #ffeeff 95%)' }}></div>
-                <div className="overflow-hidden font-bold text-sm drop-shadow-sm">{course.name}</div>
-              </div>
-              <div className="CourseInfo relative text-start w-full h-full whitespace-nowrap col-span-1">
-                <div className="TextGradient absolute right-0 top-0 w-full h-6"
-                  style={{
-                    background: 'linear-gradient(to right, \
+              <div className="overflow-hidden font-bold text-sm drop-shadow-sm 
+                items-baseline">{course.name}</div>
+            </div>
+            <div className="CourseInfo relative text-start w-full h-full whitespace-nowrap col-span-1">
+              <div className="TextGradient absolute -right-1 top-0 w-full h-6"
+                style={{
+                  background: 'linear-gradient(to right, \
                     transparent 85%, #ffeeff 95%)' }}></div>
-                <div className="overflow-hidden">{course.place+ " "}</div>
-              </div>
+              <div className="overflow-hidden text-end items-baseline">{course.place + " "}</div>
             </div>
-            <div className="CourseContent opacity-90 w-full h-6 mx-2 font-Cabin
+          </div>
+          <div className="CourseContent w-[91%] h-6 ml-2 font-Cabin
               inline-grid grid-cols-4">
-              <div className="CourseInfo text-start col-span-3 w-full 
+            <div className="CourseInfo text-start col-span-3 w-full 
                 relative whitespace-nowrap">
-                <div className="TextGradient absolute right-0 top-0 
+              <div className="TextGradient absolute -right-1 top-0 
                 w-full h-5"
-                  style={{
-                    background: 'linear-gradient(to right, \
+                style={{
+                  background: 'linear-gradient(to right, \
                   transparent 85%, #ffeeff 95%)' }}></div>
-                <div className="overflow-hidden"> {course.teachers} </div>
-              </div>
-              <div className="CourseInfo text-start col-span-1 w-full 
-                relative whitespace-nowrap">
-                <div className="TextGradient absolute right-0 top-0 
-                  w-full h-5"
-                  style={{
-                    background: 'linear-gradient(to right, \
-                  transparent 85%, #ffeeff 95%)' }}></div>
-                <div className="overflow-hidden"> {course.classes} </div>
-              </div>
+              <div className="overflow-hidden"> {course.teachers} </div>
             </div>
+            <div className="CourseInfo text-start col-span-1 w-full 
+                relative whitespace-nowrap">
+              <div className="TextGradient absolute -right-1 top-0 
+                  w-full h-5"
+                style={{
+                  background: 'linear-gradient(to right,\
+                  transparent 85%, #ffeeff 95%)' }}></div>
+              <div className="overflow-hidden text-[0.5rem] text-end"> {course.classes} </div>
+            </div>
+          </div>
         </div>
       );
       const wrpBeginHour = beginHour - 0.5   // Wrapper of half an hour long

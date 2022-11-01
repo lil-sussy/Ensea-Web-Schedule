@@ -19,72 +19,34 @@ Known issues
 */
 
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
-
-function createSocketInstance() {
-  const socket = io('http://localhost:3001', {
-    transports: ['websocket', 'polling', 'flashsocket'],
-    path: 'cloudData',
-    secure: true,
-    query: "ADE_client_browser_scrapper",
-    autoConnect: false,
-    extraHeaders: {
-      'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',  // Required or the request will be blocked by chrome
-    },
-    enabledTransports: ['ws', 'wss'],
-  })
-  // const socket = io('https://enseawebschedule.herokuapp.com', {  // https://enseawebschedule.herokuapp.com
-  //   transports: ['websocket', 'polling', 'flashsocket'],
-  //   secure: true,
-  //   query: "ADE_client_browser_scrapper",
-  //   autoConnect: false,
-  //   extraHeaders: {
-  //     'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp',
-  //   },
-  //   enabledTransports: ['ws', 'wss'],
-  // })
-
-  socket.on('connect_error', (err) => {
-    console.log(err)
-  })
-
-  socket.on('packet', ({ type, data }) => {
-    console.log('Packet received of type %s : %s', type, data)
-  })
-
-  socket.on("packetCreate", (packet) => {
-    console.log("Successfully emited packet")
-  })
-
-  socket.on("disconnect", () => {
-    console.log("disconnected from socket");
-  });
-  return socket;
-}
+const TIME_INTERVAL = 80
 
 function delay(time, callback) {
   setTimeout(callback, time);
 }
 
 function init() {  // Initial navigation through ADE
-  $('#x-auto-16').ready(() => {  // The on('load') and .load(()=>) functions doenst work as well
-    const yearSelection = $('#x-auto-16')
-    yearSelection.click();
-    let okYearButton = document.evaluate('/html/body/div[2]/div[2]/div[1]/div/div/div/div/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button', document).iterateNext()
-    okYearButton.click();
-    delay(1000, () => {  // Wait 1s
-      const week11 = $("#x-auto-184 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
-      week11.click();
-      // $('#x-auto-230 .x-tree3-node-joint').ready(() => {
-      //     const arrowTrainee = $('#x-auto-230 .x-tree3-node-joint');
-      //     console.log("dom ready, currently navigating through schedules, clicking :", arrowTrainee)
-      //     arrowTrainee.click()
-      //     let arrowFirstYear = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[1]/table/tbody/tr/td[2]/div/div/div/img[2]', document).iterateNext()
-      //     arrowFirstYear.click();
-      //     let TD3 = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[5]/table/tbody/tr/td[2]/div/div/div', document).iterateNext();
-      //     TD3.click();
-      // })
-    })
-  })
+  //Bellow script unusable since it's no longer possible to click on '2022/2023' button !!! Since end of october 2022 pls kill me
+
+  // $('#x-auto-16').ready(() => {  // The on('load') and .load(()=>) functions doenst work as well
+  //   yearSelection.click(); 
+  //   const yearSelection = $('#x-auto-16')
+  //   let okYearButton = document.evaluate('/html/body/div[2]/div[2]/div[1]/div/div/div/div/div[2]/table/tbody/tr/td[1]/table/tbody/tr/td[2]/table/tbody/tr[2]/td[2]/em/button', document).iterateNext()
+  //   okYearButton.click();
+  //   delay(1000, () => {  // Wait 1s
+  //     const week11 = $("#x-auto-184 > tbody > tr:nth-child(2) > td.x-btn-mc > em > button")
+  //     week11.click();
+  //     // $('#x-auto-230 .x-tree3-node-joint').ready(() => {
+  //     //     const arrowTrainee = $('#x-auto-230 .x-tree3-node-joint');
+  //     //     console.log("dom ready, currently navigating through schedules, clicking :", arrowTrainee)
+  //     //     arrowTrainee.click()
+  //     //     let arrowFirstYear = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[1]/table/tbody/tr/td[2]/div/div/div/img[2]', document).iterateNext()
+  //     //     arrowFirstYear.click();
+  //     //     let TD3 = document.evaluate('/html/body/div[1]/div[1]/div[2]/div[2]/div[2]/div[1]/div/div[1]/div/div[2]/div[1]/div[2]/div/div[5]/table/tbody/tr/td[2]/div/div/div', document).iterateNext();
+  //     //     TD3.click();
+  //     // })
+  //   })
+  // })
 }
 
 function settingupInterface() {
@@ -137,8 +99,7 @@ async function sleep(time) {
 }
 
 (function scrapingScheduleData() {
-  const socket = createSocketInstance()
-  delay(1000, () => {  // Wait 1s instead of waiting for jquery.load()
+  delay(2000, () => {  // Wait 1s instead of waiting for jquery.load()
     $('document').ready(() => {  // Doesn't really work, elements are not loaded at this point
       init();
       document.addEventListener('close', (event) => {
@@ -172,7 +133,7 @@ async function sleep(time) {
                 dayButton.click()
                 const dayID = day - 162;  // monday:0 friday:4
                 let courseIndex = 0;
-                const test = await sleep(200);
+                const test = await sleep(TIME_INTERVAL);
                 const dayCoursesData = { dayID: dayID, courses: [] }
                 while (courseIndex != -1) {  // Fetching until there is no course left
                   courseIndex++;
@@ -194,35 +155,22 @@ async function sleep(time) {
                 }
                 weekCoursesData.days.push(dayCoursesData)
               }
+              console.log('>====================================<');
+              console.log('Sending data of week %s ', weekID);
               $.post('http://localhost:3000/api/schedules', JSON.stringify(weekCoursesData), (data, status) => {
-                console.log(data);
-                console.log(status);
-                console.log('Data succesfully sent');
+                console.log('Data of week %s succesfully sent', weekID);
+                console.log('<====================================>');
               })
               coursesData.weeks.push(weekCoursesData)
             }
-            console.log('data fetched!')
             scrapperState.innerHTML = "ready";
-            console.log(JSON.stringify(coursesData))
-            console.log('data succesfully retrieved. sending...')
+            console.log('Year data succesfully retrieved.')
             // $.ajax({
             //   type: "POST",
             //   url: 'http://localhost:3000/api/schedules',
             //   headers: { 'Access-Control-Allow-Origin': 'https://ade.ensea.fr/direct/index.jsp' },  // Required or it will be blocked by chrome
             //   data: coursesData,
             // });
-
-            coursesData = 'uwu-ade-weekly-shcedule//' + String(coursesData)
-            socket.connect()
-            socket.on("connect", () => {
-              console.log('connected to socket { %s }', socket.id); // x8WIv7-mJelg7on_ALbx
-              const engine = socket.io.engine;
-              engine.on("packet", (packet) => {
-                console.log('packet received/sent : ', packet)
-              })
-              socket.emit(coursesData)
-              socket.disconnect()
-            });
           });
         });  // Delay 200ms
       })  // Wait 500ms
