@@ -1,6 +1,6 @@
 import { collection, setDoc, doc, addDoc, getDocs } from 'firebase/firestore';
 import { firebase, database } from './firebaseConfig';
-import scheduleTree from '../private/classesTree';
+import { scheduleList } from '../private/classesTree';
 const fs = require('fs')
 const path = require('path')
 
@@ -26,7 +26,7 @@ function isPlace(myString) {  // Place like C203 or amphitheater :3
 }
 
 function isClasseName(information: any) {
-  return scheduleTree.has(information)
+  return scheduleList.includes(information)
 }
 
 const SCHOOL_YEAR = 2022

@@ -12,6 +12,16 @@
   .NavPrev {
     @apply left-0 -top-0.5
   }
+  .SearchBar {
+    @apply bg-gradient-to-r h-[40%] text-2xl w-2/3 text-white rounded-lg border-white text-center font-academyLET font-medium leading-8 transition-all
+  }
+}
+
+*:focus {
+  outline: none
+}
+*:focus-visible {
+  outline: none
 }
 
 /*
@@ -21,6 +31,12 @@
       OR
       <a href="http://www.onlinewebfonts.com">oNline Web Fonts</a>
 */
+@font-face {font-family: "DIN Alternate"; src: url("//db.onlinewebfonts.com/t/490a4d8d3a78b2c0ba5e434c76234790.eot"); src: url("//db.onlinewebfonts.com/t/490a4d8d3a78b2c0ba5e434c76234790.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/490a4d8d3a78b2c0ba5e434c76234790.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/490a4d8d3a78b2c0ba5e434c76234790.woff") format("woff"), url("//db.onlinewebfonts.com/t/490a4d8d3a78b2c0ba5e434c76234790.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/490a4d8d3a78b2c0ba5e434c76234790.svg#DIN Alternate") format("svg"); }
+@import url(//db.onlinewebfonts.com/c/b6e1e126bc19c3e9fe26136203746a13?family=Kefa+PressS);
+@font-face {font-family: "Kefa PressS"; src: url("//db.onlinewebfonts.com/t/b6e1e126bc19c3e9fe26136203746a13.eot"); src: url("//db.onlinewebfonts.com/t/b6e1e126bc19c3e9fe26136203746a13.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/b6e1e126bc19c3e9fe26136203746a13.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/b6e1e126bc19c3e9fe26136203746a13.woff") format("woff"), url("//db.onlinewebfonts.com/t/b6e1e126bc19c3e9fe26136203746a13.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/b6e1e126bc19c3e9fe26136203746a13.svg#Kefa PressS") format("svg"); }
+@font-face {font-family: "ITC Charter"; src: url("//db.onlinewebfonts.com/t/0e70b3a23ddb2c7338b99c8c4396a0d1.eot"); src: url("//db.onlinewebfonts.com/t/0e70b3a23ddb2c7338b99c8c4396a0d1.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/0e70b3a23ddb2c7338b99c8c4396a0d1.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/0e70b3a23ddb2c7338b99c8c4396a0d1.woff") format("woff"), url("//db.onlinewebfonts.com/t/0e70b3a23ddb2c7338b99c8c4396a0d1.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/0e70b3a23ddb2c7338b99c8c4396a0d1.svg#ITC Charter") format("svg"); }
+@font-face {font-family: "DIN Condensed"; src: url("//db.onlinewebfonts.com/t/d45f96029e61832fd84afffd3068b768.eot"); src: url("//db.onlinewebfonts.com/t/d45f96029e61832fd84afffd3068b768.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/d45f96029e61832fd84afffd3068b768.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/d45f96029e61832fd84afffd3068b768.woff") format("woff"), url("//db.onlinewebfonts.com/t/d45f96029e61832fd84afffd3068b768.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/d45f96029e61832fd84afffd3068b768.svg#DIN Condensed") format("svg"); }
+@font-face {font-family: "DIN Condensed Web"; src: url("//db.onlinewebfonts.com/t/69dbc1186412d7831b88d8a78a360360.eot"); src: url("//db.onlinewebfonts.com/t/69dbc1186412d7831b88d8a78a360360.eot?#iefix") format("embedded-opentype"), url("//db.onlinewebfonts.com/t/69dbc1186412d7831b88d8a78a360360.woff2") format("woff2"), url("//db.onlinewebfonts.com/t/69dbc1186412d7831b88d8a78a360360.woff") format("woff"), url("//db.onlinewebfonts.com/t/69dbc1186412d7831b88d8a78a360360.ttf") format("truetype"), url("//db.onlinewebfonts.com/t/69dbc1186412d7831b88d8a78a360360.svg#DIN Condensed Web") format("svg"); }
 @font-face {
   font-family: "Academy Engraved LET";
   src: url("http://db.onlinewebfonts.com/t/3c471385717f118ae2efdeabbdc50824.eot");

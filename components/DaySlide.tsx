@@ -78,13 +78,13 @@ let DaySlide = ({ actualDay, date, dayData }) => {
           font-bold rounded-lg w-6 mx-auto relative bg-gradient-to-b \
         from-main-purple to-main-purple-light")}
             style={{ gridRowStart: wrpRowBegin, gridRowEnd: wrpRowEnd }}>
-            <h3 className="text-center items-center text-[0.65rem] leading-[1.1rem]
-            ">{course.begin.slice(0, 3)}
+            <h3 className="text-center items-center text-[0.65rem] leading-[0.7rem] mt-1">
+              {course.begin.slice(0, 3) + (course.begin.slice(3, 5) == 30 ? '\n'+course.begin.slice(3, 5) : '')}
             </h3>
             <div className="text-center items-center absolute bottom-0 text-[0.65rem]
-              leading-[1.1rem] w-full ">
+              leading-[0.7rem] w-full ">
               <h3 className="mx-auto">
-                {course.end.slice(0, 3)}
+                {course.end.slice(0, 3) + (course.begin.slice(3, 5) == 30 ? '\n'+course.begin.slice(3, 5) : '')}
               </h3>
             </div>
           </div>

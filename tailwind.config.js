@@ -45,10 +45,14 @@ module.exports = {
         academySTD: ["Academy Engraved STD", "sans-serif"],  // Imported in global.css
         academyLET: ["Academy Engraved LET", "sans-serif"],  // Imported in global.css
         bloggerSans: ["Blogger Sans", "sans-serif"],
-        Cabin: ['Cabin'],
         Cabin: ['Cabin Medium'],
         Chango: ['Chango, cursive'],
         marianne: ["Marianne", "sans-serif"],
+        kefa: ['Kefa PressS', 'Marianne', 'sans-serif'],
+        dinAlternate: ['DIN Alternate', 'Marianne'],
+        dinCondensed: ['DIN Condensed', 'Marianne'],
+        dinCondensedRegular: ['DIN Condensed Web', 'Marianne'],
+        Charter: ['ITC Charter', 'Marianne'],
         poppins: ["Poppins", "sans-serif"],
         adelia: ["ADELIA", "cursive"],
       },

@@ -12,13 +12,16 @@ import WeekSelectionSwiper from '../components/WeekSelectionSlider'
 
 // app/layout.tsx
 import useSWR, { SWRConfig } from 'swr'
+import SearchBar from '../components/SearchEngine';
 
 function App({ views, lastSchedule }) {
   console.log('you have visited this website : ', views)
-  const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
+  const [ isMounted, setIsMounted ] = useState(false);  // Server side rendering and traditional rendering
   const [ currentWeek, setCurrentWeek ] = useState(1)
+  const [ schedule, setSchedule ] = useState()
   useEffect(() => {
     setIsMounted(true);
+    setSchedule(lastSchedule)
     setCurrentWeek(getWeekID(new Date()))  // the first weekID is set to be today's week
   }, [])
   const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
@@ -27,12 +30,12 @@ function App({ views, lastSchedule }) {
   const config = useMemo(  // Apparently this might be useful
     () => ({
       headers: {
-        classe: lastSchedule,
+        classe: schedule,
         week: currentWeek,
         'Content-Type': 'application/json',
       },
     }),
-    [lastSchedule, currentWeek]
+    [schedule, currentWeek]
   );
   const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
   if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
@@ -51,7 +54,7 @@ function App({ views, lastSchedule }) {
       <header className="AppContainer text-zinc-800 w-full h-full
       -translate-x-1/2 absolute left-1/2 top-0">
         <div className="Header relative w-full top-0 left-0 backdrop-blur-sm">
-          <div className="z-20 w-full mx-auto bg-white bg-opacity-[20%]">
+          <div className="z-20 w-full mx-auto bg-white bg-opacity-[70%]">
             <div className="BurgerMenuContainer absolute top-0 left:0 mx-2 
             h-full w-10 flex-row flex justify-center items-center">
               <div className="BurgerMenu w-6 h-8 flex justify-evenly 
@@ -69,22 +72,8 @@ function App({ views, lastSchedule }) {
             </div>
           </div>
         </div>
-        <div className="SelectionsContainer relative from-main-orange 
-        to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center">
-          <div className="WhiteBorder bg-white w-full h-1"></div>
-          <div className="ClassSelection w-full h-full">
-            <div className="SearchBarContainer h-full w-full flex justify-center 
-            items-center">
-              <div className="SearchBar h-[40%] text-white text-2xl w-2/3  
-              rounded-lg border-white border-[1px] justify-center align-center 
-              text-center font-academyLET font-medium leading-9">
-                1G1 TP6
-              </div>
-            </div>
-          </div>
-          <div className="WhiteBorder h-1 absolute bottom-0 left-0 bg-white 
-          w-full"></div>
-        </div>
+        <SearchBar schedule={schedule} setSchedule={setSchedule} className='SelectionsContainer relative from-main-orange 
+    to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center'/>
         <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek}/>
         <div className="WeekScheduleContainer w-full h-[69%]">
           <WeekSchedule data={data} currentWeek={currentWeek} />

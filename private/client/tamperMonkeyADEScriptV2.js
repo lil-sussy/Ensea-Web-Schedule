@@ -87,6 +87,7 @@ function getCourseData(number) { // return the data of the {number} courses of t
   if (course == undefined || course == null || course.getAttribute('aria-label') == undefined) {
     return null;
   }
+  console.log('test')
   let data = course.getAttribute('aria-label').split(' null '); // the arialabel of the div containing schedule lesson info contains the informations of its children (everything to know about this course)
   if (data.length == 0)
     return null;

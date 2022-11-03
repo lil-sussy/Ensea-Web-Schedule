@@ -1,6 +1,6 @@
 import { collection, setDoc, doc, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { NextApiRequest, NextApiResponse } from 'next'
-import scheduleTree from '../../private/classesTree'
+import { scheduleList, scheduleTree } from '../../private/classesTree'
 import fs from 'fs';
 import path from 'path';
 import loadSchedules from '../../components/ScheduleExport'
@@ -17,10 +17,14 @@ const loadSchedule = (req: NextApiRequest, res: NextApiResponse) => {
     const week = Number(req.headers['week'])
     const classe = req.headers['classe']
     const classes = scheduleTree.get(classe)
-    classes.push(classe)
-    res.status(200).json({totalSchedule: loadSchedules(week, classes)})
+    if (classes) {
+      classes.push(classe)
+      res.status(200).json({totalSchedule: loadSchedules(week, classes)})
+    } else {
+      res.status(404).json({ status: 404, message:'No classe schedule found for this classe '+classe })
+    }
   } else {
-    res.status(400).json({ status: 400, message:'Only requests of type Get and Post are accpeted' })
+    res.status(400).json({ status: 400, message:'Only get and post request are handled' })
   }
 }
 

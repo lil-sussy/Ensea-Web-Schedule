@@ -19,6 +19,7 @@ export default function WeekSchedule({ data, currentWeek: currentWeekID }) {
   useEffect(() => {
     const classeSchedule = data.totalSchedule  // Schedule of every week at once
     const everyWeekSchedule = new Map()
+    console.log(classeSchedule)
     for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {  // Going through every schedules
       const course = classeSchedule[scheduleIndex].course
       const weekID = Number(course.week)  // Each course object is attached to a weekID to be identified
@@ -90,17 +91,17 @@ function initSwiper() {
     if (swiper.destroyed === true) {
       return
     }
-    const slideSize = swiper.size  // Taille d'une slide = taille du swiper width
-    const snapGrid = swiper.snapGrid  // Positions horizontales des slides
-    const swiperPos = -swiper.translate  // Actuel translation du swiper (position du centre du swiper)
+    const slideSize = swiper.size  // Width of a slide of the swiper width
+    const snapGrid = swiper.snapGrid  // Snap positions of slides in the swiper
+    const swiperPos = -swiper.translate  // Acutal position of the swiper (its x translation)
     const dx = animation_last_pos == -1 ? 0 : Math.abs(swiperPos - animation_last_pos);  // Movement
     animation_last_pos = swiperPos;
     const maxIndex = swiper.slides.length
-    for (let index = 0; index < maxIndex; index++) {  // parcours des slides
-      let p = - (snapGrid[index] - swiperPos) / slideSize  // Distance entre le centre du swiper et la slide normé par sa taille
-      p = p < -1 ? -1 : p;  // Normalisation du pourcentage entre 1 et -1
-      p = p > 1 ? 1 : p;  // Le pourcentage est l'avancement de la transition
-      // peut *être remplacer par animate.js
+    for (let index = 0; index < maxIndex; index++) {  // for each slide
+      let p = - (snapGrid[index] - swiperPos) / slideSize  // Distance between the position of the swiper and the position of the current slide normalized by a slide width
+      p = p < -1 ? -1 : p;  // This ratio is normalized between 1 and -1
+      p = p > 1 ? 1 : p;  // This new ratio now corresponds to the advancement in time of the transition 
+      // This animation could be replaced with anime js 
       const z_index = 2 - Math.round(Math.abs(p));  // either 2 or 1
       const scale = 0.8 + 0.2 * (1 - Math.abs(p));
       const transX = p * 35;  // Relative

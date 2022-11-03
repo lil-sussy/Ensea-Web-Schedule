@@ -11,6 +11,7 @@
   "dependencies": {
     "@next/font": "^13.0.0",
     "clsx": "^1.2.1",
+    "elasticlunr": "^0.9.5",
     "firebase": "^9.12.1",
     "next": "13.0.0",
     "next-session": "^4.0.5",

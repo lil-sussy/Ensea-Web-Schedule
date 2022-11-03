@@ -8,7 +8,6 @@ import 'swiper/css/pagination';
 import SwiperCore, { EffectCreative, EffectFlip, EffectCube, Navigation } from "swiper";
 import { getWeekID } from "../pages/index";
 
-let swiper: any
 export default function WeekSelectionSwiper(props: any) {
   const weekID = props.weekID
   const setWeek = props.setWeek
@@ -24,14 +23,6 @@ export default function WeekSelectionSwiper(props: any) {
   for (let i = 1; i < 48; i++) {  // Covering every weeks of the year ADE
     weeksLabels.push(WeekLabel(i))
   }
-  const onInit = (swiperJS: any) => {
-    if (swiperJS != undefined) {
-      swiper = swiperJS
-    }
-  }
-  const onTransitionStart = (swiper: any) => {
-
-  }
   const onChange = (swiper: any) => {
     setWeek(swiper.activeIndex)  // Apparently active index is real index + 1 and starts at 1
   }
@@ -39,7 +30,7 @@ export default function WeekSelectionSwiper(props: any) {
     <div className="mb-2 h-8 mx-auto w-36 bg-white relative 
     flex-col align-center justify-center rounded-lg -translate-y-1/2 ">
       <div className="w-[115%] h-full -translate-x-[7.5%]">
-        <Swiper key={2} className="" id='WeekSelection'
+        <Swiper className="" id='WeekSelection'
           modules={[Navigation]}
           enabled={true}
           direction="horizontal"
@@ -55,8 +46,6 @@ export default function WeekSelectionSwiper(props: any) {
           loop={true}
           autoplay={false}
           onSlideChangeTransitionEnd={onChange}
-          onTransitionStart={onTransitionStart}
-          onInit={onInit}
         >
           <div className=" ">
             {weeksLabels.map(label => label)}
