@@ -105,8 +105,8 @@ function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
   return (
     <div className={'SearchBar flex flex-col justify-center items-center bg-gradient-to-r from-main-orange to-main-orange-light' + (focused ?
     ' font-semibold -translate-y-[250%] border-[3px] \
-    shadow-lg z-40 duration-400 transition-all':
-    'from-transparent to-transparent translate-y-0 transition-all border-[1px] shadow-none duration-[600ms]')}>
+    shadow-lg z-40 duration-400 transition-transform':
+    'from-transparent to-transparent translate-y-0 transition-transform border-[1px] shadow-none duration-[200ms]')}>
       <input type="text" className={focused ?
         " w-full translate-y-1/10 rounded-lg text-center   \
         placeholder-white placeholder-opacity-60 transition-all bg-transparent duration-400"

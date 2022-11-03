@@ -17,6 +17,11 @@
   }
 }
 
+.GrayTextFadeGradient {
+  --gray: rgba(55, 65, 81, 1);
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0) 10%, var(--gray) 20%, var(--gray) 80%, rgba(0, 0, 0, 0) 90%);
+}
+
 *:focus {
   outline: none
 }

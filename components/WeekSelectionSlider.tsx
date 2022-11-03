@@ -5,8 +5,10 @@ import useSWR, { SWRConfig } from 'swr'
 import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
-import SwiperCore, { EffectCreative, EffectFlip, EffectCube, Navigation } from "swiper";
+import SwiperCore, { EffectCards, EffectCube, EffectFade, Navigation } from "swiper";
 import { getWeekID } from "../pages/index";
+
+SwiperCore.use([EffectFade])
 
 export default function WeekSelectionSwiper(props: any) {
   const weekID = props.weekID
@@ -26,19 +28,19 @@ export default function WeekSelectionSwiper(props: any) {
   const onChange = (swiper: any) => {
     setWeek(swiper.activeIndex)  // Apparently active index is real index + 1 and starts at 1
   }
+  const textColor = 'rgba(55, 65, 81, 1)'
   return (
     <div className="mb-2 h-8 mx-auto w-36 bg-white relative 
     flex-col align-center justify-center rounded-lg -translate-y-1/2 ">
       <div className="w-[115%] h-full -translate-x-[7.5%]">
-        <Swiper className="" id='WeekSelection'
-          modules={[Navigation]}
+        <Swiper className="bg-clip-text GrayTextFadeGradient" id='WeekSelection'
+          modules={[Navigation, EffectCube]}
           enabled={true}
           direction="horizontal"
           initialSlide={ weekID - 1 }
           spaceBetween={100}
           centeredSlides={true}
           cssMode={false}
-          
           slidesPerView={1}
           speed={400}
           touchRatio={1.5}
@@ -47,11 +49,11 @@ export default function WeekSelectionSwiper(props: any) {
           autoplay={false}
           onSlideChangeTransitionEnd={onChange}
         >
-          <div className=" ">
+          <div className="bg-clip-text">
             {weeksLabels.map(label => label)}
           </div>
-          <SwipePrevButton className="ButtonNav NavPrev font-Chango">{'<'}</SwipePrevButton>
-          <SwipeNextButton className="ButtonNav NavNext font-Chango">{'>'}</SwipeNextButton>
+          <SwipePrevButton className="ButtonNav NavPrev z-20 font-Chango">{'<'}</SwipePrevButton>
+          <SwipeNextButton className="ButtonNav NavNext z-20 font-Chango">{'>'}</SwipeNextButton>
         </Swiper>
       </div>
     </div>
@@ -60,9 +62,9 @@ export default function WeekSelectionSwiper(props: any) {
 
 function WeekLabel(weekID: number) {
   return (
-    <SwiperSlide key={weekID} className="w-full h-full">
+    <SwiperSlide key={weekID} className="w-full h-full bg-clip-text">
       <div className="WeekSelectionLabel text-[1.2rem] justify-center align-center 
-        text-center text-gray-700 font-bold ">
+        text-center text-transparent font-bold ">
         <h4 className="">Semaine {weekID}</h4>
       </div>
     </SwiperSlide>
