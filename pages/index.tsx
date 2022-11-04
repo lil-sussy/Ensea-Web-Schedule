@@ -13,9 +13,9 @@ import WeekSelectionSwiper from '../components/WeekSelectionSlider'
 // app/layout.tsx
 import useSWR, { SWRConfig } from 'swr'
 import SearchBar from '../components/SearchEngine';
+import CAS from '../lib/node-cas/lib/cas';
 
 function App({ views, lastSchedule }) {
-  console.log('you have visited this website : ', views)
   const [ isMounted, setIsMounted ] = useState(false);  // Server side rendering and traditional rendering
   const [ currentWeek, setCurrentWeek ] = useState(1)
   const [ schedule, setSchedule ] = useState()
@@ -24,23 +24,6 @@ function App({ views, lastSchedule }) {
     setSchedule(lastSchedule)
     setCurrentWeek(getWeekID(new Date()))  // the first weekID is set to be today's week
   }, [])
-  const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
-    return data
-  })
-  const config = useMemo(  // Apparently this might be useful
-    () => ({
-      headers: {
-        classe: schedule,
-        week: currentWeek,
-        'Content-Type': 'application/json',
-      },
-    }),
-    [schedule, currentWeek]
-  );
-  const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
-  if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
-  if (!data) return <p>loading...</p>
-
   if (!isMounted) {
     return null;
   }
@@ -73,10 +56,10 @@ function App({ views, lastSchedule }) {
           </div>
         </div>
         <SearchBar schedule={schedule} setSchedule={setSchedule} className='SelectionsContainer relative from-main-orange 
-    to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center'/>
+      to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center'/>
         <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek}/>
         <div className="WeekScheduleContainer w-full h-[69%]">
-          <WeekSchedule data={data} currentWeek={currentWeek} />
+          <WeekSchedule schedule={lastSchedule} currentWeek={currentWeek} />
         </div>
       </header>
     </div>
@@ -86,6 +69,30 @@ function App({ views, lastSchedule }) {
 const DEFAULT_SCHEDULE = "1G1 TP6";
 
 indexPage.getInitialProps = async ({ req, res }) => {  // Generate props on server side
+  // const cas = new CAS({
+  //   base_url         : 'https://identites.ensea.fr/cas/login',
+  //   service     : 'https://ews.ensea.jsp.fr',
+  //   version     : '3.0',
+  //   renew           : false,
+  //   is_dev_mode     : true,
+  //   dev_mode_user   : '',
+  //   dev_mode_info   : {},
+  //   session_name    : 'cas_user',
+  //   session_info    : 'cas_userinfo',
+  //   destroy_session : false,
+  //   return_to       : 'http://localhost:300/'
+  // })
+  // cas.authenticate(req, res, function(err, status, username, extended) {
+  //   if (err) {
+  //     // Handle the error
+  //     res.send({error: err});
+  //   } else {
+  //     // Log the user in 
+  //     console.log(username);
+  //     res.send({status: status, username: username, attributes: extended.attributes});
+  //   }
+  // });    
+
   const sessionCollection = collection(database, 'sessions');
   const schedulesCollection = collection(database, 'schedules');
   const session = nextSession(req); // make { autoCommit: false }: false and it will correctly redirect

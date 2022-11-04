@@ -49,7 +49,7 @@ function parseCourse(dayID: number, weekID: number, courseData: any) {
     }
   }
   const week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-  if (name != undefined) { // Then it's a propper name and it will crash firebase
+  if (name != undefined) {
     weekID += 1  // Week 0 being Week 1
     const dayOfYear = (weekID - 1) * 7 + 1
     const date = new Date(SCHOOL_YEAR, 0, dayOfYear)

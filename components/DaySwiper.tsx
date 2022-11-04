@@ -12,14 +12,29 @@ SwiperCore.use([EffectFlip])
 
 import DaySlide from './DaySlide'
 import { getWeekByID } from "../pages";
+import useSWR from "swr";
 
-export default function WeekSchedule({ data, currentWeek: currentWeekID }) {
+export default function WeekSchedule({ schedule, currentWeek: currentWeekID }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [everyWeekSchedule, setEveryWeekSchedule] = useState(new Map())
-  useEffect(() => {
+  const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
+    return data
+  })
+  const config = useMemo(  // Apparently this might be useful
+    () => ({
+      headers: {
+        classe: schedule,
+        'Content-Type': 'application/json',
+      },
+    }),
+    [schedule]
+  );
+  const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
+  if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
+  const loading = !data  // useSWR hook returns undefined and will automatically reload once the data is fetched
+  if (data && everyWeekSchedule.size == 0) {
     const classeSchedule = data.totalSchedule  // Schedule of every week at once
     const everyWeekSchedule = new Map()
-    console.log(classeSchedule)
     for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {  // Going through every schedules
       const course = classeSchedule[scheduleIndex].course
       const weekID = Number(course.week)  // Each course object is attached to a weekID to be identified
@@ -31,19 +46,19 @@ export default function WeekSchedule({ data, currentWeek: currentWeekID }) {
       everyWeekSchedule.set(weekID, weekSchedule)  // Map of weeks
     }
     setEveryWeekSchedule(everyWeekSchedule) // Map containing schedules of weeks
+  }
+  useEffect(() => {
     setIsMounted(true);
   }, [])
   if (!isMounted) {
     return null;
   }
-  console.log(currentWeekID);
   const weekDates = getWeekByID(currentWeekID)
   const daysList = []
   const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-  console.log(everyWeekSchedule);
   for (let i = 0; i < 7; i++) {
     const name = WEEK[i]
-    if (everyWeekSchedule.get(currentWeekID)) {  // Not holidays
+    if (everyWeekSchedule.get(currentWeekID)) {  // Not holidays or data still loading
       const data = everyWeekSchedule.get(currentWeekID).get(name)
       if ((name === "Samedi" || name === "Dimanche") && data == undefined) {
   
@@ -77,7 +92,7 @@ export default function WeekSchedule({ data, currentWeek: currentWeekID }) {
     {daysList.map(({ name, date, data }) => {
       return (
         <SwiperSlide key={name}>
-          <DaySlide actualDay={name} dayData={data} date={date}></DaySlide>
+          <DaySlide actualDay={name} dayData={data} date={date} loading={false}></DaySlide>
         </SwiperSlide>
       );
     })}

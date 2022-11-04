@@ -9,8 +9,22 @@ import loadSchedules from '../../components/ScheduleExport'
 const loadSchedule = (req: NextApiRequest, res: NextApiResponse) => {
   if (req.method == 'POST') {
     WriteJsonSchedule(req, res)
+    const everyWeekSchedule = new Map()
+    const classeSchedule = loadSchedules(10, ['1G1 TP6', '1G1 TD3', '1ère A ENSEA'])
+    for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {  // Going through every schedules
+      const course = classeSchedule[scheduleIndex].course
+      const weekID = Number(course.week)  // Each course object is attached to a weekID to be identified
+      const weekSchedule = everyWeekSchedule.get(weekID) ? everyWeekSchedule.get(weekID) : new Map()
+      const dayID = course.dayOfWeek  // String such as 'Lundi' or 'Vendredi'
+      const daySchedule = weekSchedule.get(dayID) ? weekSchedule.get(dayID) : [] 
+      daySchedule.push(course)  // Map of schedules of the days
+      weekSchedule.set(dayID, daySchedule)  // Map of schedules of the weeks
+      everyWeekSchedule.set(weekID, weekSchedule)  // Map of weeks
+    }
+    console.log(everyWeekSchedule)
+    res.status(200).json({status: 200, data: "Data succesfully loaded :3"})
   } else if (req.method == 'GET') {
-    if (req.headers['classe'] == undefined || req.headers['week'] == undefined) {
+    if (req.headers['classe'] == undefined) {
       res.status(400).json({ status: 400, message: "Unsupported headers"});
       return
     }
@@ -51,7 +65,7 @@ function WriteJsonSchedule(req: NextApiRequest, res: NextApiResponse) {
     fs.writeFileSync(filepathJSON, JSON.stringify(allWeeks))
   }
   console.log(req.headers['origin']);  // https://ade.ensea.fr
-  res.status(200).json({status: 200, data: "Data succesfully loaded :3"})
+  
 }
 
 export default loadSchedule

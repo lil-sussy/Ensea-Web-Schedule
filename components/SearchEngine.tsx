@@ -19,7 +19,6 @@ const index = elasticlunr(function () {
 
 export default function SearchBar({ schedule, setSchedule, className }) {
   const [displayedAnswers, setDisplayedAnswers] = useState([])
-  let searchBar: any
   const focused = displayedAnswers.length != 0
   return (
     <div className={" " + className}>
@@ -41,7 +40,6 @@ export default function SearchBar({ schedule, setSchedule, className }) {
 
 function AnswerList({ fields, setSchedule, focused, setDisplayedAnswers }) {
   const fieldView = []
-  console.log(fields)
   fields.forEach(field => {
     field = field.ref
     fieldView.push(
@@ -103,10 +101,10 @@ function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
     setDisplayedAnswers(answers)
   }
   return (
-    <div className={'SearchBar flex flex-col justify-center items-center bg-gradient-to-r from-main-orange to-main-orange-light' + (focused ?
-    ' font-semibold -translate-y-[250%] border-[3px] \
-    shadow-lg z-40 duration-400 transition-transform':
-    'from-transparent to-transparent translate-y-0 transition-transform border-[1px] shadow-none duration-[200ms]')}>
+    <div className={'SearchBar flex flex-col justify-center items-center bg-gradient-to-r from-main-orange to-main-orange-light'
+    + (focused ? ' font-semibold -translate-y-[250%] border-[3px] shadow-lg z-40 duration-400 transition-all w-2/3'
+    :
+    'from-transparent to-transparent translate-y-0 transition-all border-[1.5px] shadow-none duration-[200ms] w-2/3')}>
       <input type="text" className={focused ?
         " w-full translate-y-1/10 rounded-lg text-center   \
         placeholder-white placeholder-opacity-60 transition-all bg-transparent duration-400"

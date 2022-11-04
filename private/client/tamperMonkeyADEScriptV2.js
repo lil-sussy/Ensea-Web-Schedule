@@ -19,7 +19,7 @@ Known issues
 */
 
 const SIDE_BAR_SIZE = 1 + 45 // Size of the hour displaying sidebar wich is constant and used in absolute position calculs
-const TIME_INTERVAL = 80
+const TIME_INTERVAL = 300
 
 function delay(time, callback) {
   setTimeout(callback, time);
@@ -52,7 +52,7 @@ function init() {  // Initial navigation through ADE
 function settingupInterface() {
   const htmlButton = '\
           <div id="scrapper-interface" class="button-back" style = "position: absolute; left:0px; top:0px; \
-            width: 400px; height: 200px; border-radius: 20px; display: flex; border-radius: 10px; \
+            width: 150px; height: 250px; border-radius: 20px; display: flex; border-radius: 10px; \
             flex-flow: column wrap; flex-direction: column; justify-content: center; \
             align-items: center; background: #61aaff; text-align: center; \
             codlor: #61dafb; z-index: 10;\
@@ -66,8 +66,8 @@ function settingupInterface() {
               height: 40px;"> \
               fetch data \
             </button> \
-            <h3 id="scrapper-state" class="height: 10px; \
-            flex-grow: 2;"> \
+            <h3 id="scrapper-state" style="height: 10px; \
+            flex-grow: 2; "> \
               To start, please select a schedule and hit fetch data. \
             </h3> \
           </div>'
@@ -157,9 +157,9 @@ async function sleep(time) {
                 weekCoursesData.days.push(dayCoursesData)
               }
               console.log('>====================================<');
-              console.log('Sending data of week %s ', weekID);
+              console.log('Sending data of week %s ', weekID+1);
               $.post('http://localhost:3000/api/schedules', JSON.stringify(weekCoursesData), (data, status) => {
-                console.log('Data of week %s succesfully sent', weekID);
+                console.log('Data of week %s succesfully sent', weekID+1);
                 console.log('<====================================>');
               })
               coursesData.weeks.push(weekCoursesData)
