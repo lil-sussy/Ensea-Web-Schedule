@@ -11,7 +11,7 @@ import WeekSelectionSwiper from '../components/ews/home/WeekSelectionSlider'
 
 import { getWeekID } from '../components/ews/lib/schoolYear'
 import SearchBar from '../components/ews/home/SearchEngine';
-import CAS from '../lib/node-cas/lib/cas';
+// import CAS from '../lib/node-cas/lib/cas';
 import { getPageStaticInfo } from 'next/dist/build/analysis/get-page-static-info';
 import Image from 'next/image';
 
