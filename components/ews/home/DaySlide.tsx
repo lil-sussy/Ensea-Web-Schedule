@@ -38,7 +38,7 @@ function CourseHours({ courseData: course }) {
   const endHourPos = (wrpEndHour - 0.5 - 6) * 2 + (course.end.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am
   return (
     [
-      <div className={clsx(" w-full h- row-start-" + wrpRowBegin + " col-span-1 text-white font-bold relative")}
+      <div key={wrpBeginHour} className={clsx(" w-full h- row-start-" + wrpRowBegin + " col-span-1 text-white font-bold relative")}
         style={{ gridRowStart: wrpRowBegin }}>
         <div className="w-12 ml-1 bg-third-purple rounded-md text-main-purple h-full flex flex-col z-20">
           <h3 className="text-center items-center text-[0.65rem] leading-[0.7rem] my-auto z-20">
