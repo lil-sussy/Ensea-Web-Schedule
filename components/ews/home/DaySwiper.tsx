@@ -11,10 +11,10 @@ import "swiper/css/effect-creative"
 SwiperCore.use([EffectFlip])
 
 import DaySlide from './DaySlide'
-import { getWeekByID } from "../pages";
+import { getWeekByID } from "../lib/schoolYear";
 import useSWR from "swr";
 
-export default function WeekSchedule({ schedule, currentWeek: currentWeekID }) {
+export default function WeekDaySwiper({ schedule, currentWeek: currentWeekID }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [everyWeekSchedule, setEveryWeekSchedule] = useState(new Map())
   const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
@@ -32,20 +32,9 @@ export default function WeekSchedule({ schedule, currentWeek: currentWeekID }) {
   const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
   if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
   const loading = !data  // useSWR hook returns undefined and will automatically reload once the data is fetched
-  if (data && everyWeekSchedule.size == 0) {
-    const classeSchedule = data.totalSchedule  // Schedule of every week at once
-    const everyWeekSchedule = new Map()
-    for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {  // Going through every schedules
-      const course = classeSchedule[scheduleIndex].course
-      const weekID = Number(course.week)  // Each course object is attached to a weekID to be identified
-      const weekSchedule = everyWeekSchedule.get(weekID) ? everyWeekSchedule.get(weekID) : new Map()
-      const dayID = course.dayOfWeek  // String such as 'Lundi' or 'Vendredi'
-      const daySchedule = weekSchedule.get(dayID) ? weekSchedule.get(dayID) : [] 
-      daySchedule.push(course)  // Map of schedules of the days
-      weekSchedule.set(dayID, daySchedule)  // Map of schedules of the weeks
-      everyWeekSchedule.set(weekID, weekSchedule)  // Map of weeks
-    }
-    setEveryWeekSchedule(everyWeekSchedule) // Map containing schedules of weeks
+  if (data && everyWeekSchedule.size == 0) {  // If the data was fetched but the state wasnt initialised -> initialisation;
+    // This if is in order to prevent the inifinite state rendering :)
+    setEveryWeekSchedule(InitializeWeeksSchedule(data)) // Map containing schedules of weeks
   }
   useEffect(() => {
     setIsMounted(true);
@@ -53,24 +42,7 @@ export default function WeekSchedule({ schedule, currentWeek: currentWeekID }) {
   if (!isMounted) {
     return null;
   }
-  const weekDates = getWeekByID(currentWeekID) 
-  currentWeekID += 1   // For some reasons
-  const daysList = []
-  const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
-  for (let i = 0; i < 7; i++) {
-    const name = WEEK[i]
-    if (everyWeekSchedule.get(currentWeekID)) {  // Not holidays or data still loading
-      const data = everyWeekSchedule.get(currentWeekID).get(name)
-      if ((name === "Samedi" || name === "Dimanche") && data == undefined) {
-  
-      } else {
-        daysList.push({ name: name, date: weekDates[i], data: data })
-      }
-    } else {  // Holidays !!!
-      daysList.push({ name: name, date: weekDates[i], data: undefined})
-    }
-  }
-  const { onTransitionStart, onInit } = initSwiper()
+  const dayList = generateDayDataList(currentWeekID, everyWeekSchedule)
   return (<Swiper key={1} id='daySwiper'
     modules={ [ Pagination, Navigation ]  }
     className="WeekSchedule w-full h-full"
@@ -86,11 +58,10 @@ export default function WeekSchedule({ schedule, currentWeek: currentWeekID }) {
     navigation={false}
     loop={false}
     autoplay={false}
-    onTransitionStart={onTransitionStart}
     onInit={onInit}
     pagination={{ clickable: true }}
   >
-    {daysList.map(({ name, date, data }) => {
+    {dayList.map(({ name, date, data }) => {
       return (
         <SwiperSlide key={name}>
           <DaySlide actualDay={name} dayData={data} date={date} loading={false}></DaySlide>
@@ -100,10 +71,48 @@ export default function WeekSchedule({ schedule, currentWeek: currentWeekID }) {
   </Swiper>)
 }
 
-function initSwiper() {
+function generateDayDataList(currentWeekID: number, everyWeekSchedule: any) {
+  const weekDates = getWeekByID(currentWeekID) 
+  currentWeekID += 1   // For some reasons :/ :'(
+  const dayList = []
+  const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+  for (let i = 0; i < 7; i++) {
+    const name = WEEK[i]
+    if (everyWeekSchedule.get(currentWeekID)) {  // Not holidays or data still loading
+      const data = everyWeekSchedule.get(currentWeekID).get(name)
+      if ((name === "Samedi" || name === "Dimanche") && data == undefined) {
+  
+      } else {
+        dayList.push({ name: name, date: weekDates[i], data: data })
+      }
+    } else {  // Holidays !!!
+      dayList.push({ name: name, date: weekDates[i], data: undefined})
+    }
+  }
+  return dayList
+}
+
+function InitializeWeeksSchedule(data: any) {
+  const classeSchedule = data.totalSchedule  // Schedule of every week at once
+  const everyWeekSchedule = new Map()
+  for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {  // Going through every schedules
+    const course = classeSchedule[scheduleIndex].course
+    const weekID = Number(course.week)  // Each course object is attached to a weekID to be identified
+    const weekSchedule = everyWeekSchedule.get(weekID) ? everyWeekSchedule.get(weekID) : new Map()
+    const dayID = course.dayOfWeek  // String such as 'Lundi' or 'Vendredi'
+    const daySchedule = weekSchedule.get(dayID) ? weekSchedule.get(dayID) : [] 
+    daySchedule.push(course)  // Map of schedules of the days
+    weekSchedule.set(dayID, daySchedule)  // Map of schedules of the weeks
+    everyWeekSchedule.set(weekID, weekSchedule)  // Map of weeks
+  }
+  return everyWeekSchedule
+}
+
+const onInit = (swiper: any) => {  // On swipper initialization
   let animation_last_pos = -1;
   const HUGE_DIFFERENTIAL = 10;  // 10px
-  const NiceAnimation = (swiper: any) => {
+  const NiceAnimation = (swiper: any) => {  // This is animation uses the current translateX property of the slider to render a cool animation
+    // This animation could be done using animate js and by removing the implementation of swiper.js
     if (swiper.destroyed === true) {
       return
     }
@@ -130,18 +139,10 @@ function initSwiper() {
       }
     }
   }
-  const onInit = (swiper: any) => {  // On swipper initialization
-    NiceAnimation(swiper)  // First call initialization
-    const observer = new MutationObserver(function (mutations) {  // Style observer
-      NiceAnimation(swiper)
-    });
-    const target = swiper.el.getElementsByClassName('swiper-wrapper');  // [1] cuz there is another swiper
-    observer.observe(target[0], { attributes: true, attributeFilter: ['style'] });
-  }
-  const onTransitionStart = (swiper) => {  // This is called to late and so, doesn't work -> DELETE
-    for (let index = 0; index < swiper.slides.length; index++) {
-      swiper.slides[index].style.transitionDuration = "1000ms"
-    }
-  }
-  return { onInit, onTransitionStart }
+  NiceAnimation(swiper)  // First call initialization
+  const observer = new MutationObserver(function (mutations) {  // Style observer
+    NiceAnimation(swiper)
+  });
+  const target = swiper.el.getElementsByClassName('swiper-wrapper');  // [1] cuz there is another swiper
+  observer.observe(target[0], { attributes: true, attributeFilter: ['style'] });
 }

@@ -1,3 +1,27 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer components {
+  .ButtonNav {
+    @apply bg-clip-text bg-gradient-to-bl from-main-orange text-transparent to-main-orange text-3xl font-bold font-marianne absolute
+  }
+  .NavNext {
+    @apply right-0 -top-0.5
+  }
+  .NavPrev {
+    @apply left-0 -top-0.5
+  }
+  .SearchBar {
+    @apply bg-gradient-to-r h-[40%] text-2xl text-white rounded-lg border-white text-center font-academyLET font-medium leading-8 transition-all
+  }
+}
+
+.GrayTextFadeGradient {
+  --gray: rgba(55, 65, 81, 1);
+  background-image: linear-gradient(to right, rgba(0, 0, 0, 0) 10%, var(--gray) 20%, var(--gray) 80%, rgba(0, 0, 0, 0) 90%);
+}
+
 .swiper-horizontal>.swiper-pagination-bullets, .swiper-pagination-bullets.swiper-pagination-horizontal, .swiper-pagination-custom, .swiper-pagination-fraction {
   transform: translateY(72%) scale(0.4);
 }

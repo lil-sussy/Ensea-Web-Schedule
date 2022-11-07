@@ -6,7 +6,7 @@ import 'swiper/css';
 import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import SwiperCore, { EffectCards, EffectCube, EffectFade, Navigation } from "swiper";
-import { getWeekID } from "../pages/index";
+import { getWeekID } from "../lib/schoolYear";
 
 SwiperCore.use([EffectFade])
 

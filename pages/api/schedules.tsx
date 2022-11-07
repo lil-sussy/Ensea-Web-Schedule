@@ -3,7 +3,7 @@ import { NextApiRequest, NextApiResponse } from 'next'
 import { scheduleList, scheduleTree } from '../../private/classesTree'
 import fs from 'fs';
 import path from 'path';
-import loadSchedules from '../../components/ScheduleExport'
+import loadSchedules from '../../components/ews/lib/ScheduleExport'
 
 
 const loadSchedule = (req: NextApiRequest, res: NextApiResponse) => {

@@ -2,7 +2,7 @@ import elasticlunr from 'elasticlunr'
 import { useState } from 'react';
 import { Scrollbar, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { scheduleTree, scheduleList } from '../private/classesTree';
+import { scheduleTree, scheduleList } from '../../../private/classesTree';
 
 const index = elasticlunr(function () {
   this.addField('title');

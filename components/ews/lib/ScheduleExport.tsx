@@ -1,6 +1,6 @@
 import { collection, setDoc, doc, addDoc, getDocs } from 'firebase/firestore';
 import { firebase, database } from './firebaseConfig';
-import { scheduleList } from '../private/classesTree';
+import { scheduleList } from '../../../private/classesTree';
 const fs = require('fs')
 const path = require('path')
 
