@@ -40,12 +40,12 @@ function CourseHours({ courseData: course }) {
     [
       <div key={wrpBeginHour} className={clsx(" w-full h- row-start-" + wrpRowBegin + " col-span-1 text-white font-bold relative")}
         style={{ gridRowStart: wrpRowBegin }}>
-        <div className="w-12 ml-1 bg-third-purple rounded-md text-main-purple h-full flex flex-col z-20">
+        <div className="w-12 ml-1 bg-third-purple rounded-md text-main-purple-light h-full flex flex-col z-20">
           <h3 className="text-center items-center text-[0.65rem] leading-[0.7rem] my-auto z-20">
             {course.begin}
           </h3>
         </div>
-        <div className="w-full absolute top-1/2 h-[0.15rem] bg-gradient-to-r from-main-purple to-main-purple-light -z-10"></div>
+        <div className="w-full absolute top-1/2 h-[0.15rem] bg-gradient-to-r from-main-purple-light to-main-purple -z-10"></div>
       </div>
     ]
   )
