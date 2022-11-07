@@ -53,7 +53,8 @@ export default function WeekSchedule({ schedule, currentWeek: currentWeekID }) {
   if (!isMounted) {
     return null;
   }
-  const weekDates = getWeekByID(currentWeekID)
+  const weekDates = getWeekByID(currentWeekID) 
+  currentWeekID += 1   // For some reasons
   const daysList = []
   const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
   for (let i = 0; i < 7; i++) {

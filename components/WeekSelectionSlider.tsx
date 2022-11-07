@@ -65,7 +65,7 @@ function WeekLabel(weekID: number) {
     <SwiperSlide key={weekID} className="w-full h-full bg-clip-text">
       <div className="WeekSelectionLabel text-[1.2rem] justify-center align-center 
         text-center text-transparent font-kefa font-bold leading-8">
-        <h4 className="">Semaine {weekID}</h4>
+        <h4 className="bg-clip-text text-transparent GrayTextFadeGradient bg-fixed">Semaine {weekID}</h4>
       </div>
     </SwiperSlide>
   );

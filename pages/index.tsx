@@ -10,15 +10,14 @@ import background from '../public/background2k.png'
 import logo from '../public/logo.png'
 import WeekSelectionSwiper from '../components/WeekSelectionSlider'
 
-// app/layout.tsx
 import useSWR, { SWRConfig } from 'swr'
 import SearchBar from '../components/SearchEngine';
-import CAS from '../lib/node-cas/lib/cas';
+
 
 function App({ views, lastSchedule }) {
-  const [ isMounted, setIsMounted ] = useState(false);  // Server side rendering and traditional rendering
-  const [ currentWeek, setCurrentWeek ] = useState(1)
-  const [ schedule, setSchedule ] = useState()
+  const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
+  const [currentWeek, setCurrentWeek] = useState(1)
+  const [schedule, setSchedule] = useState()
   useEffect(() => {
     setIsMounted(true);
     setSchedule(lastSchedule)
@@ -42,10 +41,10 @@ function App({ views, lastSchedule }) {
             h-full w-10 flex-row flex justify-center items-center">
               <div className="BurgerMenu w-6 h-8 flex justify-evenly 
               items-center flex-col">
-                <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
-                <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
-                <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
-                <div className = "w-6 h-0.5 rounded-full bg-main-orange"></div>
+                <div className="w-6 h-0.5 rounded-full bg-main-orange"></div>
+                <div className="w-6 h-0.5 rounded-full bg-main-orange"></div>
+                <div className="w-6 h-0.5 rounded-full bg-main-orange"></div>
+                <div className="w-6 h-0.5 rounded-full bg-main-orange"></div>
               </div>
             </div>
             <div className="h-full w-full py-1 pb-1">
@@ -57,7 +56,7 @@ function App({ views, lastSchedule }) {
         </div>
         <SearchBar schedule={schedule} setSchedule={setSchedule} className='SelectionsContainer relative from-main-orange 
       to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center'/>
-        <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek}/>
+        <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek} />
         <div className="WeekScheduleContainer w-full h-[69%]">
           <WeekSchedule schedule={lastSchedule} currentWeek={currentWeek} />
         </div>
@@ -92,15 +91,14 @@ indexPage.getInitialProps = async ({ req, res }) => {  // Generate props on serv
   //     res.send({status: status, username: username, attributes: extended.attributes});
   //   }
   // });    
-
-  const sessionCollection = collection(database, 'sessions');
-  const schedulesCollection = collection(database, 'schedules');
-  const session = nextSession(req); // make { autoCommit: false }: false and it will correctly redirect
-  // session.views = session.views ? session.views + 1 : 1;  // View counter
-  // session.lastSchedule = session.lastSchedule ? session.lastSchedule : DEFAULT_SCHEDULE;
+  const options = {}
+  const getSession = await nextSession(options); // make { autoCommit: false }: false and it will correctly redirect
+  const session = await getSession(req, res)
+  session.views = session.views ? session.views + 1 : 1;  // View counter
+  session.lastSchedule = session.lastSchedule ? session.lastSchedule : DEFAULT_SCHEDULE;
   return {
-    // views: session.views,  // Informations passed in App constructor
-    lastSchedule: DEFAULT_SCHEDULE
+    views: session.views,  // Informations passed in App constructor
+    lastSchedule: session.lastSchedule
   };
 }
 
@@ -132,18 +130,18 @@ function dateDiffInDays(preceding: Date, date: Date) {
 }
 
 export function getMondayOfDate(date: Date) {
-  const mondayOfTheMonth = date.getDate() - date.getDay() +1
+  const mondayOfTheMonth = date.getDate() - date.getDay() + 1
   return new Date(new Date(date).setDate(mondayOfTheMonth))
 }
 
 export function getWeekByID(weekID: number) {
-  const time = ((weekID - 1) * 7 + 1)*24*60*60*1000
+  const time = ((weekID - 1) * 7 + 1) * 24 * 60 * 60 * 1000
   const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = new Date('29 Aug 2022 02:00:00 GMT')  // First monday of first week, France is in GMT+2 zone
   const mondayInTheMonth = new Date(FIRST_MONDAY_OF_THE_SCHOOL_YEAR.getTime() + time)
   const monday = new Date(mondayInTheMonth)
   const week = [monday]
   for (let i = 1; i < 7; i++) {
-    const day = new Date(monday.getTime() + 24*60*60*1000*i)
+    const day = new Date(monday.getTime() + 24 * 60 * 60 * 1000 * i)
     week.push(day)
   }
   return week
@@ -153,7 +151,7 @@ export function getWeekByID(weekID: number) {
 export function getWeekID(day: Date) {
   const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = new Date('29 Aug 2022 02:00:00 GMT')  // First monday of first week, France is in GMT+2 zone
   const diff = dateDiffInDays(FIRST_MONDAY_OF_THE_SCHOOL_YEAR, new Date())
-  return Math.floor(Math.abs(diff)/7) + 1 
+  return Math.floor(Math.abs(diff) / 7) + 1
 }
 
 /**
