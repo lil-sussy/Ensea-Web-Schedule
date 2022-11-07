@@ -17,29 +17,29 @@ import useSWR from "swr";
 export default function WeekDaySwiper({ schedule, currentWeek: currentWeekID }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [everyWeekSchedule, setEveryWeekSchedule] = useState(new Map())
+  useEffect(() => {
+    setIsMounted(true);
+  }, [])
   const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
     return data
   })
   const config = useMemo(  // Apparently this might be useful
-    () => ({
-      headers: {
-        classe: schedule,
-        'Content-Type': 'application/json',
-      },
-    }),
+  () => ({
+    headers: {
+      classe: schedule,
+      'Content-Type': 'application/json',
+    },
+  }),
     [schedule]
-  );
-  const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
+    );
+    const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
   if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
   const loading = !data  // useSWR hook returns undefined and will automatically reload once the data is fetched
   if (data && everyWeekSchedule.size == 0) {  // If the data was fetched but the state wasnt initialised -> initialisation;
     // This if is in order to prevent the inifinite state rendering :)
     setEveryWeekSchedule(InitializeWeeksSchedule(data)) // Map containing schedules of weeks
   }
-  useEffect(() => {
-    setIsMounted(true);
-  }, [])
-  if (!isMounted) {
+  if (!isMounted) {  // To use server side rendering with nextjs without anay pb
     return null;
   }
   const dayList = generateDayDataList(currentWeekID, everyWeekSchedule)

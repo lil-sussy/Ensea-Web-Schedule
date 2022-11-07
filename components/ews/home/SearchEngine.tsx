@@ -112,14 +112,17 @@ function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
         "placeholder-white w-full translate-y-1/10 rounded-lg bg-transparent text-center \
           duration-[600ms] " }
         onInput={(event) => {
-          doResearch(event.target.value) // TS error ignored it works just fine!
+          const target = event.target as HTMLInputElement  // To prevent TS error
+          doResearch(target.value)
         }}
         onClick={(event) => {
-          doResearch(event.target.value) // TS error ignored it works just fine!
+          const target = event.target as HTMLInputElement
+          doResearch(target.value)
         }}
         onKeyUp={event => {
+          const target = event.target as HTMLInputElement
           if (event.key == 'enter') {
-            const answers = index.search(event.target.value, {
+            const answers = index.search(target.value, {
               fields: {  // This is useless because of the configuration im using
                 title: { boost: 1 },
                 body: { boost: 2 }

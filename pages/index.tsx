@@ -13,6 +13,7 @@ import { getWeekID } from '../components/ews/lib/schoolYear'
 import SearchBar from '../components/ews/home/SearchEngine';
 import CAS from '../lib/node-cas/lib/cas';
 import { getPageStaticInfo } from 'next/dist/build/analysis/get-page-static-info';
+import Image from 'next/image';
 
 const DEFAULT_SCHEDULE = "1G1 TP6";
 
@@ -72,10 +73,9 @@ export default function ewsIndex(pageProps) {
 function App({ views, lastSchedule }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [currentWeek, setCurrentWeek] = useState(1)
-  const [schedule, setSchedule] = useState()
+  const [schedule, setSchedule] = useState(lastSchedule)
   useEffect(() => {
     setIsMounted(true);
-    setSchedule(lastSchedule)
     setCurrentWeek(getWeekID(new Date()))  // the first weekID is set to be today's week
   }, [])
   if (!isMounted) {
