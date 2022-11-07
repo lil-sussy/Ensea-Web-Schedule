@@ -32,6 +32,7 @@ export default function WeekSelectionSwiper(props: any) {
   return (
     <div className="mb-2 h-8 mx-auto w-36 bg-white relative 
     flex-col align-center justify-center rounded-lg -translate-y-1/2 ">
+      <WhiteFadingMask/>
       <div className="w-[115%] h-full -translate-x-[7.5%]">
         <Swiper className="bg-clip-text GrayTextFadeGradient" id='WeekSelection'
           modules={[Navigation, EffectCube]}
@@ -52,8 +53,8 @@ export default function WeekSelectionSwiper(props: any) {
           <div className="bg-clip-text">
             {weeksLabels.map(label => label)}
           </div>
-          <SwipePrevButton className="ButtonNav NavPrev z-20 font-Chango">{'<'}</SwipePrevButton>
-          <SwipeNextButton className="ButtonNav NavNext z-20 font-Chango">{'>'}</SwipeNextButton>
+          <SwipePrevButton className="ButtonNav NavPrev z-20 font-Chango  border-white">{'<'}</SwipePrevButton>
+          <SwipeNextButton className="ButtonNav NavNext z-20 font-Chango  border-white">{'>'}</SwipeNextButton>
         </Swiper>
       </div>
     </div>
@@ -62,13 +63,24 @@ export default function WeekSelectionSwiper(props: any) {
 
 function WeekLabel(weekID: number) {
   return (
-    <SwiperSlide key={weekID} className="w-full h-full bg-clip-text">
+    <SwiperSlide key={weekID} className="w-full h-full">
       <div className="WeekSelectionLabel text-[1.2rem] justify-center align-center 
         text-center text-transparent font-kefa font-bold leading-8">
-        <h4 className="bg-clip-text text-transparent GrayTextFadeGradient bg-fixed">Semaine {weekID}</h4>
+        <h4 className="bg-clip-text text-gray-700 bg-fixed">Semaine {weekID}</h4>
       </div>
     </SwiperSlide>
   );
+}
+
+function WhiteFadingMask() {
+  return (
+    <div className="absolute w-full rounded-2xl h-full "
+    style={{
+      backgroundImage: 'linear-gradient(to right, rgba(0, 0, 0, 0) 10%, white 20%, white 80%, rgba(0, 0, 0, 0) 90%)',
+    }}>
+
+    </div>
+  )
 }
 
 function SwipeNextButton({ className, children }) {
