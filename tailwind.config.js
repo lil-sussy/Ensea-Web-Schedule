@@ -17,8 +17,8 @@ module.exports = {
         'second-purple-light': '#af52d5',
         'second-purple-dark': '#4a0073',
         'third-purple': '#ffeeff',
+        'fourth-purple': 'ffebee',
         'third-purple-light': '#ede7f6',
-        'white': '#ffffff',
       },
       gridTemplateRows: {
         '25': 'repeat(25, 4%)',

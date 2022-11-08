@@ -11,7 +11,7 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
     for (let i = 0; i < courses.length; i++) {
       const courseData = courses[i]
       divCourses.push(<Course courseData={courseData} />);
-      courseHourWrappers.push(...CourseHours({courseData}));
+      courseHourWrappers.push(CourseHours({ courseData: courseData, ending:false }));
     }
   } else {
     divCourses.push(
@@ -28,7 +28,7 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
   );
 }
 
-function CourseHours({ courseData: course }) {
+function CourseHours({ courseData: course, ending }) {
   const beginHour = Number(course.begin.slice(0, 2))
   const endHour = Number(course.end.slice(0, 2))
   const wrpBeginHour = beginHour   // Wrapper of half an hour long
@@ -36,8 +36,8 @@ function CourseHours({ courseData: course }) {
   const wrpRowBegin = (wrpBeginHour - 6) * 2 + (course.begin.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 6am
   const wrpRowEnd = (wrpEndHour - 6) * 2 + (course.end.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am
   const endHourPos = (wrpEndHour - 0.5 - 6) * 2 + (course.end.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am
-  return (
-    [
+  if (!ending)
+    return (
       <div key={wrpBeginHour} className={clsx(" w-full h- row-start-" + wrpRowBegin + " col-span-1 text-white font-bold relative")}
         style={{ gridRowStart: wrpRowBegin }}>
         <div className="w-12 ml-1 bg-third-purple rounded-md text-main-purple-light h-full flex flex-col z-20">
@@ -47,8 +47,19 @@ function CourseHours({ courseData: course }) {
         </div>
         <div className="w-full absolute top-1/2 h-[0.15rem] bg-gradient-to-r from-main-purple-light to-main-purple -z-10"></div>
       </div>
-    ]
-  )
+    )
+  else
+    return (
+      <div key={wrpBeginHour} className={clsx(" w-full h- row-start-" + wrpRowBegin + " col-span-1 text-white font-bold relative")}
+        style={{ gridRowStart: wrpRowBegin }}>
+        <div className="w-12 ml-1 bg-third-purple rounded-md text-main-purple-light h-full flex flex-col z-20">
+          <h3 className="text-center items-center text-[0.65rem] leading-[0.7rem] my-auto z-20">
+            {course.begin}
+          </h3>
+        </div>
+        <div className="w-full absolute top-1/2 h-[0.15rem] bg-gradient-to-r from-main-purple-light to-main-purple -z-10"></div>
+      </div>
+    )
 }
 
 function Course({ courseData: course }) {
@@ -58,7 +69,7 @@ function Course({ courseData: course }) {
   const rowEnd = (endHour - 6) * 2 + (course.end.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 6am + if half hour
   return (
     <div key={course.begin} className={clsx(
-      "Course w-full  text-gray-700 outline-2 outline-white relative rounded-md  bg-gradient-to-b p-2 font-marianne\
+      "Course w-full  text-gray-700 outline-2 outline-white relative bg-gradient-to-b p-2 font-marianne\
       from-third-purple to-third-purple row-start-" + rowBegin + " row-end-" + rowEnd + " flex flex-row items-center")}
       style={{
         gridRowStart: rowBegin, gridRowEnd: rowEnd,  // Because it doesnt work with tailwind
@@ -66,8 +77,8 @@ function Course({ courseData: course }) {
       <CoursePlace place={course.place}/>
       <div className="inline-block w-[80%]">
         <div className="w-full flex items-start flex-col justify-center">
-          <h3 className="font-bold text-base drop-shadow-sm font-dinCondensed">
-            {course.name}
+          <h3 className="font-bold text-base drop-shadow-sm font-dinCondensed overflow-hidden whitespace-nowrap">
+            {course.name + "vfsdfdsfjsdlfkdjsfl"}
           </h3>
           <h4 className="text-xs font-Charter">
             {course.teachers.join(', ')}
@@ -121,9 +132,12 @@ function DayContainer({ children }) {
   return (
     <div className="DayContainer w-full h-full text-lg flex 
     justify-center items-center">
-      <div className="DayAbsoluteContainer absolute top-0 py-2 drop-shadow-md
-      w-72 h-[95%] rounded-xl border-main-purple border-[1px] bg-white">
-        {children}
+      <div className='absolute top-0 w-72 h-[95%] z-0'>
+        <div className='bg-gradient-to-r from-main-purple-light to-main-purple -z-[1] absolute left-0 top-0 bottom-0 right-0 rounded-xl'>
+          <div className="DayAbsoluteContainer top-0 w-full h-full bg-white border-[1px] border-transparent box-border bg-clip-content overflow-hidden">
+            {children}
+          </div>
+        </div>
       </div>
     </div>
   )
