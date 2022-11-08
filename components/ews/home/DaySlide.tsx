@@ -129,10 +129,10 @@ function CoursePlace({ place }) {
 
 function DayContainer({ children }) {
   return (
-    <div className="DayContainer w-full h-full text-lg flex justify-center items-center">
+    <div className="DayContainer w-full h-full text-lg flex justify-center items-center drop-shadow-lg">
       <div className='absolute top-0 w-72 h-[95%] z-0'>
         <div className='bg-gradient-to-r from-main-purple-light to-main-purple -z-[1] absolute left-0 top-0 bottom-0 right-0 rounded-xl'>
-          <div className="DayAbsoluteContainer top-0 w-full h-full bg-white border-[1px] border-transparent box-border bg-clip-content overflow-hidden">
+          <div className="DayAbsoluteContainer top-0 w-full h-full bg-white border-[2px] border-transparent box-border bg-clip-content overflow-hidden">
             {children}
           </div>
         </div>
@@ -156,11 +156,11 @@ function DayContent({ courses, coursesHours }) {
 
 function DayName({ name, date }) {
   return (
-    <div className="DayName absolute flex justify-center items-center flex-col text-center w-full bottom-0 h-[0.1428]">
+    <div className="DayName absolute text-center w-full bottom-0">
       <h2 className="text-3xl font-light text-main-purple font-academyLET translate-y-3">
         {name.toUpperCase()}
       </h2>
-      <h4 className="text-xs font-normal mt-[0.1rem] text-gray-600 font-dinAlternate">
+      <h4 className="text-xs font-normal mt-[0rem] mb-[0.5rem] text-gray-600 font-dinAlternate">
         {date.toLocaleString("fr-FR", { year: 'numeric', month: '2-digit', day: '2-digit' })}
       </h4>
     </div>
