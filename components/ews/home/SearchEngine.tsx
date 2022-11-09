@@ -1,5 +1,5 @@
 import elasticlunr from 'elasticlunr'
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Scrollbar, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { scheduleTree, scheduleList } from '../../../private/classesTree';
@@ -20,7 +20,12 @@ const index = elasticlunr(function () {
 export default function SearchBar({ schedule, setSchedule, className }) {
   const [displayedAnswers, setDisplayedAnswers] = useState([])
   const focused = displayedAnswers.length != 0
-  return (
+  useEffect(() => {
+    if (!schedule) {
+      setDisplayedAnswers(performResearch(''))
+    }
+  }, [])
+  return ( 
     <div className={" " + className}>
       <div className="WhiteBorder bg-white w-full h-1"></div>
       <div className="ClassSelection w-full h-full ">
@@ -61,7 +66,7 @@ function AnswerList({ fields, setSchedule, focused, setDisplayedAnswers }) {
     <div className={ ('fixed w-full top-0 z-50 transition-transform duration-500  '
     + (focused? 'translate-y-0 h-[89%]' : 'translate-y-[200%] h-0')) }
     onClick={event => {
-      setDisplayedAnswers([])  // Unselecting
+      setDisplayedAnswers([])  // Unselecting making it unfocused
     }}>
       <Swiper className="h-full mt-24"
         modules={ [ Scrollbar, EffectFade ] }
@@ -84,22 +89,23 @@ function AnswerList({ fields, setSchedule, focused, setDisplayedAnswers }) {
   )
 }
 
-function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
-  const doResearch = (input) => {
-    const answers = index.search(input, {
-      fields: {  // This is useless because of the configuration im using
-        title: { boost: 1 },
-        body: { boost: 2 }
-      },
-      bool: "OR",
-      expand: true
+const performResearch = (input: string) => {
+  const answers = index.search(input, {
+    fields: {  // This is useless because of the configuration im using
+      title: { boost: 1 },
+      body: { boost: 2 }
+    },
+    bool: "OR",
+    expand: true
+  })
+  if (answers.length == 0)
+    scheduleTree.forEach((value, key) => {
+      answers.push({ ref: key })
     })
-    if (answers.length == 0)
-      scheduleTree.forEach((value, key) => {
-        answers.push({ ref: key })
-      })
-    setDisplayedAnswers(answers)
-  }
+  return answers
+}
+
+function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
   return (
     <div className={'SearchBar flex flex-col justify-center items-center bg-gradient-to-r from-main-orange to-main-orange-light'
     + (focused ? ' font-semibold -translate-y-[250%] border-[3px] shadow-lg z-40 duration-400 transition-all w-2/3'
@@ -113,11 +119,11 @@ function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
           duration-[600ms] " }
         onInput={(event) => {
           const target = event.target as HTMLInputElement  // To prevent TS error
-          doResearch(target.value)
+          setDisplayedAnswers(performResearch(target.value))
         }}
         onClick={(event) => {
           const target = event.target as HTMLInputElement
-          doResearch(target.value)
+          setDisplayedAnswers(performResearch(target.value))
         }}
         onKeyUp={event => {
           const target = event.target as HTMLInputElement

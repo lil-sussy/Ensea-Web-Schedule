@@ -89,7 +89,6 @@ function generateDayDataList(currentWeekID: number, everyWeekSchedule: any) {
       dayList.push({ name: name, date: weekDates[i], data: null})
     }
   }
-  console.log(dayList)
   return dayList
 }
 

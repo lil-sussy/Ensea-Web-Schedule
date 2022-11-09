@@ -12,15 +12,17 @@ import WeekSelectionSwiper from '../components/ews/home/WeekSelectionSlider'
 import { getWeekID } from '../components/ews/lib/schoolYear'
 import SearchBar from '../components/ews/home/SearchEngine';
 // import CAS from '../lib/node-cas/lib/cas';
+import { hasCookie, setCookie, getCookie } from 'cookies-next';
 import { getPageStaticInfo } from 'next/dist/build/analysis/get-page-static-info';
 import Image from 'next/image';
 
 const DEFAULT_SCHEDULE = "1G1 TP6";
 
+
 export async function getStaticProps(req, res) {
   // const cas = new CAS({
-  //   base_url         : 'https://identites.ensea.fr/cas/login',
-  //   service     : 'https://ews.ensea.jsp.fr',
+    //   base_url         : 'https://identites.ensea.fr/cas/login',
+    //   service     : 'https://ews.ensea.jsp.fr',
   //   version     : '3.0',
   //   renew           : false,
   //   is_dev_mode     : true,
@@ -32,19 +34,17 @@ export async function getStaticProps(req, res) {
   //   return_to       : 'http://localhost:300/'
   // })
   // cas.authenticate(req, res, function(err, status, username, extended) {
-  //   if (err) {
-  //     // Handle the error
-  //     res.send({error: err});
-  //   } else {
-  //     // Log the user in 
-  //     console.log(username);
-  //     res.send({status: status, username: username, attributes: extended.attributes});
-  //   }
+    //   if (err) {
+      //     // Handle the error
+      //     res.send({error: err});
+      //   } else {
+        //     // Log the user in 
+        //     console.log(username);
+        //     res.send({status: status, username: username, attributes: extended.attributes});
+        //   }
   // });    
   return {
-    props: {
-      lastSchedule: '1G1 TP6'
-    }
+    props: {}
   }
 }
 
@@ -70,10 +70,18 @@ export default function ewsIndex(pageProps) {
   );
 }
 
-function App({ views, lastSchedule }) {
+function App({ views }) {
+  const lastSchedule = getCookie('lastSchedule')
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [currentWeek, setCurrentWeek] = useState(1)
   const [schedule, setSchedule] = useState(lastSchedule)
+  const setScheduleAndSave = (schedule) => {
+    setCookie('lastSchedule', schedule, {
+      expires: new Date(new Date().getTime() + 1000*60*60*24*62),  // 62 days,
+      sameSite: true
+    })
+    setSchedule(schedule)
+  }
   useEffect(() => {
     setIsMounted(true);
     setCurrentWeek(getWeekID(new Date()))  // the first weekID is set to be today's week
@@ -83,16 +91,28 @@ function App({ views, lastSchedule }) {
   }
   return (
     <>
-      <SearchBar schedule={schedule} setSchedule={setSchedule} className='SelectionsContainer relative from-main-orange 
+      <SearchBar schedule={schedule} setSchedule={setScheduleAndSave} className='SelectionsContainer relative from-main-orange 
       to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center'/>
       <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek} />
       <div className="WeekScheduleContainer w-full h-[69%]">
-        <WeekDaySwiper schedule={lastSchedule} currentWeek={currentWeek} />
+        {
+          schedule ? 
+            <WeekDaySwiper schedule={schedule} currentWeek={currentWeek} />
+          :
+            <GetStarted/>
+        }
       </div>
     </>
   );
 }
 
+function GetStarted() {
+  return (
+    <div>
+      
+    </div>
+  )
+}
 
 function BackgroundENSEA() {
   return (
