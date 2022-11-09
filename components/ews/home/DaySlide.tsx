@@ -8,7 +8,18 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
   const courseHourWrappers = new Map()
   const divCourses = [];
   const courseHourWrapperList = []
-  if (courses != undefined) {  // It may be possible if a day is empty
+  if (courses == null) {
+    return (
+      <SwiperSlide key={actualDay as Key}>
+        <DayContainer>
+          <div className="DayContent relative h-[100%] flex justify-start">
+            <DayMask />
+          </div>
+          <DayName name={actualDay} date={date} />
+        </DayContainer>
+      </SwiperSlide >
+    );
+  } else if (courses != undefined) {  // It may be possible if a day is empty
     for (let i = 0; i < courses.length; i++) {
       const courseData = courses[i]
       divCourses.push(<Course courseData={courseData} />);
@@ -30,6 +41,22 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
       </DayContainer>
     </SwiperSlide >
   );
+}
+
+function DayMask() {
+  const emptyText = (key) => (
+    <h1 key={key} className ='font-kefa font-bold text-center text-3xl text-white'>
+      NOTHING
+    </h1>)
+  const emptyTextList = []
+  for (let i = 0; i < 100; i++) {
+    emptyTextList.push(emptyText(i))
+  }
+  return (
+    <div className='bg-third-purple w-full h-full flex flex-col justify-center'>
+      {emptyTextList}
+    </div>
+  )
 }
 
 function CourseHours({ courseData: course, ending }) {

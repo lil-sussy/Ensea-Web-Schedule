@@ -11,14 +11,16 @@ import "swiper/css/effect-creative"
 SwiperCore.use([EffectFlip])
 
 import DaySlide from './DaySlide'
-import { getWeekByID } from "../lib/schoolYear";
+import { getWeekDatesByID } from "../lib/schoolYear";
 import useSWR from "swr";
 
 export default function WeekDaySwiper({ schedule, currentWeek: currentWeekID }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [everyWeekSchedule, setEveryWeekSchedule] = useState(new Map())
+  const [initialSlide, setInitialSlide] = useState(0)
   useEffect(() => {
     setIsMounted(true);
+    setInitialSlide(new Date().getDay())
   }, [])
   const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
     return data
@@ -29,10 +31,8 @@ export default function WeekDaySwiper({ schedule, currentWeek: currentWeekID }) 
       classe: schedule,
       'Content-Type': 'application/json',
     },
-  }),
-    [schedule]
-    );
-    const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
+  }), [schedule]);
+  const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
   if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
   const loading = !data  // useSWR hook returns undefined and will automatically reload once the data is fetched
   if (data && everyWeekSchedule.size == 0) {  // If the data was fetched but the state wasnt initialised -> initialisation;
@@ -46,7 +46,7 @@ export default function WeekDaySwiper({ schedule, currentWeek: currentWeekID }) 
   return (<Swiper key={1} id='daySwiper'
     modules={ [ Pagination, Navigation ]  }
     className="WeekSchedule w-full h-full"
-    initialSlide={0}
+    initialSlide={initialSlide}
     enabled={true}
     direction="horizontal"
     spaceBetween={0}
@@ -72,7 +72,7 @@ export default function WeekDaySwiper({ schedule, currentWeek: currentWeekID }) 
 }
 
 function generateDayDataList(currentWeekID: number, everyWeekSchedule: any) {
-  const weekDates = getWeekByID(currentWeekID) 
+  const weekDates = getWeekDatesByID(currentWeekID) 
   currentWeekID += 1   // For some reasons :/ :'(
   const dayList = []
   const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
@@ -86,9 +86,10 @@ function generateDayDataList(currentWeekID: number, everyWeekSchedule: any) {
         dayList.push({ name: name, date: weekDates[i], data: data })
       }
     } else {  // Holidays !!!
-      dayList.push({ name: name, date: weekDates[i], data: undefined})
+      dayList.push({ name: name, date: weekDates[i], data: null})
     }
   }
+  console.log(dayList)
   return dayList
 }
 

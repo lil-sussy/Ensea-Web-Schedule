@@ -13,8 +13,8 @@ export function getMondayOfDate(date: Date) {
   return new Date(new Date(date).setDate(mondayOfTheMonth))
 }
 
-export function getWeekByID(weekID: number) {
-  const time = ((weekID - 1) * 7 + 1)*24*60*60*1000
+export function getWeekDatesByID(weekID: number) {
+  const time = ((weekID - 1) * 7)*24*60*60*1000
   const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = new Date('29 Aug 2022 02:00:00 GMT')  // First monday of first week, France is in GMT+2 zone
   const mondayInTheMonth = new Date(FIRST_MONDAY_OF_THE_SCHOOL_YEAR.getTime() + time)
   const monday = new Date(mondayInTheMonth)
@@ -30,7 +30,7 @@ export function getWeekByID(weekID: number) {
 export function getWeekID(day: Date) {
   const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = new Date('29 Aug 2022 02:00:00 GMT')  // First monday of first week, France is in GMT+2 zone
   const diff = dateDiffInDays(FIRST_MONDAY_OF_THE_SCHOOL_YEAR, new Date())
-  return Math.floor(Math.abs(diff)/7) + 1 
+  return Math.floor(Math.abs(diff)/7) + 1
 }
 
 /**
