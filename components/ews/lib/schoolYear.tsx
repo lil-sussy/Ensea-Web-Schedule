@@ -29,7 +29,7 @@ export function getWeekDatesByID(weekID: number) {
 // https://bobbyhadz.com/blog/javascript-get-monday-of-current-week#:~:text=function%20getMondayOfCurrentWeek()%20%7B%20const%20today,Mon%20Jan%2017%202022%20console.
 export function getWeekID(day: Date) {
   const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = new Date('29 Aug 2022 02:00:00 GMT')  // First monday of first week, France is in GMT+2 zone
-  const diff = dateDiffInDays(FIRST_MONDAY_OF_THE_SCHOOL_YEAR, new Date())
+  const diff = dateDiffInDays(FIRST_MONDAY_OF_THE_SCHOOL_YEAR, day)
   return Math.floor(Math.abs(diff)/7) + 1
 }
 

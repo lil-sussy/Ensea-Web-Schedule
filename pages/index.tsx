@@ -74,13 +74,13 @@ function App({ views }) {
   const lastSchedule = getCookie('lastSchedule')
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [currentWeek, setCurrentWeek] = useState(1)
-  const [schedule, setSchedule] = useState(lastSchedule)
-  const setScheduleAndSave = (schedule) => {
-    setCookie('lastSchedule', schedule, {
+  const [scheduleID, setScheduleID] = useState(lastSchedule)
+  const setScheduleAndSave = (scheduleID) => {
+    setCookie('lastSchedule', scheduleID, {
       expires: new Date(new Date().getTime() + 1000*60*60*24*62),  // 62 days,
       sameSite: true
     })
-    setSchedule(schedule)
+    setScheduleID(scheduleID)
   }
   useEffect(() => {
     setIsMounted(true);
@@ -91,13 +91,13 @@ function App({ views }) {
   }
   return (
     <>
-      <SearchBar schedule={schedule} setSchedule={setScheduleAndSave} className='SelectionsContainer relative from-main-orange 
+      <SearchBar schedule={scheduleID} setSchedule={setScheduleAndSave} className='SelectionsContainer relative from-main-orange 
       to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center'/>
       <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek} />
       <div className="WeekScheduleContainer w-full h-[69%]">
         {
-          schedule ? 
-            <WeekDaySwiper schedule={schedule} currentWeek={currentWeek} />
+          scheduleID ? 
+            <WeekDaySwiper schedule={scheduleID} currentWeek={currentWeek} />
           :
             <GetStarted/>
         }

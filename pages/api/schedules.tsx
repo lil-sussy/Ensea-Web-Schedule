@@ -1,39 +1,32 @@
 import { collection, setDoc, doc, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { NextApiRequest, NextApiResponse } from 'next'
-import { scheduleList, scheduleTree } from '../../private/classesTree'
+import { scheduleIDs, scheduleList } from '../../private/classesTree'
 import fs from 'fs';
 import path from 'path';
-import loadSchedules from '../../components/ews/lib/scheduleExport'
+import ical from 'ical'
+import axios from 'axios'
+import { getWeekID } from '../../components/ews/lib/schoolYear';
 
+let lastUpdate: Date  // A date
 
-const loadSchedule = (req: NextApiRequest, res: NextApiResponse) => {
+export default async function Handler(req: NextApiRequest, res: NextApiResponse) {
   if (req.method == 'POST') {
-    WriteJsonSchedule(req, res)
-    const everyWeekSchedule = new Map()
-    const classeSchedule = loadSchedules(10, ['1G1 TP6', '1G1 TD3', '1ère A ENSEA'])
-    for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {  // Going through every schedules
-      const course = classeSchedule[scheduleIndex].course
-      const weekID = Number(course.week)  // Each course object is attached to a weekID to be identified
-      const weekSchedule = everyWeekSchedule.get(weekID) ? everyWeekSchedule.get(weekID) : new Map()
-      const dayID = course.dayOfWeek  // String such as 'Lundi' or 'Vendredi'
-      const daySchedule = weekSchedule.get(dayID) ? weekSchedule.get(dayID) : [] 
-      daySchedule.push(course)  // Map of schedules of the days
-      weekSchedule.set(dayID, daySchedule)  // Map of schedules of the weeks
-      everyWeekSchedule.set(weekID, weekSchedule)  // Map of weeks
-    }
-    console.log(everyWeekSchedule)
-    res.status(200).json({status: 200, data: "Data succesfully loaded :3"})
+    res.status(200).json({status: 401, data: "Data not succesfully loaded cuz it's automatique now mf :3"})
   } else if (req.method == 'GET') {
+    const now = new Date()
+    if (!lastUpdate || now.getTime() - lastUpdate.getTime() > 5*60*60*1000) {  // Refresh of the data every 5min
+      updateAndSaveSchedule()
+      lastUpdate = now
+    }
     if (req.headers['classe'] == undefined) {
       res.status(400).json({ status: 400, message: "Unsupported headers"});
       return
     }
-    const week = Number(req.headers['week'])
     const classe = req.headers['classe']
-    const classes = scheduleTree.get(classe)
-    if (classes) {
-      classes.push(classe)
-      res.status(200).json({totalSchedule: loadSchedules(week, classes)})
+    if (classe) {
+      const schedules = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))))
+      console.log(schedules)
+      res.status(200).json({totalSchedule: schedules.get(classe)})
     } else {
       res.status(404).json({ status: 404, message:'No classe schedule found for this classe '+classe })
     }
@@ -42,30 +35,168 @@ const loadSchedule = (req: NextApiRequest, res: NextApiResponse) => {
   }
 }
 
-let allWeeks = []
-const LAST_WEEK_ID = 47
-function WriteJsonSchedule(req: NextApiRequest, res: NextApiResponse) {
-  const filepathJSON = path.join(process.cwd(), '/private/schedules.json')
-  
-  const weirdObjectWtfPleaseHelpMe = JSON.stringify(req.body)
-  const dearGodWhyTheFuckIsThisAtTheBeginning = '{"'
-  const dearGodWhyTheFuckIsThisAtTheEnd = '":""}'
-  const actualStringifyObject = weirdObjectWtfPleaseHelpMe.slice(dearGodWhyTheFuckIsThisAtTheBeginning.length
-    , weirdObjectWtfPleaseHelpMe.length - dearGodWhyTheFuckIsThisAtTheEnd.length)  // Please send help
-  
-  const week = JSON.parse(actualStringifyObject.replaceAll('\\', ''));  // Dear god what the fuck
-  if (week.weekID == 1) {  // If this is the first week being sent
-    allWeeks = []
-    fs.writeFileSync(filepathJSON, '')  // Clear file (useless)
-  }
-  console.log(allWeeks);
-  
-  allWeeks.push(week)
-  if (week.weekID == LAST_WEEK_ID) {
-    fs.writeFileSync(filepathJSON, JSON.stringify(allWeeks))
-  }
-  console.log(req.headers['origin']);  // https://ade.ensea.fr
-  
+function generateADEurl(schedule: number, begin: string, end: string) {
+  const URL = 'https://ade.ensea.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?'+
+  'resources='+schedule+'&projectId=1&calType=ical&firstDate='+begin+'&lastDate='+end
+  return URL
 }
 
-export default loadSchedule
+function replacer(key, value) {
+  if(value instanceof Map) {
+    return {
+      dataType: 'Map',
+      value: Array.from(value.entries()), // or with spread: value: [...value]
+    };
+  } else {
+    return value;
+  }
+}
+
+function reviver(key, value) {
+  if(typeof value === 'object' && value !== null) {
+    if (value.dataType === 'Map') {
+      return new Map(value.value);
+    }
+  }
+  return value;
+}
+
+async function updateAndSaveSchedule() {
+  scheduleIDs.forEach((scheduleID, schedule) => {  // Iterate trough every classes and save their schedules
+    axios.get(generateADEurl(scheduleID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
+    .then((res) => {
+      const data = ADEisCringe(res.data)
+      fs.writeFileSync(path.join(process.cwd(), '/private/test.ics'), data)
+      let schedules = JSON.parse(String(fs.readFileSync(path.join(process.cwd() + '/private/schedules.json'))), reviver)
+      if (!schedules.get)
+      schedules = new Map<String, Map<number, Course[]>>()  // Map of schedules then map of weekIDs
+      const calendar = ical.parseICS(data)  // Calendar is not iterable :)
+      for (const[key, value] of Object.entries(calendar)) {
+        const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value))  // lol
+        const weeks = schedules.get(schedule) ? schedules.get(schedule) : new Map<number, Course[]>()
+        const week = weeks.get(course.courseData.week) ? weeks.get(course.courseData.week) : []
+        week.push(course)
+        weeks.set(course.courseData.week, week)
+        schedules.set(schedule, weeks)
+      }
+      fs.writeFileSync(path.join(process.cwd() + '/private/schedules.json'), JSON.stringify(schedules, replacer))
+    })
+  })
+}
+
+function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course) {
+  // You might wonder : what is going on ?
+  // Well this is simple, see aparently for every course dated before today are MODIFIED by ADE
+  // I attended to some of those courses and I can confirm that every courses's hours are MODIFIED.
+  // But this is not the case for the courses of the current week and the courses of every weeks after :)))
+  // At this point I just wanna die I dont even want to continue typing this function this is just too CRINGE.
+  const currentWeekID = getWeekID(new Date())  // WeekID of this week
+  if (course.courseData.week < currentWeekID) {
+    const begin = course.courseData.begin
+    course.courseData.begin = ('0' + (Number(begin.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
+    course.courseData.begin += begin.slice(2, 5)
+    const end = course.courseData.end
+    course.courseData.end = ('0' + (Number(end.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
+    course.courseData.end += end.slice(2, 5)
+  }
+  // pls send help.
+  return course
+}
+
+function ADEisCringe(ADEdata: string) {
+  const timezoneID = 'TZID=France/Paris'
+  let data = ""
+  const lines = ADEdata.split('\n') as string[]
+  for (let line of lines) {
+    if (line.startsWith('DTSTAMP') || line.startsWith('DTSTART') || line.startsWith('DTEND') || line.startsWith('LAST-MODIFIED')) {
+      const ICSKey = line.split(':')[0]
+      const ICSValue = line.split(':')[1]
+      data += ICSKey + ';' + timezoneID + ':' + ICSValue + '\n'
+    } else {
+      data += line + '\n'
+    }
+  }
+  return data
+}
+
+function removeSpaces(str: String) {
+  let begin = 0
+  let end = 0
+  while (String(str).charAt(begin) === ' ') {
+    begin++
+  }
+  while (str.charAt(str.length - 1 - end) === " ") {
+    end++
+  }
+  return str.slice(begin, str.length - end)
+}
+
+function isClasseName(information: any) {
+  return scheduleList.includes(information)
+}
+
+function parseCourseFromCalEvent(event: any): Course {
+  const SCHOOL_YEAR = 2022
+  const name = event.summary
+
+  const teachers = [], classes = []
+  const places = event.location.split('\n')
+  const informations = event.description.split('\n')
+  let exportDate: string
+  for (let i = 1; i < informations .length - 1; i++) {  // Ignoring first and last element
+    const information = removeSpaces(informations [i])
+    if (isClasseName(information)) {
+      classes.push(information)
+    } else if (information.startsWith('(Exported :')) {  // Weird data stuff inside the summary completly useless
+      exportDate = information
+    } else {
+      teachers.push(information)
+    }
+  }
+  const week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
+  const beginDate = (event.start as Date)
+  const endDate = event.end as Date
+  const creationDate = event.created as Date
+  const modifiedDate = event.lastmodified as Date
+  const weekID = getWeekID(beginDate)
+  if (name != undefined) {
+    const dayOfYear = (weekID - 1) * 7 + 1
+    const date = new Date(SCHOOL_YEAR, 0, dayOfYear)
+    const courseData = {
+      name: name as string,
+      dayOfWeek: week[beginDate.getDay()-1] as string,
+      date: beginDate.toLocaleString("fr-FR", { year: 'numeric', month: '2-digit', day: '2-digit' }) as string,
+      week: weekID as number,
+      begin: beginDate.toLocaleString("fr-FR", { hour: '2-digit', minute: '2-digit' }) as string,
+      end: endDate.toLocaleString("fr-FR", { hour: '2-digit', minute: '2-digit' }) as string,
+      teachers: teachers as string[],
+      locations: places as string[],
+      creationDate: creationDate as Date,
+      modificationDate: modifiedDate as Date,
+      exported: exportDate as string,
+    }
+    // console.log('event', event)
+    // console.log('course', course)
+    for (let i = 0; i < classes.length; i++) {
+      const classe = classes[i]
+    }
+    return { classes, courseData }
+  }
+}
+
+export type Course = {
+  classes: string[],
+  courseData: {
+    name: string,
+    dayOfWeek: string,
+    date: string,
+    week: number,
+    begin: string,
+    end: string,
+    teachers: string[],
+    locations: string[],
+    creationDate: Date,
+    modificationDate: Date,
+    exported: string
+  }
+}

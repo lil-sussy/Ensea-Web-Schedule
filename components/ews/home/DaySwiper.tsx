@@ -14,7 +14,7 @@ import DaySlide from './DaySlide'
 import { getWeekDatesByID } from "../lib/schoolYear";
 import useSWR from "swr";
 
-export default function WeekDaySwiper({ schedule, currentWeek: currentWeekID }) {
+export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: currentWeekID }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [everyWeekSchedule, setEveryWeekSchedule] = useState(new Map())
   const [initialSlide, setInitialSlide] = useState(0)
@@ -28,10 +28,10 @@ export default function WeekDaySwiper({ schedule, currentWeek: currentWeekID }) 
   const config = useMemo(  // Apparently this might be useful
   () => ({
     headers: {
-      classe: schedule,
+      classe: scheduleID,
       'Content-Type': 'application/json',
     },
-  }), [schedule]);
+  }), [scheduleID]);
   const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
   if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
   const loading = !data  // useSWR hook returns undefined and will automatically reload once the data is fetched

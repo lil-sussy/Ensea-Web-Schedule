@@ -2,13 +2,13 @@ import elasticlunr from 'elasticlunr'
 import { useState, useEffect } from 'react';
 import { Scrollbar, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { scheduleTree, scheduleList } from '../../../private/classesTree';
+import { scheduleTree } from '../../../private/classesTree';
 
 const index = elasticlunr(function () {
   this.addField('title');
   this.addField('body');
   this.setRef('id');
-  scheduleTree.forEach((value, key) => {
+  scheduleTree.forEach((value: string[], key: string) => {
     this.addDoc({
       'title': key,  // Groupe de TP
       'body': value.join(' ') + ' ' + key,  // Groupe de TD, année et groupe de Tp
@@ -25,7 +25,7 @@ export default function SearchBar({ schedule, setSchedule, className }) {
       setDisplayedAnswers(performResearch(''))
     }
   }, [])
-  return ( 
+  return (
     <div className={" " + className}>
       <div className="WhiteBorder bg-white w-full h-1"></div>
       <div className="ClassSelection w-full h-full ">
