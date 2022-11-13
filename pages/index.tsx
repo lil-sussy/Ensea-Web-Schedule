@@ -48,13 +48,22 @@ export async function getStaticProps(req, res) {
   }
 }
 
-export default function ewsIndex(pageProps) {
+export default function ewsIndex(pageProps: any) {
   return (
     <React.StrictMode>
       <Head>
         <title>Ensea Web Schedule</title>
         <meta name="description" content="Ensea Web Schedule" />
         <meta property="og:title" content="Ensea Web Schedule" key="title" />
+        <meta property="og:url" content="www.ews.assos-ensea.fr" />
+        <meta property="og:type" content="website" />
+        <meta property="fb:app_id" content="ratio facebook" />
+        <meta name="twitter:card" content="summary" />
+        <meta
+          property="og:description"
+          content="Hurray!! Yes Social Media Preview is Working"
+        />
+        <meta property="og:image" content={"../public/logo.png"} />
       </Head>
       <Head>
         <link rel="icon" href="/favicon.ico" />

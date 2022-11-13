@@ -165,6 +165,223 @@ scheduleList.push(_1DA_TD2)
 //1ère DC
 scheduleTree.set(_1DC_TP1, [_1DC_TP1, _1ère_DC])
 
+//2ème Année D
+const _2ème_D = '2ème D'
+const _2DA_INA = '2DA_INA'
+const _2D = '2D'
+scheduleList.push(_2D)
+scheduleList.push(_2ème_D)
+
+const _2DA_TP1 = '2DA TP1'
+const _2DA_TP2 = '2DA TP2'
+const _2DA_TP3 = '2DA TP3'
+const _2DA_TP4 = '2DA TP4'
+scheduleTree.set(_2DA_INA, [_2ème_D])
+scheduleIDs.set(_2DA_INA, 612)
+scheduleTree.set(_2DA_TP1, [_2D, _2ème_D])
+scheduleIDs.set('2DA TP1', 600)
+scheduleTree.set(_2DA_TP2, [_2D, _2ème_D])
+scheduleIDs.set('2DA TP2', 607)
+scheduleTree.set(_2DA_TP3, [_2D, _2ème_D])
+scheduleIDs.set('2DA TP3', 493)
+scheduleTree.set(_2DA_TP4, [_2D, _2ème_D])
+scheduleIDs.set('2DA TP4', 553)
+
+//2ème Année
+const _2ème_ENSEA = '2ème ENSEA'
+const _2G1_TD1 = '2G1 TD1 (Info / Signal)'
+const _2G1_TD2 = '2G1 TD2 (internationale'
+const _2G1_TD3 = '2G1 TD3 (Signal / Elec)'
+const _2G2_TD1 = '2G2 TD1 (Info/ Elec)'
+const _2G2_TD2 = '2G2 TD2 (Info/ Elec)'
+const _2G2_TD3 = '2G2 TD3 (Info/ Autom)'
+const _2G3_TD1 = '2G3 TD1 (Elec / Autom)'
+const _2G3_TD2 = '2G3 TD2 (Signal / Info)'
+scheduleList.push(_2ème_ENSEA)
+scheduleList.push(_2G1_TD1)
+scheduleList.push(_2G1_TD2)
+scheduleList.push(_2G1_TD3)
+scheduleList.push(_2G2_TD1)
+scheduleList.push(_2G2_TD2)
+scheduleList.push(_2G2_TD3)
+scheduleList.push(_2G3_TD1)
+scheduleList.push(_2G3_TD2)
+scheduleTree.set('2G1 TP1', [_2ème_ENSEA, _2G1_TD1])
+scheduleIDs.set('2G1 TP1', 464)
+scheduleTree.set('2G1 TP2', [_2ème_ENSEA, _2G1_TD1])
+scheduleIDs.set('2G1 TP2', 465)
+scheduleTree.set('2G1 TP3', [_2ème_ENSEA, _2G1_TD2])
+scheduleIDs.set('2G1 TP3', 467)
+scheduleTree.set('2G1 TP4', [_2ème_ENSEA, _2G1_TD2])
+scheduleIDs.set('2G1 TP4', 468)
+scheduleTree.set('2G1 TP5', [_2ème_ENSEA, _2G1_TD3])
+scheduleIDs.set('2G1 TP5', 540)
+scheduleTree.set('2G1 TP6', [_2ème_ENSEA, _2G1_TD3])
+scheduleIDs.set('2G1 TP6', 448)
+scheduleTree.set('2G2 TP1', [_2ème_ENSEA, _2G2_TD1])
+scheduleIDs.set('2G2 TP1', 470)
+scheduleTree.set('2G2 TP2', [_2ème_ENSEA, _2G2_TD1])
+scheduleIDs.set('2G2 TP2', 471)
+scheduleTree.set('2G2 TP3', [_2ème_ENSEA, _2G2_TD2])
+scheduleIDs.set('2G2 TP3', 473)
+scheduleTree.set('2G2 TP4', [_2ème_ENSEA, _2G2_TD2])
+scheduleIDs.set('2G2 TP4', 474)
+scheduleTree.set('2G2 TP5', [_2ème_ENSEA, _2G2_TD3])
+scheduleIDs.set('2G2 TP5', 605)
+scheduleTree.set('2G2 TP6', [_2ème_ENSEA, _2G2_TD3])
+scheduleIDs.set('2G2 TP6', 606)
+scheduleTree.set('2G3 TP1', [_2ème_ENSEA, _2G3_TD1])
+scheduleIDs.set('2G3 TP1', 479)
+scheduleTree.set('2G3 TP2', [_2ème_ENSEA, _2G3_TD1])
+scheduleIDs.set('2G3 TP2', 480)
+scheduleTree.set('2G3 TP3', [_2ème_ENSEA, _2G3_TD2])
+scheduleIDs.set('2G3 TP3', 482)
+scheduleTree.set('2G3 TP4', [_2ème_ENSEA, _2G3_TD2])
+scheduleIDs.set('2G3 TP4', 483)
+scheduleIDs.set('2G3 TP5', 542)  // ??
+scheduleIDs.set('2G3 TP6', 549)
+
+//3ème D
+const _3ème_D = '3ème D'
+const _3DN = '3DN'
+const _3DRT = '3DRT'
+scheduleList.push(_3ème_D)
+scheduleList.push(_3DN)
+scheduleList.push(_3DRT)
+
+scheduleTree.set('3D - TP1', [_3ème_D])
+scheduleTree.set('3D - TP2', [_3ème_D])
+scheduleTree.set('3D - TP3', [_3ème_D])
+scheduleTree.set('3D - TP4', [_3ème_D])
+scheduleTree.set('3DINA', [_3ème_D])
+
+const _3ème_AEI = '3ème AEI'
+const _3ème_ESC = '3ème ESC'
+const _3ème_ESE = '3ème ESE'
+const _3ème_EVE = '3ème EVE'
+const _3ème_IS = '3ème IS'
+const _3ème_MSC = '3ème MSC'
+const _3ème_RTS = '3ème RTS'
+const _3ème_SIA = '3ème SIA'
+scheduleTree.set('AEI TP1', [_3ème_D, _3ème_AEI])
+scheduleTree.set('AE2 TP2', [_3ème_D, _3ème_AEI])
+scheduleTree.set('ESC TP1', [_3ème_D, _3ème_ESC])
+scheduleTree.set('ESC TP2', [_3ème_D, _3ème_ESC])
+scheduleTree.set('EVE TP1', [_3ème_D, _3ème_EVE])
+scheduleTree.set('EVE TP2', [_3ème_D, _3ème_EVE])
+scheduleTree.set('ESE TP1', [_3ème_D, _3ème_ESE])
+scheduleTree.set('ESE TP2', [_3ème_D, _3ème_ESE])
+scheduleTree.set('IS TP1', [_3ème_D, _3ème_IS])
+scheduleTree.set('IS TP2', [_3ème_D, _3ème_IS])
+scheduleTree.set('MSC TP1', [_3ème_D, _3ème_MSC])
+scheduleTree.set('MSC TP2', [_3ème_D, _3ème_MSC])
+scheduleTree.set('RTS TP1', [_3ème_D, _3ème_RTS])
+scheduleTree.set('RTS TP2', [_3ème_D, _3ème_RTS])
+scheduleTree.set('SIA TP1', [_3ème_D, _3ème_SIA])
+scheduleTree.set('SIA TP2', [_3ème_D, _3ème_SIA])
+
+scheduleIDs.set('3D INA', 457)
+scheduleIDs.set('3DN', 597)
+scheduleIDs.set('3DN -TP1', 616)
+scheduleIDs.set('3DN -TP2', 598)
+scheduleIDs.set('3DRT', 614)
+scheduleIDs.set('3DRT - TP1', 615)
+scheduleIDs.set('3DRT - TP2', 618)
+scheduleIDs.set('3D - TP1', 593)
+scheduleIDs.set('3D - TP2', 595)
+scheduleIDs.set('3D - TP3', 596)
+scheduleIDs.set('3D - TP4', 631)
+scheduleIDs.set('3ème AEI', 508)
+scheduleIDs.set('AEI TP1', 523)
+/*
+649 "Chinois"
+560 "CNAM"
+561 "CNAM gr1"
+534 "Défense et sécurité"
+656 "Drone groupe 1"
+657 "Drone groupe 2"
+646 "Drones"
+535 "D&S groupe 1"
+643 "D&S groupe 2"
+495 "DSML"
+617 "DSML TP1"
+619 "DSML TP2"
+496 "DSML TP3"
+538 "Electronique et signal pour la musique"
+581 "Entr groupe 1"
+514 "ESC TP1"
+518 "ESC TP2"
+526 "ESE TP1"
+528 "ESE TP2"
+539 "E&S groupe 1"
+543 "E&S groupe 2"
+438 "ESI"
+572 "ESI TP1"
+439 "ESI TP2"
+568 "ESI TP3"
+551 "EVE TP1"
+552 "EVE TP2"
+515 "FAME"
+516 "FAME Gr 1"
+592 "FAME Gr 2"
+628 "FORMATIONS_COURTES"
+202 "Français langue étrangère"
+545 "I.A. et Big Data"
+546 "IA groupe 1"
+547 "IA groupe 2"
+601 "IAR"
+608 "IAR TP1"
+603 "IAR TP2"
+602 "IAR TP3"
+554 "Image et réalité virtuelle"
+555 "Image groupe 1"
+556 "Image groupe 2"
+580 "Innovation et entrepreneuriat"
+
+557 "Internet of Things"
+558 "IoT groupe 1"
+559 "IoT groupe 2"
+575 "IS TP1"
+582 "IS TP2"
+648 "Japonais"
+
+647 "LV3 ENSEA"
+437 "MASTERES"
+562 "Microélec groupe 1"
+477 "Microélec groupe 2"
+476 "Microélectronique"
+494 "MSC TP1"
+489 "MSC TP2"
+567 "Multiphys groupe 1"
+475 "Options"
+449 "PIM"
+450 "PIM TP1"
+594 "PIM TP2"
+661 "PREMASTER"
+660 "PREMASTER"
+586 "RT TP1"
+587 "RT TP2"
+650 "Russe"
+563 "Sécurité des systèmes d'information"
+589 "SIA TP1"
+590 "SIA TP2"
+609 "SIT"
+613 "SIT TP1"
+611 "SIT TP2"
+610 "SIT TP3"
+544 "SP Gr1"
+498 "SP Gr2"
+564 "SSI groupe 1"
+565 "SSI groupe 2"
+497 "Summer Program"
+566 "Systèmes multiphysiques"
+490 "VALEO"
+570 "VE groupe 1"
+571 "VE groupe 2"
+569 "Véhicule électrique"
+*/
+
+
 scheduleIDs.forEach((value, key) => {
   scheduleList.push(key)
 })
