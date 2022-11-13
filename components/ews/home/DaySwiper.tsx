@@ -14,6 +14,17 @@ import DaySlide from './DaySlide'
 import { getWeekDatesByID } from "../lib/schoolYear";
 import useSWR from "swr";
 
+import type { Course } from "../../../pages/api/schedules";
+
+function reviver(key, value) {
+  if(typeof value === 'object' && value !== null) {
+    if (value.dataType === 'Map') {
+      return new Map(value.value);
+    }
+  }
+  return value;
+}
+
 export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: currentWeekID }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [everyWeekSchedule, setEveryWeekSchedule] = useState(new Map())
@@ -23,7 +34,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
     setInitialSlide(new Date().getDay())
   }, [])
   const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
-    return data
+    return JSON.parse(data.totalSchedule, reviver)
   })
   const config = useMemo(  // Apparently this might be useful
   () => ({
@@ -32,16 +43,39 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
       'Content-Type': 'application/json',
     },
   }), [scheduleID]);
-  const { data, error } = useSWR(['/api/schedules', config], fetchWithUser)
-  if (error) return <p>No Data! contact me at yan.regojo@ensea.fr</p>
-  const loading = !data  // useSWR hook returns undefined and will automatically reload once the data is fetched
-  if (data && everyWeekSchedule.size == 0) {  // If the data was fetched but the state wasnt initialised -> initialisation;
+  const { data: yearSchedule, error } = useSWR(['/api/schedules', config], fetchWithUser)
+  const loading = !yearSchedule  // useSWR hook returns undefined and will automatically reload once the data is fetched
+  if (yearSchedule && yearSchedule.size != 0 && everyWeekSchedule.size == 0) {  // If the data was fetched but the state wasnt initialised -> initialisation;
     // This if is in order to prevent the inifinite state rendering :)
-    setEveryWeekSchedule(InitializeWeeksSchedule(data)) // Map containing schedules of weeks
+    setEveryWeekSchedule(yearSchedule) // Map containing schedules of weeks
   }
   if (!isMounted) {  // To use server side rendering with nextjs without anay pb
     return null;
   }
+  if (error) return <p> 500: Server error please contact me at yan.regojo@ensea.fr </p>
+  if (loading) return (
+    <div className=''>
+      <h1>Data is loading on the server pls wait</h1>
+      <svg xmlns="http://www.w3.org/2000/svg" style={{ margin: "auto", background: "", display: "block" }} width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+        <g transform="translate(0 18)">
+          <path fill="#999999" d="M53.2,30.3c0.4-1.3,0.6-2.7,0.6-4.2c0-1.2-0.1-2.3-0.4-3.4c-1.5-6-7-10.5-13.5-10.5 c-5.3,0-9.9,3-12.3,7.4c-0.9-0.3-1.8-0.4-2.8-0.4c-5.1,0-9.3,4.1-9.3,9.3c0,0.6,0.1,1.3,0.2,1.9c-4.7,0.7-8.3,4.8-8.3,9.7 c0,5.4,4.4,9.8,9.8,9.8h34.2c3.8,0,7.1-2.2,8.8-5.4c0.7-1.3,1.1-2.9,1.1-4.5C61.4,35.2,57.8,31.1,53.2,30.3z">
+            <animateTransform attributeName="transform" type="translate" values="-3 0;3 0;-3 0" keyTimes="0;0.5;1" dur="2" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1"></animateTransform>
+          </path>
+          <defs>
+            <path id="ldio-iwdxn2mvp5-path" d="M0,0v100h100V0H0z M62.9,44.4c-1.7,3.4-5.3,5.8-9.4,5.8H17c-5.8,0-10.5-4.7-10.5-10.5 c0-5.2,3.8-9.6,8.9-10.4c-0.1-0.6-0.2-1.3-0.2-2c0-5.5,4.4-9.9,9.9-9.9c1,0,2,0.2,3,0.5c2.5-4.7,7.4-7.9,13.1-7.9 c6.9,0,12.8,4.8,14.4,11.2c0.3,1.2,0.4,2.4,0.4,3.6c0,1.6-0.2,3.1-0.7,4.5c5,0.8,8.7,5.2,8.7,10.3C64,41.3,63.6,43,62.9,44.4z">
+              <animateTransform attributeName="transform" type="translate" values="-3 0;3 0;-3 0" keyTimes="0;0.5;1" dur="2" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1"></animateTransform>
+            </path>
+            <clipPath id="ldio-iwdxn2mvp5-cp"><use href="#ldio-iwdxn2mvp5-path"></use></clipPath>
+          </defs>
+          <g clipPath="url(ldio-iwdxn2mvp5-cp)">
+            <path fill="#bbbbbb" d="M84.9,28.9c0.4-1.1,0.6-2.3,0.6-3.5c0-1-0.1-1.9-0.4-2.8 c-1.3-5-6.1-8.7-11.8-8.7c-4.6,0-8.7,2.5-10.7,6.1c-0.8-0.2-1.6-0.4-2.4-0.4c-4.5,0-8.1,3.4-8.1,7.6c0,0.5,0.1,1,0.2,1.5 c-4.1,0.6-7.2,4-7.2,8c0,4.5,3.8,8.1,8.6,8.1h29.8c3.3,0,6.2-1.8,7.7-4.4c0.6-1.1,0.9-2.3,0.9-3.7C92,32.9,88.9,29.6,84.9,28.9z">
+              <animateTransform attributeName="transform" type="translate" values="-3 0;3 0;-3 0" keyTimes="0;0.5;1" dur="1.32" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1"></animateTransform>
+            </path>
+          </g>
+        </g>
+      </svg>
+    </div>
+  )
   const dayList = generateDayDataList(currentWeekID, everyWeekSchedule)
   return (<Swiper key={1} id='daySwiper'
     modules={ [ Pagination, Navigation ]  }
@@ -71,7 +105,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   </Swiper>)
 }
 
-function generateDayDataList(currentWeekID: number, everyWeekSchedule: any) {
+function generateDayDataList(currentWeekID: number, everyWeekSchedule: Map<number, Map<String, Course[]>>) {
   const weekDates = getWeekDatesByID(currentWeekID) 
   currentWeekID += 1   // For some reasons :/ :'(
   const dayList = []
@@ -90,22 +124,6 @@ function generateDayDataList(currentWeekID: number, everyWeekSchedule: any) {
     }
   }
   return dayList
-}
-
-function InitializeWeeksSchedule(data: any) {
-  const classeSchedule = data.totalSchedule  // Schedule of every week at once
-  const everyWeekSchedule = new Map()
-  for (let scheduleIndex = 0; scheduleIndex < classeSchedule.length; scheduleIndex++) {  // Going through every schedules
-    const course = classeSchedule[scheduleIndex].course
-    const weekID = Number(course.week)  // Each course object is attached to a weekID to be identified
-    const weekSchedule = everyWeekSchedule.get(weekID) ? everyWeekSchedule.get(weekID) : new Map()
-    const dayID = course.dayOfWeek  // String such as 'Lundi' or 'Vendredi'
-    const daySchedule = weekSchedule.get(dayID) ? weekSchedule.get(dayID) : [] 
-    daySchedule.push(course)  // Map of schedules of the days
-    weekSchedule.set(dayID, daySchedule)  // Map of schedules of the weeks
-    everyWeekSchedule.set(weekID, weekSchedule)  // Map of weeks
-  }
-  return everyWeekSchedule
 }
 
 const onInit = (swiper: any) => {  // On swipper initialization

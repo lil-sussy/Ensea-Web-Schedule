@@ -3,8 +3,11 @@ import { useState, useEffect, useMemo, Attributes, Key, ReactElement } from 'rea
 import { Swiper, SwiperSlide, SwiperProps } from "swiper/react";
 import "swiper/swiper-bundle.min.css";
 
+import type { Course } from '../../../pages/api/schedules';
+
 export default function DaySlide({ actualDay, date, dayData, loading }) {
-  const courses = dayData;
+  const courses = dayData as Course[];
+  console.log(courses)
   const courseHourWrappers = new Map()
   const divCourses = [];
   const courseHourWrapperList = []
@@ -21,7 +24,7 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
     );
   } else if (courses != undefined) {  // It may be possible if a day is empty
     for (let i = 0; i < courses.length; i++) {
-      const courseData = courses[i]
+      const courseData = courses[i].courseData
       divCourses.push(<Course courseData={courseData} />);
       courseHourWrappers.set(courseData.begin, CourseHours({ courseData: courseData, ending:false }));
       if (!courseHourWrappers.get(courseData.end))  // We only display the end hour of the course if there is another course that starts after
@@ -100,7 +103,7 @@ function Course({ courseData: course }) {
       style={{
         gridRowStart: rowBegin, gridRowEnd: rowEnd,  // Because it doesnt work with tailwind
       }}>
-      <CoursePlace place={course.place}/>
+      <CoursePlace place={course.locations}/>
       <div className="inline-block w-[80%] h-full bg-third-purple">
         <div className="w-full h-full flex items-start flex-col justify-evenly">
           <h3 className="font-normal text-base font-dinCondensed overflow-hidden whitespace-nowrap">

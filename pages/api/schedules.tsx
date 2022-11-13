@@ -24,9 +24,8 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
     }
     const classe = req.headers['classe']
     if (classe) {
-      const schedules = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))))
-      console.log(schedules)
-      res.status(200).json({totalSchedule: schedules.get(classe)})
+      const schedules = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver)
+      res.status(200).json({totalSchedule: JSON.stringify(schedules.get(classe), replacer)})
     } else {
       res.status(404).json({ status: 404, message:'No classe schedule found for this classe '+classe })
     }
@@ -41,7 +40,7 @@ function generateADEurl(schedule: number, begin: string, end: string) {
   return URL
 }
 
-function replacer(key, value) {
+export function replacer(key, value) {
   if(value instanceof Map) {
     return {
       dataType: 'Map',
@@ -52,7 +51,7 @@ function replacer(key, value) {
   }
 }
 
-function reviver(key, value) {
+export function reviver(key, value) {
   if(typeof value === 'object' && value !== null) {
     if (value.dataType === 'Map') {
       return new Map(value.value);
@@ -62,29 +61,39 @@ function reviver(key, value) {
 }
 
 async function updateAndSaveSchedule() {
+  const scheduleJSONpath = path.join(process.cwd() + '/private/schedules.json')
   scheduleIDs.forEach((scheduleID, schedule) => {  // Iterate trough every classes and save their schedules
     axios.get(generateADEurl(scheduleID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
     .then((res) => {
-      const data = ADEisCringe(res.data)
-      fs.writeFileSync(path.join(process.cwd(), '/private/test.ics'), data)
-      let schedules = JSON.parse(String(fs.readFileSync(path.join(process.cwd() + '/private/schedules.json'))), reviver)
-      if (!schedules.get)
-      schedules = new Map<String, Map<number, Course[]>>()  // Map of schedules then map of weekIDs
+      const data = ADEisCringe(res.data)  // lol
+      let schedules = JSON.parse(String(fs.readFileSync(scheduleJSONpath)), reviver) as Map<String, Map<number, Map<String, Course[]>>>  // reviver param is necessary for map types
+      if (!schedules.get)  // First load it's gon be an empty object
+        schedules = new Map<String, Map<number, Map<String, Course[]>>>()  // Map of courses of day of week of schedule
       const calendar = ical.parseICS(data)  // Calendar is not iterable :)
       for (const[key, value] of Object.entries(calendar)) {
         const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value))  // lol
-        const weeks = schedules.get(schedule) ? schedules.get(schedule) : new Map<number, Course[]>()
-        const week = weeks.get(course.courseData.week) ? weeks.get(course.courseData.week) : []
-        week.push(course)
+        const weeks = schedules.get(schedule) ? schedules.get(schedule) : new Map<number, Map<string, Course[]>>()
+        const week = weeks.get(course.courseData.week) ? weeks.get(course.courseData.week) : new Map<String, Course[]>()
+        const day = week.get(course.courseData.dayOfWeek) ? week.get(course.courseData.dayOfWeek) : []
+        let includes = false
+        for (const otherCourse of day) {
+          if (otherCourse.id == course.id) {
+            includes = true
+            break;
+          }
+        }
+        if (!includes)
+          day.push(course)
+        week.set(course.courseData.dayOfWeek, day)
         weeks.set(course.courseData.week, week)
         schedules.set(schedule, weeks)
       }
-      fs.writeFileSync(path.join(process.cwd() + '/private/schedules.json'), JSON.stringify(schedules, replacer))
+      fs.writeFileSync(scheduleJSONpath, JSON.stringify(schedules, replacer))
     })
   })
 }
 
-function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course) {
+function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {
   // You might wonder : what is going on ?
   // Well this is simple, see aparently for every course dated before today are MODIFIED by ADE
   // I attended to some of those courses and I can confirm that every courses's hours are MODIFIED.
@@ -162,6 +171,7 @@ function parseCourseFromCalEvent(event: any): Course {
   if (name != undefined) {
     const dayOfYear = (weekID - 1) * 7 + 1
     const date = new Date(SCHOOL_YEAR, 0, dayOfYear)
+    const ID = event.uid
     const courseData = {
       name: name as string,
       dayOfWeek: week[beginDate.getDay()-1] as string,
@@ -180,12 +190,12 @@ function parseCourseFromCalEvent(event: any): Course {
     for (let i = 0; i < classes.length; i++) {
       const classe = classes[i]
     }
-    return { classes, courseData }
+    return { id: ID, courseData: courseData }
   }
 }
 
 export type Course = {
-  classes: string[],
+  id: string,
   courseData: {
     name: string,
     dayOfWeek: string,
