@@ -2,7 +2,7 @@ import elasticlunr from 'elasticlunr'
 import { useState, useEffect } from 'react';
 import { Scrollbar, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
-import { scheduleTree } from '../../../private/classesTree';
+import { scheduleTree, scheduleIDs } from '../../../private/classesTree';
 
 const index = elasticlunr(function () {
   this.addField('title');
@@ -17,14 +17,21 @@ const index = elasticlunr(function () {
   })
 });
 
-export default function SearchBar({ schedule, setSchedule, className }) {
+export default function SearchBar({ scheduleID, setSchedule, className }) {
   const [displayedAnswers, setDisplayedAnswers] = useState([])
+  const [textFieldValue, setTextFieldValue] = useState('')
   const focused = displayedAnswers.length != 0
   useEffect(() => {
-    if (!schedule) {
+    if (!scheduleID) {
       setDisplayedAnswers(performResearch(''))
+    } else {
+      setTextFieldValue(scheduleID)
     }
   }, [])
+  const setScheduleAndValue = (scheduleID: string) => {
+    setTextFieldValue(scheduleID)
+    setSchedule(scheduleID)
+  }
   return (
     <div className={" " + className}>
       <div className="WhiteBorder bg-white w-full h-1"></div>
@@ -32,12 +39,12 @@ export default function SearchBar({ schedule, setSchedule, className }) {
         <div className="SearchBarContainer h-full w-full flex justify-center 
         items-center">
           <TextInput focused={focused} setDisplayedAnswers={setDisplayedAnswers}
-            setSchedule={setSchedule} value={schedule} />
+            setSchedule={setScheduleAndValue} scheduleID={textFieldValue} />
         </div>
       </div>
       <div className="WhiteBorder h-1 absolute bottom-0 left-0 bg-white 
       w-full"></div>
-      <AnswerList focused={focused} fields={displayedAnswers} setSchedule={setSchedule} setDisplayedAnswers={setDisplayedAnswers} />
+      <AnswerList focused={focused} fields={displayedAnswers} setSchedule={setScheduleAndValue} setDisplayedAnswers={setDisplayedAnswers} />
       <BlurMask focused={focused}/>
     </div>
   );
@@ -105,7 +112,22 @@ const performResearch = (input: string) => {
   return answers
 }
 
-function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
+type TextFieldProps = {
+  focused: Boolean,
+  setDisplayedAnswers: Function,
+  setSchedule: Function,
+  scheduleID: string,
+}
+function TextInput(props: TextFieldProps) {
+  const { focused, setDisplayedAnswers, setSchedule, scheduleID } = props
+  const [value, setValue] = useState('')
+  useEffect(() => {
+    setValue(scheduleID)
+  }, [])
+  useEffect(() => {
+    if (!focused)
+      setValue(scheduleID)
+  }, [focused, scheduleID])
   return (
     <div className={'SearchBar flex flex-col justify-center items-center bg-gradient-to-r from-main-orange to-main-orange-light'
     + (focused ? ' font-semibold -translate-y-[250%] border-[3px] shadow-lg z-40 duration-400 transition-all w-2/3'
@@ -119,11 +141,13 @@ function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
           duration-[600ms] " }
         onInput={(event) => {
           const target = event.target as HTMLInputElement  // To prevent TS error
-          setDisplayedAnswers(performResearch(target.value))
+          setValue(target.value)  // To make reload less painful for user!!!!!
+          setDisplayedAnswers(performResearch(target.value))  // This will reload the parent and this searchbar :/
         }}
         onClick={(event) => {
           const target = event.target as HTMLInputElement
-          setDisplayedAnswers(performResearch(target.value))
+          setValue(target.value)  // To make reload less painful for user!!!!!
+          setDisplayedAnswers(performResearch(target.value))  // as well
         }}
         onKeyUp={event => {
           const target = event.target as HTMLInputElement
@@ -142,7 +166,8 @@ function TextInput({ focused, setDisplayedAnswers, setSchedule, value }) {
             }
           }
         }}
-      placeholder={value}>
+      placeholder={value}
+      value={focused ? value : ''}>
       </input>
     </div>
   )

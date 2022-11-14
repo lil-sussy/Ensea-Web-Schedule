@@ -59,9 +59,9 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   const mainOrangeLight = '#ffc046'
   if (loading || error) return (
     <div className='w-full h-full'>
-      <h1 className="font-kefa text-md text-center w-64 rounded-lg bg-white p-1 mx-auto border-main-orange border-2"><span className="text-main-orange">EWS</span> is fetching your schedule from <span className='text-main-purple'>ADE</span></h1>
-      <svg xmlns="http://www.w3.org/2000/svg" style={{ margin: "auto", background: "", display: "block" }} width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
-        <g transform="translate(0 18)">
+      <h1 className="font-kefa text-md mt-6 shadow-sm text-center w-64 rounded-lg bg-white p-1 mx-auto border-main-orange border-2"><span className="text-main-orange">EWS</span> is fetching your schedule from <span className='text-main-purple'>ADE</span></h1>
+      <svg className='bg-clip-text' xmlns="http://www.w3.org/2000/svg" style={{ margin: "auto", background: "", display: "block" }} width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
+        <g className='shadow-xl' transform="translate(0 18)">
           <path fill={ mainOrangeLight } d="M53.2,30.3c0.4-1.3,0.6-2.7,0.6-4.2c0-1.2-0.1-2.3-0.4-3.4c-1.5-6-7-10.5-13.5-10.5 c-5.3,0-9.9,3-12.3,7.4c-0.9-0.3-1.8-0.4-2.8-0.4c-5.1,0-9.3,4.1-9.3,9.3c0,0.6,0.1,1.3,0.2,1.9c-4.7,0.7-8.3,4.8-8.3,9.7 c0,5.4,4.4,9.8,9.8,9.8h34.2c3.8,0,7.1-2.2,8.8-5.4c0.7-1.3,1.1-2.9,1.1-4.5C61.4,35.2,57.8,31.1,53.2,30.3z">
             <animateTransform attributeName="transform" type="translate" values="-3 0;3 0;-3 0" keyTimes="0;0.5;1" dur="2" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1"></animateTransform>
           </path>
@@ -72,7 +72,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
             <clipPath id="ldio-iwdxn2mvp5-cp"><use href="#ldio-iwdxn2mvp5-path"></use></clipPath>
           </defs>
           <g clipPath="url(ldio-iwdxn2mvp5-cp)">
-            <path fill={ mainPurpleLight } d="M84.9,28.9c0.4-1.1,0.6-2.3,0.6-3.5c0-1-0.1-1.9-0.4-2.8 c-1.3-5-6.1-8.7-11.8-8.7c-4.6,0-8.7,2.5-10.7,6.1c-0.8-0.2-1.6-0.4-2.4-0.4c-4.5,0-8.1,3.4-8.1,7.6c0,0.5,0.1,1,0.2,1.5 c-4.1,0.6-7.2,4-7.2,8c0,4.5,3.8,8.1,8.6,8.1h29.8c3.3,0,6.2-1.8,7.7-4.4c0.6-1.1,0.9-2.3,0.9-3.7C92,32.9,88.9,29.6,84.9,28.9z">
+            <path className='shadow-xl' fill={ mainPurpleLight } d="M84.9,28.9c0.4-1.1,0.6-2.3,0.6-3.5c0-1-0.1-1.9-0.4-2.8 c-1.3-5-6.1-8.7-11.8-8.7c-4.6,0-8.7,2.5-10.7,6.1c-0.8-0.2-1.6-0.4-2.4-0.4c-4.5,0-8.1,3.4-8.1,7.6c0,0.5,0.1,1,0.2,1.5 c-4.1,0.6-7.2,4-7.2,8c0,4.5,3.8,8.1,8.6,8.1h29.8c3.3,0,6.2-1.8,7.7-4.4c0.6-1.1,0.9-2.3,0.9-3.7C92,32.9,88.9,29.6,84.9,28.9z">
               <animateTransform attributeName="transform" type="translate" values="-3 0;3 0;-3 0" keyTimes="0;0.5;1" dur="1.32" repeatCount="indefinite" calcMode="spline" keySplines="0.5 0 0.5 1;0.5 0 0.5 1"></animateTransform>
             </path>
           </g>
