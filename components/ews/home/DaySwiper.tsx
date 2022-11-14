@@ -52,8 +52,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   if (!isMounted) {  // To use server side rendering with nextjs without anay pb
     return null;
   }
-  if (error) return <p> 500: Server error please contact me at yan.regojo@ensea.fr </p>
-  if (loading) return (
+  if (loading || error) return (
     <div className=''>
       <h1>Data is loading on the server pls wait</h1>
       <svg xmlns="http://www.w3.org/2000/svg" style={{ margin: "auto", background: "", display: "block" }} width="200px" height="200px" viewBox="0 0 100 100" preserveAspectRatio="xMidYMid">
@@ -107,7 +106,6 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
 
 function generateDayDataList(currentWeekID: number, everyWeekSchedule: Map<number, Map<String, Course[]>>) {
   const weekDates = getWeekDatesByID(currentWeekID) 
-  currentWeekID += 1   // For some reasons :/ :'(
   const dayList = []
   const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
   for (let i = 0; i < 7; i++) {

@@ -91,11 +91,14 @@ function CourseHours({ courseData: course, ending }) {
     )
 }
 
-function Course({ courseData: course }) {
+function Course({ courseData }) {
+  const course = courseData
   const beginHour = Number(course.begin.slice(0, 2))
   const endHour = Number(course.end.slice(0, 2))
   const rowBegin = (beginHour - 7) * 2 + (course.begin.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am + 1 if half hour
   const rowEnd = (endHour - 7) * 2 + (course.end.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am + if half hour
+  if (course.teachers[0] == '')
+    course.teachers.shift()   // Remove first element of list
   return (
     <div key={course.begin} className={clsx(
       "Course w-full  text-gray-700 outline-2 outline-white relative font-marianne bg-third-purple\
@@ -187,12 +190,12 @@ function DayContent({ courses, coursesHours }) {
 function DayName({ name, date }) {
   return (
     <div className="DayName absolute text-center w-full bottom-0">
-      <h2 className="text-3xl font-light text-main-purple font-academyLET translate-y-3">
-        {name.toUpperCase()}
-      </h2>
-      <h4 className="text-xs font-normal mt-[0rem] mb-[0.5rem] text-gray-600 font-dinAlternate">
+      <h4 className="text-xs font-normal mt-[0.5rem] text-gray-600 font-dinAlternate translate-y-2">
         {date.toLocaleString("fr-FR", { year: 'numeric', month: '2-digit', day: '2-digit' })}
       </h4>
+      <h2 className="text-4xl font-light text-main-purple font-academyLET translate-y-1">
+        {name.toUpperCase()}
+      </h2>
     </div>
   )
 }

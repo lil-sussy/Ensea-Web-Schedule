@@ -4,7 +4,7 @@
 
 @layer components {
   .ButtonNav {
-    @apply bg-clip-text bg-gradient-to-bl from-main-orange text-transparent to-main-orange text-3xl font-bold font-marianne absolute
+    @apply bg-clip-text bg-gradient-to-bl from-main-orange text-transparent to-main-purple text-3xl font-bold font-marianne absolute
   }
   .NavNext {
     @apply right-0 -top-0.5
@@ -19,6 +19,9 @@
 
 .DayAbsoluteContainer {
   border-radius: inherit;
+}
+
+.TextBorder {
 }
 
 .GrayTextFadeGradient {

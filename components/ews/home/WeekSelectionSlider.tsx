@@ -7,6 +7,7 @@ import 'swiper/css/navigation';
 import 'swiper/css/pagination';
 import SwiperCore, { EffectCards, EffectCube, EffectFade, Navigation } from "swiper";
 import { getWeekID } from "../lib/schoolYear";
+import clsx from 'clsx';
 
 SwiperCore.use([EffectFade])
 
@@ -63,7 +64,7 @@ export default function WeekSelectionSwiper(props: any) {
 
 function WeekLabel(weekID: number) {
   return (
-    <SwiperSlide key={weekID} className="w-full h-full">
+    <SwiperSlide key={weekID} className="w-[full] h-full">
       <div className="WeekSelectionLabel text-[1.2rem] justify-center align-center 
         text-center text-transparent font-kefa font-bold leading-8">
         <h4 className="bg-clip-text text-gray-700 bg-fixed">Semaine {weekID}</h4>
@@ -86,7 +87,7 @@ function WhiteFadingMask() {
 function SwipeNextButton({ className, children }) {
   const swiper = useSwiper()
   return (
-    <button className={className}
+    <button className={clsx('TextBorder ' + className)}
       onClick={(event) => {
         console.log(event);
         
@@ -100,7 +101,7 @@ function SwipeNextButton({ className, children }) {
 function SwipePrevButton({ className, children }) {
   const swiper = useSwiper()
   return (
-    <button className={className}
+    <button className={clsx('TextBorder ' + className)}
       onClick={(event) => {
         swiper.slidePrev()
       }}>

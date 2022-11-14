@@ -149,7 +149,7 @@ function parseCourseFromCalEvent(event: any): Course {
   const name = event.summary
 
   const teachers = [], classes = []
-  const places = event.location.split('\n')
+  const places = event.location.split(',')
   const informations = event.description.split('\n')
   let exportDate: string
   for (let i = 1; i < informations .length - 1; i++) {  // Ignoring first and last element
