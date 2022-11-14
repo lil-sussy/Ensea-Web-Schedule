@@ -7,7 +7,6 @@ import type { Course } from '../../../pages/api/schedules';
 
 export default function DaySlide({ actualDay, date, dayData, loading }) {
   const courses = dayData as Course[];
-  console.log(courses)
   const courseHourWrappers = new Map()
   const divCourses = [];
   const courseHourWrapperList = []
@@ -190,7 +189,7 @@ function DayContent({ courses, coursesHours }) {
 function DayName({ name, date }) {
   return (
     <div className="DayName absolute text-center w-full bottom-0">
-      <h4 className="text-xs font-normal mt-[0.5rem] text-gray-600 font-dinAlternate translate-y-2">
+      <h4 className="text-xs font-normal mt-[0.5rem] text-gray-600 font-dinAlternate translate-y-1">
         {date.toLocaleString("fr-FR", { year: 'numeric', month: '2-digit', day: '2-digit' })}
       </h4>
       <h2 className="text-4xl font-light text-main-purple font-academyLET translate-y-1">
