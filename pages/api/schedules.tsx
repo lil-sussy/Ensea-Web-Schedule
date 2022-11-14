@@ -15,14 +15,7 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
   } else if (req.method == 'GET') {
     const now = new Date()
     if (!lastUpdate || now.getTime() - lastUpdate.getTime() > 5*60*60*1000) {  // Refresh of the data every 5min
-      updateAndSaveSchedule().then(() => {
-        // if (classe) {
-        //   const schedules = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver)
-        //   res.status(200).json({totalSchedule: JSON.stringify(schedules.get(classe), replacer)})
-        // } else {
-        //   res.status(404).json({ status: 404, message:'No classe schedule found for this classe '+classe })
-        // }
-      })
+      updateAndSaveSchedule() // Process takes 16s on average
       lastUpdate = new Date()
     }
     if (req.headers['classe'] == undefined) {

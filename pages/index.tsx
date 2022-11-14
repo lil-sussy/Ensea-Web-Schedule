@@ -13,11 +13,7 @@ import { getWeekID } from '../components/ews/lib/schoolYear'
 import SearchBar from '../components/ews/home/SearchEngine';
 // import CAS from '../lib/node-cas/lib/cas';
 import { hasCookie, setCookie, getCookie } from 'cookies-next';
-import { getPageStaticInfo } from 'next/dist/build/analysis/get-page-static-info';
 import Image from 'next/image';
-
-const DEFAULT_SCHEDULE = "1G1 TP6";
-
 
 export async function getStaticProps(req, res) {
   // const cas = new CAS({
@@ -100,7 +96,7 @@ function App({ views }) {
   }
   return (
     <>
-      <SearchBar schedule={scheduleID} setSchedule={setScheduleAndSave} className='SelectionsContainer relative from-main-orange 
+      <SearchBar scheduleID={scheduleID} setSchedule={setScheduleAndSave} className='SelectionsContainer relative from-main-orange 
       to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center'/>
       <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek} />
       <div className="WeekScheduleContainer w-full h-[69%]">
@@ -118,7 +114,6 @@ function App({ views }) {
 function GetStarted() {
   return (
     <div>
-      
     </div>
   )
 }

@@ -25,6 +25,11 @@ function reviver(key, value) {
   return value;
 }
 
+export async function getServerSideProps() {
+  console.log('salut')
+}
+
+
 export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: currentWeekID }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [everyWeekSchedule, setEveryWeekSchedule] = useState(new Map())
@@ -45,6 +50,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   }), [scheduleID]);
   const { data: yearSchedule, error } = useSWR(['/api/schedules', config], fetchWithUser)
   const loading = !yearSchedule  // useSWR hook returns undefined and will automatically reload once the data is fetched
+  // It also automaticaly reload component if data is change SERVER SIDE THIS IS INSANE!!
   if (yearSchedule && yearSchedule.size != 0 && everyWeekSchedule.size == 0) {  // If the data was fetched but the state wasnt initialised -> initialisation;
     // This if is in order to prevent the inifinite state rendering :)
     setEveryWeekSchedule(yearSchedule) // Map containing schedules of weeks
