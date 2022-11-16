@@ -36,7 +36,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   const [initialSlide, setInitialSlide] = useState(0)
   useEffect(() => {
     setIsMounted(true);
-    setInitialSlide(new Date().getDay())
+    setInitialSlide(new Date().getDay()-1)  // Apparently monday is not 0 or initialIndex first index is 1 (more plausible)
   }, [])
   const fetchWithUser = (url, headers) => fetch(url, headers).then(res => res.json()).then((data) => {
     return JSON.parse(data.totalSchedule, reviver)
