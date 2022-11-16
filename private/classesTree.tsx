@@ -293,8 +293,37 @@ scheduleIDs.set('3D - TP3', 596)
 scheduleIDs.set('3D - TP4', 631)
 scheduleIDs.set('3ème AEI', 508)
 scheduleIDs.set('AEI TP1', 523)
+scheduleIDs.set('SIT TP1', 613)
+scheduleIDs.set('SIT TP2', 611)
+scheduleIDs.set('SIT TP3', 610)
+scheduleIDs.set('SIA TP1', 589)
+scheduleIDs.set('SIA TP2', 590)
+scheduleIDs.set('RT TP1', 586)
+scheduleIDs.set('RT TP2', 587)
+scheduleIDs.set('PIM TP1', 450)
+scheduleIDs.set('PIM TP2', 594)
+scheduleIDs.set('MSC TP1', 494)
+scheduleIDs.set('MSC TP2', 489)
+scheduleIDs.set('DSML TP1', 617)
+scheduleIDs.set('DSML TP2', 619)
+scheduleIDs.set('DSML TP3', 496)
+scheduleIDs.set('ESC TP1', 514)
+scheduleIDs.set('ESC TP2', 518)
+scheduleIDs.set('ESE TP1', 526)
+scheduleIDs.set('ESE TP2', 528)
+scheduleIDs.set('ESI TP1', 572)
+scheduleIDs.set('ESI TP2', 439)
+scheduleIDs.set('ESI TP3', 568)
+scheduleIDs.set('EVE TP1', 551)
+scheduleIDs.set('EVE TP2', 552)
+scheduleIDs.set('IAR TP1', 608)
+scheduleIDs.set('IAR TP2', 603)
+scheduleIDs.set('IAR TP3', 602)
+scheduleIDs.set('IS TP1', 575)
+scheduleIDs.set('IS TP2', 582)
 /*
 649 "Chinois"
+601 "IAR"
 560 "CNAM"
 561 "CNAM gr1"
 534 "Défense et sécurité"
@@ -304,23 +333,11 @@ scheduleIDs.set('AEI TP1', 523)
 535 "D&S groupe 1"
 643 "D&S groupe 2"
 495 "DSML"
-617 "DSML TP1"
-619 "DSML TP2"
-496 "DSML TP3"
 538 "Electronique et signal pour la musique"
 581 "Entr groupe 1"
-514 "ESC TP1"
-518 "ESC TP2"
-526 "ESE TP1"
-528 "ESE TP2"
 539 "E&S groupe 1"
 543 "E&S groupe 2"
 438 "ESI"
-572 "ESI TP1"
-439 "ESI TP2"
-568 "ESI TP3"
-551 "EVE TP1"
-552 "EVE TP2"
 515 "FAME"
 516 "FAME Gr 1"
 592 "FAME Gr 2"
@@ -329,10 +346,6 @@ scheduleIDs.set('AEI TP1', 523)
 545 "I.A. et Big Data"
 546 "IA groupe 1"
 547 "IA groupe 2"
-601 "IAR"
-608 "IAR TP1"
-603 "IAR TP2"
-602 "IAR TP3"
 554 "Image et réalité virtuelle"
 555 "Image groupe 1"
 556 "Image groupe 2"
@@ -341,8 +354,6 @@ scheduleIDs.set('AEI TP1', 523)
 557 "Internet of Things"
 558 "IoT groupe 1"
 559 "IoT groupe 2"
-575 "IS TP1"
-582 "IS TP2"
 648 "Japonais"
 
 647 "LV3 ENSEA"
@@ -350,25 +361,14 @@ scheduleIDs.set('AEI TP1', 523)
 562 "Microélec groupe 1"
 477 "Microélec groupe 2"
 476 "Microélectronique"
-494 "MSC TP1"
-489 "MSC TP2"
 567 "Multiphys groupe 1"
 475 "Options"
 449 "PIM"
-450 "PIM TP1"
-594 "PIM TP2"
 661 "PREMASTER"
 660 "PREMASTER"
-586 "RT TP1"
-587 "RT TP2"
 650 "Russe"
 563 "Sécurité des systèmes d'information"
-589 "SIA TP1"
-590 "SIA TP2"
 609 "SIT"
-613 "SIT TP1"
-611 "SIT TP2"
-610 "SIT TP3"
 544 "SP Gr1"
 498 "SP Gr2"
 564 "SSI groupe 1"

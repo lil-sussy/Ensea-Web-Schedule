@@ -4,7 +4,6 @@ import { scheduleIDs, scheduleList } from '../../private/classesTree';
 import fs from 'fs';
 import path from 'path';
 import ical from 'ical'
-import axios from 'axios'
 import { getWeekID } from '../../components/ews/lib/schoolYear';
 
 let lastUpdate: Date  // A date
@@ -14,7 +13,8 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
     res.status(200).json({status: 401, data: "Data not succesfully loaded cuz it's automatique now mf :3"})
   } else if (req.method == 'GET') {
     const now = new Date()
-    if (!lastUpdate || now.getTime() - lastUpdate.getTime() > 5*60*60*1000) {  // Refresh of the data every 5min
+    const DELTA = 10*60*1000  // 10min
+    if (!lastUpdate || (now.getTime() - lastUpdate.getTime() > DELTA)) {  // Refresh of the data every 5min
       updateAndSaveSchedule() // Process takes 16s on average
       lastUpdate = new Date()
     }
@@ -33,6 +33,8 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
     res.status(400).json({ status: 400, message:'Only get and post request are handled' })
   }
 }
+const axios = require('axios')
+const test = axios.get(generateADEurl(523, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
 
 function generateADEurl(schedule: number, begin: string, end: string) {
   const URL = 'https://ade.ensea.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?'+
@@ -75,13 +77,13 @@ const updateAndSaveSchedule = async () => {
     const beginTime = new Date()
     const scheduleJSONpath = path.join(process.cwd() + '/private/schedules.json')
     let schedules = new Map<String, Map<number, Map<String, Course[]>>>()  // Map of courses of day of week of schedule
+    // console.log(await axios.get('https:ade.ensea.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=523&projectId=1&calType=ical&firstDate=2022-09-01&lastDate=2023-08-09'));
     for (const scheduleID of Array.from(scheduleIDs.keys())) {  // Iterate trough every classes and save their schedules
       const scheduleADEID = scheduleIDs.get(scheduleID)
       const res = await axios.get(generateADEurl(scheduleADEID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
       const data = ADEisCringe(res.data)  // lol
-      schedules = JSON.parse(String(fs.readFileSync(scheduleJSONpath)), reviver) as Map<String, Map<number, Map<String, Course[]>>>  // reviver param is necessary for map types
       const calendar = ical.parseICS(data)  // Calendar is not iterable :)
-      for (const[key, value] of Object.entries(calendar)) {
+      for (const[key, value] of Object.entries(calendar)) {  // Iterate through yearschedule courses
         const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value))  // lol
         const weeks = schedules.get(scheduleID) ? schedules.get(scheduleID) : new Map<number, Map<string, Course[]>>()
         const week = weeks.get(course.courseData.week) ? weeks.get(course.courseData.week) : new Map<String, Course[]>()
@@ -98,11 +100,13 @@ const updateAndSaveSchedule = async () => {
         week.set(course.courseData.dayOfWeek, day)
         weeks.set(course.courseData.week, week)
         schedules.set(scheduleID, weeks)
+        console.log(Array.from(schedules.keys()).length)
       }
       progressBar.tick(1, {
         schedule: scheduleID
       })
     }
+    console.log(schedules.get('AEI TP1'))
     fs.writeFileSync(scheduleJSONpath, JSON.stringify(schedules, replacer))  // Saved in 33ms 
     console.log('Schedules were succesfully updated in %d ms', (new Date().getTime() - beginTime.getTime()));
     resolve('done')
