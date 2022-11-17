@@ -1,6 +1,12 @@
 import { NextApiRequest, NextApiResponse } from "next";
 import CAS from "../../cas-client-node/src/index";
 
+type User = {
+  mail: String,
+  firstName: String,
+  lastName: String,
+  uname: String,
+}
 
 let authed = false
 export default async function Handler(req: NextApiRequest, res: NextApiResponse) {
@@ -11,17 +17,25 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
   if (ticket) {
     console.log('auhted');
     authed = true
-    fetch((cas_host + '/serviceValidate?service=' + service + '&ticket=' + ticket)).then(async (res) => {
-      const data = await res.text()
-      console.log(data)
-      const body = res.body as any
-      console.log(body)
-      // let list_user = data.match(/(<cas:user>)(.+?)(<\/cas:user>)/i);
-      // let user = list_user[0];
-      // user = user.replace('<cas:user>', '');
-      // user = user.replace('<\/cas:user>', '');
+    fetch((cas_host + '/serviceValidate?service=' + service + '&ticket=' + ticket)).then(async (data) => {
+      let textData = await data.text()
+      console.log(textData)
+      let list_user = textData.match(/(<cas:user>)(.+?)(<\/cas:user>)/i);
+      let uname = list_user[0];
+      uname = uname.replace('<cas:user>', '');
+      uname = uname.replace('<\/cas:user>', '');
+      let listMail = textData.match(/(<cas:mail>)(.+?)(<\/cas:mail>)/i);
+      let mail = listMail[0];
+      mail = mail.replace('<cas:mail>', '');
+      mail = mail.replace('<\/cas:mail>', '');
+      const user: User = {
+        mail: mail,
+        firstName: mail.split('.')[0],
+        lastName: mail.split('.')[1].split('@')[0],  // Yeah this is cringe, use : regex
+        uname: uname,
+      }
+      res.status(200).json({ status: 200, user})
     })
-    res.status(200)
   } else if (!authed) {
     res.redirect(307, '/sso')
   }
