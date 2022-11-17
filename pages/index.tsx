@@ -4,7 +4,7 @@ import WeekDaySwiper from '../components/ews/home/DaySwiper';
 import nextSession from "next-session"
 import Head from 'next/head'
 import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { firebase, database } from '../components/ews/lib/firebaseConfig';
+import { firebase, database, auth } from '../components/ews/lib/firebaseConfig';
 import background from '../public/background2k.png'
 import logo from '../public/logo.png'
 import WeekSelectionSwiper from '../components/ews/home/WeekSelectionSlider'
@@ -17,22 +17,64 @@ import Image from 'next/image';
 import { NextRequest, NextResponse } from 'next/server'
 import { NextRouter, Router, useRouter } from 'next/router';
 
-let loggedin = false
-export async function getStaticProps(req: NextRequest, res: NextResponse) {
-  if (!loggedin) {
-    return {
-      redirect: {
-        destination: '/api/cas',
-        permanent: false,
-      },
-    }
+function attemptUserToLogIn(ticket: any): any {
+  if (ticket) {
+  } else {
+    
   }
+}
+
+function redirectToCasServer() {
   return {
-    props: {}
+    redirect: {
+      destination: '/sso',
+      permanent: false,
+    },
+  }
+}
+
+export async function getServerSideProps(req: any, res: any) {
+  //Check if user exists (jwt on client)
+  const ticket = req.query.ticket
+  if (auth.currentUser) {
+    const idToken = await auth.currentUser.getIdToken(/* forceRefresh */ true)
+    if (idToken) {
+      return fetch(process.env.server + '/api/cas', {
+        headers: {
+          idToken: idToken
+        }
+      })
+    } else {
+      // If there is a ticket (the user has been succesfully authed on cas server)
+      if (ticket) {
+        const tokenID = await fetch(process.env.server + '/api/cas', {
+          headers: {
+            ticket: ticket
+          }
+        })
+        console.log('tokenID', tokenID);
+        return null
+      } else {
+        return redirectToCasServer()
+      }
+    };
+  } else {
+    if (ticket) {
+      const tokenID = await fetch(process.env.server + '/api/cas', {
+        headers: {
+          ticket: ticket
+        }
+      })
+      console.log('tokenID', tokenID);
+      return null
+    } else {
+      return redirectToCasServer()
+    }
   }
 }
 
 export default function ewsIndex(pageProps: any) {
+  console.log('pageProps', pageProps)
   return (
     <React.StrictMode>
       <Head>

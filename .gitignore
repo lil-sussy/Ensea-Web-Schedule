@@ -20,6 +20,7 @@
 .env.development.local
 .env.test.local
 .env.production.local
+/private/googleprivatekey.json
 /private/test.ics
 /private/schedules.json
 

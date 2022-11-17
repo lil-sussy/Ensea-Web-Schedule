@@ -1,8 +1,7 @@
 import { initializeApp } from "firebase/app";
 import { getFirestore } from 'firebase/firestore';
 import { getAnalytics } from "firebase/analytics";
-
-
+import { getAuth } from "firebase/auth" // New import
 
 // Import the functions you need from the SDKs you need
 // https://firebase.google.com/docs/web/setup#available-libraries
@@ -19,10 +18,14 @@ const firebaseConfig = {
   measurementId: "G-DFMX68CNV4"
 };
 
-
 export const firebase = initializeApp(firebaseConfig);
 export const database = getFirestore(firebase);
+export const auth = getAuth(firebase)
 // export const analytics = getAnalytics(fireBase);
+
+
+
+
 
 /* eslint-disable no-undef */
 // Import and configure the Firebase SDK
@@ -31,17 +34,6 @@ export const database = getFirestore(firebase);
 // importScripts('https://www.gstatic.com/firebasejs/7.19.1/firebase-app.js');
 // importScripts('https://www.gstatic.com/firebasejs/7.19.1/firebase-messaging.js');
 // importScripts('https://www.gstatic.com/firebasejs/7.19.1/firebase-analytics.js');
-
-// var firebaseConfig = {
-//   apiKey: "kk",
-//   authDomain: "kk",
-//   databaseURL: "kk",
-//   projectId: "kk",
-//   storageBucket: "kk",
-//   messagingSenderId: "kk",
-//   appId: "kk",
-//   measurementId: "G-kk"
-// };
 
 // // Initialize Firebase
 // console.log('navigator.cookieEnabled: ' + navigator.cookieEnabled);
