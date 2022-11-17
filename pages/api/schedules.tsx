@@ -15,7 +15,7 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
     const now = new Date()
     const DELTA = 10*60*1000  // 10min
     if (!lastUpdate || (now.getTime() - lastUpdate.getTime() > DELTA)) {  // Refresh of the data every 5min
-      updateAndSaveSchedule() // Process takes 16s on average
+      updateAndSaveSchedule() // Process takes 30s on average
       lastUpdate = new Date()
     }
     if (req.headers['classe'] == undefined) {
@@ -77,7 +77,6 @@ const updateAndSaveSchedule = async () => {
     const beginTime = new Date()
     const scheduleJSONpath = path.join(process.cwd() + '/private/schedules.json')
     let schedules = new Map<String, Map<number, Map<String, Course[]>>>()  // Map of courses of day of week of schedule
-    // console.log(await axios.get('https:ade.ensea.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?resources=523&projectId=1&calType=ical&firstDate=2022-09-01&lastDate=2023-08-09'));
     for (const scheduleID of Array.from(scheduleIDs.keys())) {  // Iterate trough every classes and save their schedules
       const scheduleADEID = scheduleIDs.get(scheduleID)
       const res = await axios.get(generateADEurl(scheduleADEID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
@@ -100,13 +99,11 @@ const updateAndSaveSchedule = async () => {
         week.set(course.courseData.dayOfWeek, day)
         weeks.set(course.courseData.week, week)
         schedules.set(scheduleID, weeks)
-        console.log(Array.from(schedules.keys()).length)
       }
       progressBar.tick(1, {
         schedule: scheduleID
       })
     }
-    console.log(schedules.get('AEI TP1'))
     fs.writeFileSync(scheduleJSONpath, JSON.stringify(schedules, replacer))  // Saved in 33ms 
     console.log('Schedules were succesfully updated in %d ms', (new Date().getTime() - beginTime.getTime()));
     resolve('done')

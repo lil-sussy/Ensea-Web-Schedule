@@ -14,31 +14,19 @@ import SearchBar from '../components/ews/home/SearchEngine';
 // import CAS from '../lib/node-cas/lib/cas';
 import { hasCookie, setCookie, getCookie } from 'cookies-next';
 import Image from 'next/image';
+import { NextRequest, NextResponse } from 'next/server'
+import { NextRouter, Router, useRouter } from 'next/router';
 
-export async function getStaticProps(req, res) {
-  // const cas = new CAS({
-    //   base_url         : 'https://identites.ensea.fr/cas/login',
-    //   service     : 'https://ews.ensea.jsp.fr',
-  //   version     : '3.0',
-  //   renew           : false,
-  //   is_dev_mode     : true,
-  //   dev_mode_user   : '',
-  //   dev_mode_info   : {},
-  //   session_name    : 'cas_user',
-  //   session_info    : 'cas_userinfo',
-  //   destroy_session : false,
-  //   return_to       : 'http://localhost:300/'
-  // })
-  // cas.authenticate(req, res, function(err, status, username, extended) {
-    //   if (err) {
-      //     // Handle the error
-      //     res.send({error: err});
-      //   } else {
-        //     // Log the user in 
-        //     console.log(username);
-        //     res.send({status: status, username: username, attributes: extended.attributes});
-        //   }
-  // });    
+let loggedin = false
+export async function getStaticProps(req: NextRequest, res: NextResponse) {
+  // if (!loggedin) {
+  //   return {
+  //     redirect: {
+  //       destination: '/sso',
+  //       permanent: false,
+  //     },
+  //   }
+  // }
   return {
     props: {}
   }
@@ -74,15 +62,46 @@ export default function ewsIndex(pageProps: any) {
     </React.StrictMode>
   );
 }
+let authed = false
+const cas_host = 'https://identites.ensea.fr/cas'
+const service = process.env.casService ? process.env.casService : 'http://localhost:3000'
+async function ClientSideCASAuth() {
+  const router = useRouter() as NextRouter
+  if (router.isReady) {
+    if (router.query.ticket) {
+      console.log('auhted');
+      authed = true
+      const ticket = router.query.ticket
+      const req: RequestInit = {
+        mode: 'no-cors',
+        method: "GET",
+        headers: {
+          mode: 'no-cors',
+          ReferrerPolicy: 'unsafe-url'
+        },
+        credentials: "include",
+      }
+      fetch((cas_host + '/serviceValidate?service=' + service + '&ticket=' + ticket), req).then((res) => {
+        console.log(res)
+        // let list_user = data.match(/(<cas:user>)(.+?)(<\/cas:user>)/i);
+        // let user = list_user[0];
+        // user = user.replace('<cas:user>', '');
+        // user = user.replace('<\/cas:user>', '');
+      })
+    } else if (!authed) {
+      router.push('/sso')
+    }
+  }
+}
 
-function App({ views }) {
+function App() {
   const lastSchedule = getCookie('lastSchedule')
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [currentWeek, setCurrentWeek] = useState(1)
   const [scheduleID, setScheduleID] = useState(lastSchedule)
   const setScheduleAndSave = (scheduleID) => {
     setCookie('lastSchedule', scheduleID, {
-      expires: new Date(new Date().getTime() + 1000*60*60*24*62),  // 62 days,
+      expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 62),  // 62 days,
       sameSite: true
     })
     setScheduleID(scheduleID)
@@ -92,8 +111,9 @@ function App({ views }) {
     setCurrentWeek(getWeekID(new Date()))  // the first weekID is set to be today's week
   }, [])
   if (!isMounted) {
-    return null;
+    return
   }
+  ClientSideCASAuth()
   return (
     <>
       <SearchBar scheduleID={scheduleID} setSchedule={setScheduleAndSave} className='SelectionsContainer relative from-main-orange 
@@ -101,10 +121,10 @@ function App({ views }) {
       <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek} />
       <div className="WeekScheduleContainer w-full h-[69%]">
         {
-          scheduleID ? 
+          scheduleID ?
             <WeekDaySwiper schedule={scheduleID} currentWeek={currentWeek} />
-          :
-            <GetStarted/>
+            :
+            <GetStarted />
         }
       </div>
     </>
