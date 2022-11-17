@@ -19,14 +19,14 @@ import { NextRouter, Router, useRouter } from 'next/router';
 
 let loggedin = false
 export async function getStaticProps(req: NextRequest, res: NextResponse) {
-  // if (!loggedin) {
-  //   return {
-  //     redirect: {
-  //       destination: '/sso',
-  //       permanent: false,
-  //     },
-  //   }
-  // }
+  if (!loggedin) {
+    return {
+      redirect: {
+        destination: '/api/cas',
+        permanent: false,
+      },
+    }
+  }
   return {
     props: {}
   }
@@ -62,37 +62,6 @@ export default function ewsIndex(pageProps: any) {
     </React.StrictMode>
   );
 }
-let authed = false
-const cas_host = 'https://identites.ensea.fr/cas'
-const service = process.env.casService ? process.env.casService : 'http://localhost:3000'
-async function ClientSideCASAuth() {
-  const router = useRouter() as NextRouter
-  if (router.isReady) {
-    if (router.query.ticket) {
-      console.log('auhted');
-      authed = true
-      const ticket = router.query.ticket
-      const req: RequestInit = {
-        mode: 'no-cors',
-        method: "GET",
-        headers: {
-          mode: 'no-cors',
-          ReferrerPolicy: 'unsafe-url'
-        },
-        credentials: "include",
-      }
-      fetch((cas_host + '/serviceValidate?service=' + service + '&ticket=' + ticket), req).then((res) => {
-        console.log(res)
-        // let list_user = data.match(/(<cas:user>)(.+?)(<\/cas:user>)/i);
-        // let user = list_user[0];
-        // user = user.replace('<cas:user>', '');
-        // user = user.replace('<\/cas:user>', '');
-      })
-    } else if (!authed) {
-      router.push('/sso')
-    }
-  }
-}
 
 function App() {
   const lastSchedule = getCookie('lastSchedule')
@@ -113,7 +82,6 @@ function App() {
   if (!isMounted) {
     return
   }
-  ClientSideCASAuth()
   return (
     <>
       <SearchBar scheduleID={scheduleID} setSchedule={setScheduleAndSave} className='SelectionsContainer relative from-main-orange 

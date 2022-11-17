@@ -15,8 +15,8 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
     const now = new Date()
     const DELTA = 10*60*1000  // 10min
     if (!lastUpdate || (now.getTime() - lastUpdate.getTime() > DELTA)) {  // Refresh of the data every 5min
-      updateAndSaveSchedule() // Process takes 30s on average
       lastUpdate = new Date()
+      updateAndSaveSchedule() // Process takes 30s on average
     }
     if (req.headers['classe'] == undefined) {
       res.status(400).json({ status: 400, message: "Unsupported headers"});
