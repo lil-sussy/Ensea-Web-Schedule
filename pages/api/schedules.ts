@@ -1,10 +1,10 @@
-import { collection, setDoc, doc, addDoc, getDocs, query, where } from 'firebase/firestore';
 import { NextApiRequest, NextApiResponse } from 'next'
 import { scheduleIDs, scheduleList } from '../../private/classesTree';
 import fs from 'fs';
 import path from 'path';
 import ical from 'ical'
 import { getWeekID } from '../../components/ews/lib/schoolYear';
+import axios from 'axios'
 
 let lastUpdate: Date  // A date
 
@@ -33,8 +33,6 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
     res.status(400).json({ status: 400, message:'Only get and post request are handled' })
   }
 }
-const axios = require('axios')
-const test = axios.get(generateADEurl(523, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
 
 function generateADEurl(schedule: number, begin: string, end: string) {
   const URL = 'https://ade.ensea.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?'+
@@ -100,7 +98,6 @@ const updateAndSaveSchedule = async () => {
         week.set(course.courseData.dayOfWeek, day)
         weeks.set(course.courseData.week, week)
         schedules.set(scheduleID, weeks)
-        console.log(Array.from(schedules.keys()).length)
       }
       progressBar.tick(1, {
         schedule: scheduleID
