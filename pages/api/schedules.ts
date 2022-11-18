@@ -103,7 +103,6 @@ const updateAndSaveSchedule = async () => {
         schedule: scheduleID
       })
     }
-    console.log(schedules.get('AEI TP1'))
     fs.writeFileSync(scheduleJSONpath, JSON.stringify(schedules, replacer))  // Saved in 33ms 
     console.log('Schedules were succesfully updated in %d ms', (new Date().getTime() - beginTime.getTime()));
     resolve('done')
