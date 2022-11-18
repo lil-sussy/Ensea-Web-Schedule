@@ -16,6 +16,7 @@ import { hasCookie, setCookie, getCookie } from 'cookies-next';
 import Image from 'next/image';
 import { NextRequest, NextResponse } from 'next/server'
 import { NextRouter, Router, useRouter } from 'next/router';
+import { signInWithCustomToken } from 'firebase/auth';
 
 function attemptUserToLogIn(ticket: any): any {
   if (ticket) {
@@ -24,57 +25,35 @@ function attemptUserToLogIn(ticket: any): any {
   }
 }
 
-function redirectToCasServer() {
-  return {
-    redirect: {
-      destination: '/sso',
-      permanent: false,
-    },
-  }
-}
-
 export async function getServerSideProps(req: any, res: any) {
   //Check if user exists (jwt on client)
   const ticket = req.query.ticket
-  if (auth.currentUser) {
-    const idToken = await auth.currentUser.getIdToken(/* forceRefresh */ true)
-    if (idToken) {
-      return fetch(process.env.server + '/api/cas', {
-        headers: {
-          idToken: idToken
-        }
-      })
-    } else {
-      // If there is a ticket (the user has been succesfully authed on cas server)
-      if (ticket) {
-        const tokenID = await fetch(process.env.server + '/api/cas', {
-          headers: {
-            ticket: ticket
-          }
-        })
-        console.log('tokenID', tokenID);
-        return null
-      } else {
-        return redirectToCasServer()
-      }
-    };
-  } else {
-    if (ticket) {
-      const tokenID = await fetch(process.env.server + '/api/cas', {
-        headers: {
-          ticket: ticket
-        }
-      })
-      console.log('tokenID', tokenID);
-      return null
-    } else {
-      return redirectToCasServer()
-    }
-  }
+  return { props: { ticket: ticket } }
 }
 
-export default function ewsIndex(pageProps: any) {
-  console.log('pageProps', pageProps)
+function ewsIndex({ ticket }) {
+  let userToken: string
+  if (auth.currentUser) {
+    auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
+      if (!userToken ) {  // If the user is already signed in with an existing account
+        if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
+          const res = fetch(process.env.server + '/api/cas', {
+            headers: {
+              ticket: ticket
+            }
+          }).then(res => res.json()).then(res =>  {
+            userToken = res.userToken
+          })
+          userToken = (res as any).userToken
+        } else {
+          const router = useRouter()
+          router.push('/sso')
+        }
+      };
+    })
+  }
+  
+  const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
   return (
     <React.StrictMode>
       <Head>
@@ -98,12 +77,13 @@ export default function ewsIndex(pageProps: any) {
         <BackgroundENSEA />
         <AppContainer>
           <AthenaHeader />
-          <App {...pageProps} />
+          <App/>
         </AppContainer>
       </>
     </React.StrictMode>
   );
 }
+
 
 function App() {
   const lastSchedule = getCookie('lastSchedule')
@@ -132,9 +112,9 @@ function App() {
       <div className="WeekScheduleContainer w-full h-[69%]">
         {
           scheduleID ?
-            <WeekDaySwiper schedule={scheduleID} currentWeek={currentWeek} />
-            :
-            <GetStarted />
+          <WeekDaySwiper schedule={scheduleID} currentWeek={currentWeek} />
+          :
+          <GetStarted />
         }
       </div>
     </>
@@ -152,7 +132,7 @@ function BackgroundENSEA() {
   return (
     <div className="BackgroundENSEA bg-cover h-screen w-screen transition
     blur-[2px] "
-      style={{ backgroundImage: ('url(' + background.src + ')') }}>
+    style={{ backgroundImage: ('url(' + background.src + ')') }}>
       <div className="w-full h-full bg-opacity-30 bg-white"></div>
     </div>
   )
@@ -161,7 +141,7 @@ function BackgroundENSEA() {
 function AppContainer(props) {
   return (
     <div className="AppContainer text-zinc-800 w-full h-full
-      -translate-x-1/2 absolute left-1/2 top-0">
+    -translate-x-1/2 absolute left-1/2 top-0">
       {props.children}
     </div>
   )
@@ -191,15 +171,4 @@ function AthenaHeader() {
   )
 }
 
-// Redirecting in nextjs :
-
-// import { NextResponse } from 'next/server'
-// import type { NextRequest } from 'next/server'
-
-// export function middleware(request: NextRequest) {   
-//   const url = request.nextUrl.clone()   
-//   if (url.pathname === '/') {
-//     url.pathname = '/hello-nextjs'
-//     return NextResponse.redirect(url)   
-//   } 
-// }
+export default ewsIndex  // Had to export this after otherwise index is not considered as a react component
