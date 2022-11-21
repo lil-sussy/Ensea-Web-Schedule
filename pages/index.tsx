@@ -18,42 +18,50 @@ import { NextRequest, NextResponse } from 'next/server'
 import { NextRouter, Router, useRouter } from 'next/router';
 import { signInWithCustomToken } from 'firebase/auth';
 
-function attemptUserToLogIn(ticket: any): any {
-  if (ticket) {
-  } else {
-    
-  }
-}
-
 export async function getServerSideProps(req: any, res: any) {
   //Check if user exists (jwt on client)
   const ticket = req.query.ticket
-  return { props: { ticket: ticket } }
+  const host = req.req.headers.host
+  if (ticket)
+  return { props: { ticket: ticket, host: host } }
+  else
+  return { props: { ticket: null, host: host }}
 }
 
-function ewsIndex({ ticket }) {
+function ewsIndex({ ticket, host }) {
+  const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
+  useEffect(() => {
+    setIsMounted(true);
+  }, [])
+  if (!isMounted) {
+    return
+  }
   let userToken: string
-  if (auth.currentUser) {
+  if (auth.currentUser) {// If the user is already signed in with an existing account
+    console.log('logged in');
     auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
-      if (!userToken ) {  // If the user is already signed in with an existing account
-        if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
-          const res = fetch(process.env.server + '/api/cas', {
-            headers: {
-              ticket: ticket
-            }
-          }).then(res => res.json()).then(res =>  {
-            userToken = res.userToken
-          })
-          userToken = (res as any).userToken
-        } else {
-          const router = useRouter()
-          router.push('/sso')
-        }
-      };
+      const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
+      console.log(user)
     })
+  } else {
+    if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
+      fetch(process.env.server + '/api/cas', {
+        headers: {
+          ticket: ticket
+        }
+      }).then(res => res.json()).then(res =>  {
+        userToken = res.userToken
+        console.log('token', userToken);
+        if (userToken) {
+          const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
+        }
+      })
+    } else {
+      const router = useRouter()
+      router.push('https://identites.ensea.fr/cas/login?service=http://'+host)
+    }
   }
   
-  const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
   return (
     <React.StrictMode>
       <Head>
@@ -66,7 +74,7 @@ function ewsIndex({ ticket }) {
         <meta name="twitter:card" content="summary" />
         <meta
           property="og:description"
-          content="Hurray!! Yes Social Media Preview is Working"
+          content=""
         />
         <meta property="og:image" content={"../public/logo.png"} />
       </Head>

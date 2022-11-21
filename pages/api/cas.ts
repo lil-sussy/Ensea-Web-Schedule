@@ -21,36 +21,38 @@ if (firebaseAdmin.apps.length == 0) {
 
 export default async function Handler(req: NextApiRequest, res: NextApiResponse) {
   const cas_host = 'https://identites.ensea.fr/cas'
-  const service = process.env.casService ? process.env.casService : 'http://localhost:3000/api/cas'
+  // const service = process.env.casService ? process.env.casService : 'http://localhost:3000/api/cas'
+  const service = req.headers.host+'/api/cas';
   const ticket = req.headers.ticket;
-  const idToken = req.headers.idToken;
+  console.log(ticket)
   if (ticket) {
     const data = await fetch((cas_host + '/serviceValidate?service=' + service + '&ticket=' + ticket[0]))
-    // let textData = await data.text()
-    // console.log(textData)
-    // let list_user = textData.match(/(<cas:user>)(.+?)(<\/cas:user>)/i);
-    // let uname = list_user[0];
-    // uname = uname.replace('<cas:user>', '');
-    // uname = uname.replace('<\/cas:user>', '');
-    // let listMail = textData.match(/(<cas:mail>)(.+?)(<\/cas:mail>)/i);
-    // let mail = listMail[0];
-    // mail = mail.replace('<cas:mail>', '');
-    // mail = mail.replace('<\/cas:mail>', '');
-    const mail = 'ratio.uwu@cringe.diesofcringe'
-    const uname = 'palu'
-    const user: User = {
-      mail: mail,
-      firstName: mail.split('.')[0],
-      lastName: mail.split('.')[1].split('@')[0],  // Yeah this is cringe, use : regex
-      uname: uname,
+    let textData = await data.text()
+    console.log(textData)
+    if (textData.includes('<cas:authenticationFailure code="INVALID_TICKET">')) {
+      res.status(400).json({ status: 400, message: 'Cas auhtentification failed' })
+    } else {
+      let list_user = textData.match(/(<cas:user>)(.+?)(<\/cas:user>)/i);
+      let uname = list_user[0];
+      uname = uname.replace('<cas:user>', '');
+      uname = uname.replace('<\/cas:user>', '');
+      let listMail = textData.match(/(<cas:mail>)(.+?)(<\/cas:mail>)/i);
+      let mail = listMail[0];
+      mail = mail.replace('<cas:mail>', '');
+      mail = mail.replace('<\/cas:mail>', '');
+      const user: User = {
+        mail: mail,
+        firstName: mail.split('.')[0],
+        lastName: mail.split('.')[1].split('@')[0],  // Yeah this is cringe, use : regex
+        uname: uname,
+      }
+      const userId = ticket+uname;  // Custom userID
+      const additionalClaims = {
+        premiumAccount: true,
+      };
+      const customToken = await getAuth().createCustomToken(userId, additionalClaims)
+      res.status(200).json({ userToken: customToken })
     }
-    // const bob: UserRecord = await getAuth().getUser('bob');
-    const userId = ticket+uname;  // Custom userID
-    const additionalClaims = {
-      premiumAccount: true,
-    };
-    const customToken = await getAuth().createCustomToken(userId, additionalClaims)
-    res.status(200).json({ userToken: customToken })
   } else {
     res.status(400).json({ status: 400, message: 'This api is used to validate cas ticket, please provide a ticket' })
   }

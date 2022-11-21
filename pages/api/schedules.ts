@@ -116,17 +116,19 @@ function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {
   // I attended to some of those courses and I can confirm that every courses's hours are MODIFIED.
   // But this is not the case for the courses of the current week and the courses of every weeks after :)))
   // At this point I just wanna die I dont even want to continue typing this function this is just too CRINGE.
-  const currentWeekID = getWeekID(new Date())  // WeekID of this week
-  if (course.courseData.week < currentWeekID) {
-    const begin = course.courseData.begin
-    course.courseData.begin = ('0' + (Number(begin.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
-    course.courseData.begin += begin.slice(2, 5)
-    const end = course.courseData.end
-    course.courseData.end = ('0' + (Number(end.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
-    course.courseData.end += end.slice(2, 5)
-  }
+  
+  // const currentWeekID = getWeekID(new Date())  // WeekID of this week
+  // if (course.courseData.week < currentWeekID) {
+  //   const begin = course.courseData.begin
+  //   course.courseData.begin = ('0' + (Number(begin.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
+  //   course.courseData.begin += begin.slice(2, 5)
+  //   const end = course.courseData.end
+  //   course.courseData.end = ('0' + (Number(end.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
+  //   course.courseData.end += end.slice(2, 5)
+  // }
+
   // pls send help.
-  return course
+  return course  // Apparently the problem has been handle on ADE side, I dont trust them this function stays there
 }
 
 function ADEisCringe(ADEdata: string) {
