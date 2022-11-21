@@ -39,7 +39,6 @@ function EwsIndex({ ticket, host }) {
   }
   let userToken: string
   if (auth.currentUser) {// If the user is already signed in with an existing account
-    console.log('logged in');
     auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
       const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
       console.log(user)
