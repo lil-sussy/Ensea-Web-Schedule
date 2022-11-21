@@ -28,8 +28,9 @@ export async function getServerSideProps(req: any, res: any) {
   return { props: { ticket: null, host: host }}
 }
 
-function ewsIndex({ ticket, host }) {
+function EwsIndex({ ticket, host }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
+  const router = useRouter()
   useEffect(() => {
     setIsMounted(true);
   }, [])
@@ -57,7 +58,6 @@ function ewsIndex({ ticket, host }) {
         }
       })
     } else {
-      const router = useRouter()
       router.push('https://identites.ensea.fr/cas/login?service=http://'+host)
     }
   }
@@ -179,4 +179,4 @@ function AthenaHeader() {
   )
 }
 
-export default ewsIndex  // Had to export this after otherwise index is not considered as a react component
+export default EwsIndex  // Had to export this after otherwise index is not considered as a react component
