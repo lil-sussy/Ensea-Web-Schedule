@@ -21,10 +21,9 @@ if (firebaseAdmin.apps.length == 0) {
 
 export default async function Handler(req: NextApiRequest, res: NextApiResponse) {
   const cas_host = 'https://identites.ensea.fr/cas'
-  // const service = process.env.casService ? process.env.casService : 'http://localhost:3000/api/cas'
   const service = req.headers.host+'/api/cas';
   const ticket = req.headers.ticket;
-  console.log(ticket)
+  console.log('ticket', ticket)
   if (ticket) {
     const data = await fetch((cas_host + '/serviceValidate?service=' + service + '&ticket=' + ticket[0]))
     let textData = await data.text()
@@ -46,11 +45,8 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
         lastName: mail.split('.')[1].split('@')[0],  // Yeah this is cringe, use : regex
         uname: uname,
       }
-      const userId = ticket+uname;  // Custom userID
-      const additionalClaims = {
-        premiumAccount: true,
-      };
-      const customToken = await getAuth().createCustomToken(userId, additionalClaims)
+      const userId = ticket+'';  // Custom userID
+      const customToken = await getAuth().createCustomToken(userId, user)
       res.status(200).json({ userToken: customToken })
     }
   } else {

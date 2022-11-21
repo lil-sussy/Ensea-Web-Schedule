@@ -45,7 +45,7 @@ function ewsIndex({ ticket, host }) {
     })
   } else {
     if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
-      fetch(process.env.server + '/api/cas', {
+      fetch('http://'+host+'/api/cas', {
         headers: {
           ticket: ticket
         }
