@@ -4,7 +4,7 @@ import WeekDaySwiper from '../components/ews/home/DaySwiper';
 import nextSession from "next-session"
 import Head from 'next/head'
 import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { firebase, database } from '../components/ews/lib/firebaseConfig';
+import { firebase, database, auth } from '../components/ews/lib/firebaseConfig';
 import background from '../public/background2k.png'
 import logo from '../public/logo.png'
 import WeekSelectionSwiper from '../components/ews/home/WeekSelectionSlider'
@@ -14,37 +14,54 @@ import SearchBar from '../components/ews/home/SearchEngine';
 // import CAS from '../lib/node-cas/lib/cas';
 import { hasCookie, setCookie, getCookie } from 'cookies-next';
 import Image from 'next/image';
+import { NextRequest, NextResponse } from 'next/server'
+import { NextRouter, Router, useRouter } from 'next/router';
+import { signInWithCustomToken } from 'firebase/auth';
 
-export async function getStaticProps(req, res) {
-  // const cas = new CAS({
-    //   base_url         : 'https://identites.ensea.fr/cas/login',
-    //   service     : 'https://ews.ensea.jsp.fr',
-  //   version     : '3.0',
-  //   renew           : false,
-  //   is_dev_mode     : true,
-  //   dev_mode_user   : '',
-  //   dev_mode_info   : {},
-  //   session_name    : 'cas_user',
-  //   session_info    : 'cas_userinfo',
-  //   destroy_session : false,
-  //   return_to       : 'http://localhost:300/'
-  // })
-  // cas.authenticate(req, res, function(err, status, username, extended) {
-    //   if (err) {
-      //     // Handle the error
-      //     res.send({error: err});
-      //   } else {
-        //     // Log the user in 
-        //     console.log(username);
-        //     res.send({status: status, username: username, attributes: extended.attributes});
-        //   }
-  // });    
-  return {
-    props: {}
-  }
+export async function getServerSideProps(req: any, res: any) {
+  //Check if user exists (jwt on client)
+  const ticket = req.query.ticket
+  const host = req.req.headers.host
+  if (ticket)
+  return { props: { ticket: ticket, host: host } }
+  else
+  return { props: { ticket: null, host: host }}
 }
 
-export default function ewsIndex(pageProps: any) {
+function ewsIndex({ ticket, host }) {
+  const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
+  useEffect(() => {
+    setIsMounted(true);
+  }, [])
+  if (!isMounted) {
+    return
+  }
+  let userToken: string
+  if (auth.currentUser) {// If the user is already signed in with an existing account
+    console.log('logged in');
+    auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
+      const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
+      console.log(user)
+    })
+  } else {
+    if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
+      fetch('http://'+host+'/api/cas', {
+        headers: {
+          ticket: ticket
+        }
+      }).then(res => res.json()).then(res =>  {
+        userToken = res.userToken
+        console.log('token', userToken);
+        if (userToken) {
+          const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
+        }
+      })
+    } else {
+      const router = useRouter()
+      router.push('https://identites.ensea.fr/cas/login?service=http://'+host)
+    }
+  }
+  
   return (
     <React.StrictMode>
       <Head>
@@ -57,7 +74,7 @@ export default function ewsIndex(pageProps: any) {
         <meta name="twitter:card" content="summary" />
         <meta
           property="og:description"
-          content="Hurray!! Yes Social Media Preview is Working"
+          content=""
         />
         <meta property="og:image" content={"../public/logo.png"} />
       </Head>
@@ -68,21 +85,22 @@ export default function ewsIndex(pageProps: any) {
         <BackgroundENSEA />
         <AppContainer>
           <AthenaHeader />
-          <App {...pageProps} />
+          <App/>
         </AppContainer>
       </>
     </React.StrictMode>
   );
 }
 
-function App({ views }) {
+
+function App() {
   const lastSchedule = getCookie('lastSchedule')
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const [currentWeek, setCurrentWeek] = useState(1)
   const [scheduleID, setScheduleID] = useState(lastSchedule)
   const setScheduleAndSave = (scheduleID) => {
     setCookie('lastSchedule', scheduleID, {
-      expires: new Date(new Date().getTime() + 1000*60*60*24*62),  // 62 days,
+      expires: new Date(new Date().getTime() + 1000 * 60 * 60 * 24 * 62),  // 62 days,
       sameSite: true
     })
     setScheduleID(scheduleID)
@@ -92,7 +110,7 @@ function App({ views }) {
     setCurrentWeek(getWeekID(new Date()))  // the first weekID is set to be today's week
   }, [])
   if (!isMounted) {
-    return null;
+    return
   }
   return (
     <>
@@ -101,10 +119,10 @@ function App({ views }) {
       <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek} />
       <div className="WeekScheduleContainer w-full h-[69%]">
         {
-          scheduleID ? 
-            <WeekDaySwiper schedule={scheduleID} currentWeek={currentWeek} />
+          scheduleID ?
+          <WeekDaySwiper schedule={scheduleID} currentWeek={currentWeek} />
           :
-            <GetStarted/>
+          <GetStarted />
         }
       </div>
     </>
@@ -122,7 +140,7 @@ function BackgroundENSEA() {
   return (
     <div className="BackgroundENSEA bg-cover h-screen w-screen transition
     blur-[2px] "
-      style={{ backgroundImage: ('url(' + background.src + ')') }}>
+    style={{ backgroundImage: ('url(' + background.src + ')') }}>
       <div className="w-full h-full bg-opacity-30 bg-white"></div>
     </div>
   )
@@ -131,7 +149,7 @@ function BackgroundENSEA() {
 function AppContainer(props) {
   return (
     <div className="AppContainer text-zinc-800 w-full h-full
-      -translate-x-1/2 absolute left-1/2 top-0">
+    -translate-x-1/2 absolute left-1/2 top-0">
       {props.children}
     </div>
   )
@@ -161,15 +179,4 @@ function AthenaHeader() {
   )
 }
 
-// Redirecting in nextjs :
-
-// import { NextResponse } from 'next/server'
-// import type { NextRequest } from 'next/server'
-
-// export function middleware(request: NextRequest) {   
-//   const url = request.nextUrl.clone()   
-//   if (url.pathname === '/') {
-//     url.pathname = '/hello-nextjs'
-//     return NextResponse.redirect(url)   
-//   } 
-// }
+export default ewsIndex  // Had to export this after otherwise index is not considered as a react component

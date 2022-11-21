@@ -1,7 +1,8 @@
 /** @type {import('next').NextConfig} */
-const nextConfig = {
+
+GOOGLE_APPLICATION_CREDENTIALS = '/private/googleprivatekey.json'
+  
+module.exports = {
   reactStrictMode: true,
   swcMinify: true,
-}
-
-module.exports = nextConfig
+}, GOOGLE_APPLICATION_CREDENTIALS 
