@@ -1,5 +1,6 @@
 // https://stackoverflow.com/questions/3224834/get-difference-between-2-dates-in-javascript
 function dateDiffInDays(preceding: Date, date: Date) {
+  console.log(preceding, date)
   const _MS_PER_DAY = 1000 * 60 * 60 * 24;
   // Discard the time and time-zone information.
   const utc1 = Date.UTC(preceding.getFullYear(), preceding.getMonth(), preceding.getDate());

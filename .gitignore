@@ -21,6 +21,7 @@
 .env.test.local
 .env.production.local
 /private/googleprivatekey.json
+/private/firebaseAdminPrivateKey.json
 /private/test.ics
 /private/schedules.json
 

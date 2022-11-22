@@ -11,7 +11,7 @@ type User = {
 }
 
 //Firebase admin
-export const GOOGLE_APPLICATION_CREDENTIALS = process.cwd()+'/private/googleprivatekey.json'
+export const GOOGLE_APPLICATION_CREDENTIALS = process.cwd()+'/private/firebaseAdminPrivateKey.json'
 
 if (firebaseAdmin.apps.length == 0) {
   initializeApp({
@@ -23,7 +23,6 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
   const cas_host = 'https://identites.ensea.fr/cas'
   const service = req.headers.host+'/api/cas';
   const ticket = req.headers.ticket;
-  console.log('ticket', ticket)
   if (ticket) {
     const data = await fetch((cas_host + '/serviceValidate?service=' + service + '&ticket=' + ticket[0]))
     let textData = await data.text()

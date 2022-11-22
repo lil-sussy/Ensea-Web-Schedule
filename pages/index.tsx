@@ -1,10 +1,8 @@
 import { useState, useEffect, useMemo } from 'react';
 import React from 'react';
 import WeekDaySwiper from '../components/ews/home/DaySwiper';
-import nextSession from "next-session"
 import Head from 'next/head'
-import { collection, addDoc, getDocs } from 'firebase/firestore';
-import { firebase, database, auth } from '../components/ews/lib/firebaseConfig';
+import { firebase, database, auth } from '../components/ews/lib/firebaseClientConfig';
 import background from '../public/background2k.png'
 import logo from '../public/logo.png'
 import WeekSelectionSwiper from '../components/ews/home/WeekSelectionSlider'
@@ -14,7 +12,6 @@ import SearchBar from '../components/ews/home/SearchEngine';
 // import CAS from '../lib/node-cas/lib/cas';
 import { hasCookie, setCookie, getCookie } from 'cookies-next';
 import Image from 'next/image';
-import { NextRequest, NextResponse } from 'next/server'
 import { NextRouter, Router, useRouter } from 'next/router';
 import { signInWithCustomToken } from 'firebase/auth';
 
@@ -28,7 +25,7 @@ export async function getServerSideProps(req: any, res: any) {
   return { props: { ticket: null, host: host }}
 }
 
-function EwsIndex({ ticket, host }) {
+function EWSIndex({ ticket, host }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
   const router = useRouter()
   useEffect(() => {
@@ -39,6 +36,7 @@ function EwsIndex({ ticket, host }) {
   }
   let userToken: string
   if (auth.currentUser) {// If the user is already signed in with an existing account
+    console.log('logggedin', auth.currentUser);
     auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
       const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
       console.log(user)
@@ -49,7 +47,7 @@ function EwsIndex({ ticket, host }) {
         headers: {
           ticket: ticket
         }
-      }).then(res => res.json()).then(res =>  {
+      }).then(res => res.json()).then(res => {
         userToken = res.userToken
         console.log('token', userToken);
         if (userToken) {
@@ -57,7 +55,7 @@ function EwsIndex({ ticket, host }) {
         }
       })
     } else {
-      router.push('https://identites.ensea.fr/cas/login?service=http://'+host)
+      router.push('https://identites.ensea.fr/cas/login?service=http://'+host)  // after the auth, the server will send the user back to this page (index)
     }
   }
   
@@ -178,4 +176,4 @@ function AthenaHeader() {
   )
 }
 
-export default EwsIndex  // Had to export this after otherwise index is not considered as a react component
+export default EWSIndex  // Had to export this after otherwise index is not considered as a react component
