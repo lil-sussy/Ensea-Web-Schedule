@@ -11,8 +11,6 @@
   "dependencies": {
     "@next/font": "^13.0.0",
     "axios": "^1.1.3",
-    "cas-client-authentication": "^1.1.2",
-    "cas-client-node": "^1.1.0",
     "clsx": "^1.2.1",
     "cookiejar": "^2.1.3",
     "cookies-next": "^2.1.1",

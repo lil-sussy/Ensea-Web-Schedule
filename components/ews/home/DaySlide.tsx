@@ -7,7 +7,7 @@ import type { Course } from '../../../pages/api/schedules';
 
 export default function DaySlide({ actualDay, date, dayData, loading }) {
   const courses = dayData as Course[];
-  const courseHourWrappers = new Map()
+  const courseHourWrappers = emptyDayHourGrid()
   const divCourses = [];
   const courseHourWrapperList = []
   if (courses == null) {
@@ -43,6 +43,14 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
       </DayContainer>
     </SwiperSlide >
   );
+}
+
+function emptyDayHourGrid(): Map<String, any> {
+  const hourList = new Map()
+  // for (let i = 8; i < 21; i++) {
+  //   hourList.set()
+  // }
+  return hourList
 }
 
 function DayMask() {
