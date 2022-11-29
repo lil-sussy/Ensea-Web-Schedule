@@ -32,7 +32,7 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
     courseHourWrappers.forEach((value, key) => courseHourWrapperList.push(value))
   } else {
     divCourses.push(
-      <div className=''>
+      <div key={'1'} className=''>
       </div>)
   }
   return (
@@ -47,9 +47,13 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
 
 function emptyDayHourGrid(): Map<String, any> {
   const hourList = new Map()
-  // for (let i = 8; i < 21; i++) {
-  //   hourList.set()
-  // }
+  for (let i = 8; i < 21; i++) {
+    const hour = (i < 10 ? "0" + i : i) + ':00'
+    hourList.set(hour, (
+      <div key={hour} className={clsx('w-full -z-20 h-[1px] row-span-1 bg-main-purple')}
+      style={{ gridRowStart: (i-7)*2 }}></div>
+    ))
+  }
   return hourList
 }
 

@@ -24,7 +24,7 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
   const service = req.headers.host+'/api/cas';
   const ticket = req.headers.ticket;
   if (ticket) {
-    const data = await fetch((cas_host + '/serviceValidate?service=' + service + '&ticket=' + ticket[0]))
+    const data = await fetch((cas_host + '/serviceValidate?service=http://' + service + '&ticket=' + ticket))
     let textData = await data.text()
     console.log(textData)
     if (textData.includes('<cas:authenticationFailure code="INVALID_TICKET">')) {
