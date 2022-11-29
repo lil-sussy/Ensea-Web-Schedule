@@ -132,6 +132,7 @@ function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {
 }
 
 function ADEisCringe(ADEdata: string) {
+  return ADEdata
   const timezoneID = 'TZID=France/Paris'
   let data = ""
   const lines = ADEdata.split('\n') as string[]
@@ -139,12 +140,14 @@ function ADEisCringe(ADEdata: string) {
     if (line.startsWith('DTSTAMP') || line.startsWith('DTSTART') || line.startsWith('DTEND') || line.startsWith('LAST-MODIFIED')) {
       const ICSKey = line.split(':')[0]
       const ICSValue = line.split(':')[1]
+      console.log(line)
       const ADEHour = Number(/T+\d{2}/.exec(ICSValue)[0].slice(1))
       const hourIndex = /T+\d{2}/.exec(ICSValue)[1]
       let realHour = String(ADEHour + (new Date().getHours() - new Date().getUTCHours()) + 1)  // Ade is substracting 1 hour to every damn courses
-      realHour = Number(realHour) < 10 ? '0' + realHour : realHour
+      realHour = Number(realHour) < 10 ? '0' + realHour : ''+realHour
       line = ICSKey + ';' + timezoneID + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
       data += line
+      console.log(line)
     } else {
       data += line + '\n'
     }

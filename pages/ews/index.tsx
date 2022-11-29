@@ -1,24 +1,25 @@
 import { useState, useEffect, useMemo } from 'react';
 import React from 'react';
-import WeekDaySwiper from '../components/ews/home/DaySwiper';
+import WeekDaySwiper from '../../components/ews/home/DaySwiper';
 import Head from 'next/head'
-import { firebase, database, auth } from '../components/ews/lib/firebaseClientConfig';
-import background from '../public/background2k.png'
-import logo from '../public/logo.png'
-import WeekSelectionSwiper from '../components/ews/home/WeekSelectionSlider'
+import { firebase, database, auth } from '../../components/ews/lib/firebaseClientConfig';
+import background from '../../public/background2k.png'
+import logo from '../../public/logo.png'
+import WeekSelectionSwiper from '../../components/ews/home/WeekSelectionSlider'
 
-import { getWeekID } from '../components/ews/lib/schoolYear'
-import SearchBar from '../components/ews/home/SearchEngine';
-// import CAS from '../lib/node-cas/lib/cas';
+import { getWeekID } from '../../components/ews/lib/schoolYear'
+import SearchBar from '../../components/ews/home/SearchEngine';
+// import CAS from '../../lib/node-cas/lib/cas';
 import { hasCookie, setCookie, getCookie } from 'cookies-next';
 import Image from 'next/image';
 import { NextRouter, Router, useRouter } from 'next/router';
 import { signInWithCustomToken } from 'firebase/auth';
+import type { CasResponse } from '../api/cas'
 
 export async function getServerSideProps(req: any, res: any) {
   //Check if user exists (jwt on client)
   const ticket = req.query.ticket
-  const host = req.req.headers.host
+  const host = req.req.headers.host + '/ews'
   if (ticket)
   return { props: { ticket: ticket, host: host } }
   else
@@ -36,22 +37,25 @@ function EWSIndex({ ticket, host }) {
   }
   let userToken: string
   if (auth.currentUser) {// If the user is already signed in with an existing account
-    console.log('logggedin', auth.currentUser);
     auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
-      const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
-      console.log(user)
+      const user = signInWithCustomToken(auth, userToken)
+        .then(user => console.log('logged in user', user))  // user should always exist at this point
     })
   } else {
     if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
-      fetch('http://'+host+'/api/cas', {
+      fetch('/api/cas', {
         headers: {
           ticket: ticket
         }
-      }).then(res => res.json()).then(res => {
+      }).then(res => res.json()).then(apiRes => {
+        const res = apiRes as CasResponse
         userToken = res.userToken
         console.log('token', userToken);
         if (userToken) {
-          const user = signInWithCustomToken(auth, userToken).then(user => console.log(user))  // user should always exist at this point
+          signInWithCustomToken(auth, userToken).then((operation) => {
+            const user = operation.user
+            console.log('then user', user)  // user should always exist at this point
+          })
         }
       })
     } else {

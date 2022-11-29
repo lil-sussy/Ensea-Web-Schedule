@@ -47,11 +47,16 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
 
 function emptyDayHourGrid(): Map<String, any> {
   const hourList = new Map()
+  return hourList
   for (let i = 8; i < 21; i++) {
     const hour = (i < 10 ? "0" + i : i) + ':00'
     hourList.set(hour, (
-      <div key={hour} className={clsx('w-full -z-20 h-[1px] row-span-1 bg-main-purple')}
-      style={{ gridRowStart: (i-7)*2 }}></div>
+      <div key={hour} className={clsx(" w-full h- row-start-" + hour + " col-span-1 font-bold relative -z-40")}
+        style={{ gridRowStart: (i-7)*2 }}>
+        <div className="w-full absolute top-1/2 h-[1px] bg-gradient-to-r from-main-purple-light to-main-purple -z-40"></div>
+      </div>
+      // <div key={hour} className={clsx('w-full -z-20 h-[1px] row-span-1 bg-main-purple')}
+      // style={{ gridRowStart: (i-7)*2 }}></div>
     ))
   }
   return hourList
