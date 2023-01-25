@@ -71,8 +71,7 @@ const updateAndSaveSchedule = async (scheduleID: string) => {
   return new Promise(async (resolve) => {
     const beginTime = new Date()  // Begining time of process
     const scheduleJSONpath = path.join(process.cwd() + '/private/schedules.json')  // Path of the schedule json to save the all thing
-    const lastSchedulesData = fs.readFileSync(scheduleJSONpath)  // Read the json file
-    let schoolSchedules: SchoolSchedule = JSON.parse(String(lastSchedulesData), reviver) ? JSON.parse(String(lastSchedulesData), reviver) : new Map();
+    let schoolSchedules: SchoolSchedule = fs.existsSync(scheduleJSONpath) ? JSON.parse(String(fs.readFileSync(scheduleJSONpath)), reviver) : new Map();
     const scheduleADEID = scheduleIDs.get(scheduleID)
     const res = await axios.get(generateADEurl(scheduleADEID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
     const data = ADEisCringe(res.data)  // lol
