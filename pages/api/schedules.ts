@@ -11,15 +11,13 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
   if (req.method == 'POST') {
     res.status(200).json({status: 401, data: "Data not succesfully loaded cuz it's automatique now mf :3"})
   } else if (req.method == 'GET') {
-    const now = new Date()
-    const DELTA = 10*60*1000  // 10min
-    updateAndSaveSchedule() // Process takes 30s on average
     if (req.headers['classe'] == undefined) {
       res.status(400).json({ status: 400, message: "Unsupported headers"});
       return
     }
-    const classe = req.headers['classe']
+    const classe = req.headers['classe'] as string
     if (classe) {
+      updateAndSaveSchedule(classe) // Process takes 30s on average
       const schedules = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver)
       res.status(200).json({totalSchedule: JSON.stringify(schedules.get(classe), replacer)})
     } else {
@@ -58,7 +56,11 @@ export function reviver(key, value) {
 
 import ProgressBar from 'progress'
 
-const updateAndSaveSchedule = async () => {
+export type ClassSchedule = {lastUpdate: Date, weeks: Map<number, Map<String, Course[]>>}
+export type SchoolSchedule = Map<String, {lastUpdate: Date, weeks: Map<number, Map<String, Course[]>>}>
+
+const REFRESH_TIME = 5*60*1000  // 5min
+const updateAndSaveSchedule = async (scheduleID: string) => {
   const progressBar = new ProgressBar('Updating from ADE - :percent (:bar) :schedule.',{
     total: Array.from(scheduleIDs.keys()).length,
     complete: '#',
@@ -67,44 +69,71 @@ const updateAndSaveSchedule = async () => {
     clear: true,
   })
   return new Promise(async (resolve) => {
-    console.log('Starting new schedules update from ADE servers...')
-    const beginTime = new Date()
-    const scheduleJSONpath = path.join(process.cwd() + '/private/schedules.json')
-    let schedules = new Map<String, {lastUpdate: Date, weeks: Map<number, Map<String, Course[]>>}>();  // Map of courses of day of week of schedule + last update
-    for (const scheduleID of Array.from(scheduleIDs.keys())) {  // Iterate trough every classes and save their schedules
-      const scheduleADEID = scheduleIDs.get(scheduleID)
-      const res = await axios.get(generateADEurl(scheduleADEID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
-      const data = ADEisCringe(res.data)  // lol
-      const calendar = ical.parseICS(data)  // Calendar is not iterable :)
-      for (const[key, value] of Object.entries(calendar)) {  // Iterate through yearschedule courses
-        const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value))  // lol
-        const schedule = schedules.get(scheduleID) ? schedules.get(scheduleID) : {lastUpdate: null, weeks: new Map<number, Map<string, Course[]>>()}
-        if (!schedule.lastUpdate || new Date().getTime() - schedule.lastUpdate.getTime() < 5*60*1000) {  // If last update is older than 5min
-          schedule.lastUpdate = new Date()
-          const week = schedule.weeks.get(course.courseData.week) ? schedule.weeks.get(course.courseData.week) : new Map<String, Course[]>()
-          const day = week.get(course.courseData.dayOfWeek) ? week.get(course.courseData.dayOfWeek) : []
-          let includes = false
-          for (const otherCourse of day) {  // Check if this course already exists in this schedule (happens with multiclasses courses)
-            if (otherCourse.id == course.id) {
-              includes = true
-              break;
-            }
-          }
-          if (!includes)
-            day.push(course)
-          week.set(course.courseData.dayOfWeek, day)
-          schedule.weeks.set(course.courseData.week, week)
-          schedules.set(scheduleID, schedule)
-        }
-        progressBar.tick(1, {
-          schedule: scheduleID
-        })
-      }
-    }
-    fs.writeFileSync(scheduleJSONpath, JSON.stringify(schedules, replacer))  // Saved in 33ms 
-    console.log('Schedules were succesfully updated in %d ms', (new Date().getTime() - beginTime.getTime()));
+    const beginTime = new Date()  // Begining time of process
+    const scheduleJSONpath = path.join(process.cwd() + '/private/schedules.json')  // Path of the schedule json to save the all thing
+    const lastSchedulesData = fs.readFileSync(scheduleJSONpath)  // Read the json file
+    let schoolSchedules: SchoolSchedule = JSON.parse(String(lastSchedulesData), reviver) ? JSON.parse(String(lastSchedulesData), reviver) : new Map();
+    const scheduleADEID = scheduleIDs.get(scheduleID)
+    const res = await axios.get(generateADEurl(scheduleADEID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
+    const data = ADEisCringe(res.data)  // lol
+    const calendar = ical.parseICS(data)  // Calendar is not iterable :)
+    // Getting or Creating a class schedule to add it and save
+    const schedule = schoolSchedules.get(scheduleID) ? schoolSchedules.get(scheduleID) : {lastUpdate: null, weeks: new Map<number, Map<string, Course[]>>()}
+    if (!schedule.lastUpdate || new Date().getTime() - (new Date(schedule.lastUpdate)).getTime() > REFRESH_TIME) {  // If last update is older than 5min
+      console.log('Starting new update for %s\'s schedule from ADE servers...', scheduleID)
+      console.log("last update of %s is older than 5min. Updating...", scheduleID, schedule.lastUpdate)
+      schoolSchedules = UpdateClassSchedule(calendar, schoolSchedules, schedule, scheduleID, progressBar)
+      fs.writeFileSync(scheduleJSONpath, JSON.stringify(schoolSchedules, replacer))  // Saved in 33ms 
+      console.log('Schedule of class %s was succesfully updated in %d ms', scheduleID, (new Date().getTime() - beginTime.getTime()));
+    } else {
+      console.log('%s\'s schedule is up to date (%s)', scheduleID, schedule.lastUpdate)
+    }   
     resolve('done')
   })
+  //   for (const scheduleID of Array.from(scheduleIDs.keys())) {  // Iterate trough every known classes of ADE and save their schedules
+  //     const scheduleADEID = scheduleIDs.get(scheduleID)
+  //     const res = await axios.get(generateADEurl(scheduleADEID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
+  //     const data = ADEisCringe(res.data)  // lol
+  //     const calendar = ical.parseICS(data)  // Calendar is not iterable :)
+  //     // Getting or Creating a class schedule to add it and save
+  //     const schedule = schedules.get(scheduleID) ? schedules.get(scheduleID) : {lastUpdate: null, weeks: new Map<number, Map<string, Course[]>>()}
+  //     if (!schedule.lastUpdate || new Date().getTime() - schedule.lastUpdate.getTime() < 5*60*1000) {  // If last update is older than 5min
+  //       console.log("last update of %s was at %s. Updating...", scheduleID, schedule.lastUpdate)
+  //       schedules = UpdateClassSchedule(calendar, schedules, schedule, scheduleID)
+  //     }      
+  //     progressBar.tick(1, {
+  //       schedule: scheduleID
+  //     })
+  //   }
+  //   fs.writeFileSync(scheduleJSONpath, JSON.stringify(schedules, replacer))  // Saved in 33ms 
+  //   console.log('Schedules were succesfully updated in %d ms', (new Date().getTime() - beginTime.getTime()));
+  //   resolve('done')
+  // })
+}
+
+function UpdateClassSchedule(calendar, schedules, schedule, scheduleID, progressBar) {
+  for (const[key, value] of Object.entries(calendar)) {  // Iterate through every courses of the year
+    const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value))  // lol
+    schedule.lastUpdate = new Date()
+    const week = schedule.weeks.get(course.courseData.week) ? schedule.weeks.get(course.courseData.week) : new Map<String, Course[]>()
+    const day = week.get(course.courseData.dayOfWeek) ? week.get(course.courseData.dayOfWeek) : []
+    let includes = false
+    for (const otherCourse of day) {  // Check if this course already exists in this schedule (happens with multiclasses courses)
+      if (otherCourse.id == course.id) {
+        includes = true
+        break;
+      }
+    }
+    if (!includes)
+      day.push(course)
+    week.set(course.courseData.dayOfWeek, day)
+    schedule.weeks.set(course.courseData.week, week)
+    schedules.set(scheduleID, schedule)
+    progressBar.tick(1, {
+      week: course.courseData.week,
+    })
+  }
+  return schedules
 }
 
 function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {

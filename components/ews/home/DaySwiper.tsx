@@ -14,6 +14,7 @@ import DaySlide from './DaySlide'
 import { getWeekDatesByID } from "../lib/schoolYear";
 import useSWR from "swr";
 
+import type { ClassSchedule } from "../../../pages/api/schedules";
 import type { Course } from "../../../pages/api/schedules";
 
 function reviver(key, value) {
@@ -29,10 +30,9 @@ export async function getServerSideProps() {
   console.log('salut')
 }
 
-
 export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: currentWeekID }) {
   const [isMounted, setIsMounted] = useState(false);  // Server side rendering and traditional rendering
-  const [everyWeekSchedule, setEveryWeekSchedule] = useState(new Map())
+  const [everyWeekSchedule, setEveryWeekSchedule] = useState({lastUpdate: new Date(), weeks: new Map()});
   const [initialSlide, setInitialSlide] = useState(0)
   useEffect(() => {
     setIsMounted(true);
@@ -51,7 +51,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   const { data: yearSchedule, error } = useSWR(['/api/schedules', config], fetchWithUser)
   const loading = !yearSchedule  // useSWR hook returns undefined and will automatically reload once the data is fetched
   // It also automaticaly reload component if data is change SERVER SIDE THIS IS INSANE!!
-  if (yearSchedule && yearSchedule.size != 0 && everyWeekSchedule.size == 0) {  // If the data was fetched but the state wasnt initialised -> initialisation;
+  if (yearSchedule && yearSchedule.size != 0 && everyWeekSchedule.weeks.size == 0) {  // If the data was fetched but the state wasnt initialised -> initialisation;
     // This if is in order to prevent the inifinite state rendering :)
     setEveryWeekSchedule(yearSchedule) // Map containing schedules of weeks
   }
@@ -86,7 +86,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
       </svg>
     </div>
   )
-  const dayList = generateDayDataList(currentWeekID, everyWeekSchedule)
+  const dayList = generateDayDataList(currentWeekID, (everyWeekSchedule as ClassSchedule))
   return (<Swiper key={1} id='daySwiper'
     modules={ [ Pagination, Navigation ]  }
     className="WeekSchedule w-full h-full"
@@ -115,21 +115,24 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   </Swiper>)
 }
 
-function generateDayDataList(currentWeekID: number, everyWeekSchedule: Map<number, Map<String, Course[]>>) {
+function generateDayDataList(currentWeekID: number, schedule: ClassSchedule) {
   const weekDates = getWeekDatesByID(currentWeekID) 
   const dayList = []
   const WEEK = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
   for (let i = 0; i < 7; i++) {
     const name = WEEK[i]
-    if (everyWeekSchedule.get(currentWeekID)) {  // Not holidays or data still loading
-      const data = everyWeekSchedule.get(currentWeekID).get(name)
-      if ((name === "Samedi" || name === "Dimanche") && data == undefined) {
-  
-      } else {
-        dayList.push({ name: name, date: weekDates[i], data: data })
+    if (schedule.weeks) {
+      const everyWeekSchedule = schedule.weeks
+      if (everyWeekSchedule.get(currentWeekID)) {  // Not holidays or data still loading
+        const data = everyWeekSchedule.get(currentWeekID).get(name)
+        if ((name === "Samedi" || name === "Dimanche") && data == undefined) {
+    
+        } else {
+          dayList.push({ name: name, date: weekDates[i], data: data })
+        }
+      } else {  // Holidays !!!
+        dayList.push({ name: name, date: weekDates[i], data: null})
       }
-    } else {  // Holidays !!!
-      dayList.push({ name: name, date: weekDates[i], data: null})
     }
   }
   return dayList
