@@ -3,8 +3,8 @@ import React from 'react';
 import WeekDaySwiper from '../components/ews/home/DaySwiper';
 import Head from 'next/head'
 import { firebase, database, auth } from '../components/ews/lib/firebaseClientConfig';
-import background from '../../public/background2k.png'
-import logo from '../../public/logo.png'
+import background from '../public/background2k.png'
+import logo from '../public/logo.png'
 import WeekSelectionSwiper from '../components/ews/home/WeekSelectionSlider'
 
 import { getWeekID } from '../components/ews/lib/schoolYear'
