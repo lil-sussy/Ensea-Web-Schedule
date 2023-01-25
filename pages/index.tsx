@@ -19,7 +19,7 @@ import type { CasResponse } from './api/cas'
 export async function getServerSideProps(req: any, res: any) {
   //Check if user exists (jwt on client)
   const ticket = req.query.ticket
-  const host = req.req.headers.host + '/ews'
+  const host = req.req.headers.host + ''
   if (ticket)
   return { props: { ticket: ticket, host: host } }
   else
