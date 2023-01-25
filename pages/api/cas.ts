@@ -36,7 +36,7 @@ export default async function Handler(
   res: NextApiResponse
 ) {
   const cas_host = "https://identites.ensea.fr/cas";
-  const service = req.headers.host + "/ews";
+  const service = req.headers.host + "";
   const ticket = req.headers.ticket;
   if (ticket) {
     const data = await fetch(
