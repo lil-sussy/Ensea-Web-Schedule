@@ -321,6 +321,11 @@ scheduleIDs.set('IAR TP2', 603)
 scheduleIDs.set('IAR TP3', 602)
 scheduleIDs.set('IS TP1', 575)
 scheduleIDs.set('IS TP2', 582)
+
+scheduleTree.set('FAME Gr 1', ["FAME"])
+scheduleTree.set('FAME Gr 2', ["FAME"])
+scheduleIDs.set('FAME Gr 1', 516)
+scheduleIDs.set('FAME Gr 2', 592)
 /*
 649 "Chinois"
 601 "IAR"
