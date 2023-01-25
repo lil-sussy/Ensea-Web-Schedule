@@ -1,20 +1,20 @@
 import { useState, useEffect, useMemo } from 'react';
 import React from 'react';
-import WeekDaySwiper from '../../components/ews/home/DaySwiper';
+import WeekDaySwiper from '../components/ews/home/DaySwiper';
 import Head from 'next/head'
-import { firebase, database, auth } from '../../components/ews/lib/firebaseClientConfig';
+import { firebase, database, auth } from '../components/ews/lib/firebaseClientConfig';
 import background from '../../public/background2k.png'
 import logo from '../../public/logo.png'
-import WeekSelectionSwiper from '../../components/ews/home/WeekSelectionSlider'
+import WeekSelectionSwiper from '../components/ews/home/WeekSelectionSlider'
 
-import { getWeekID } from '../../components/ews/lib/schoolYear'
-import SearchBar from '../../components/ews/home/SearchEngine';
+import { getWeekID } from '../components/ews/lib/schoolYear'
+import SearchBar from '../components/ews/home/SearchEngine';
 // import CAS from '../../lib/node-cas/lib/cas';
 import { hasCookie, setCookie, getCookie } from 'cookies-next';
 import Image from 'next/image';
 import { NextRouter, Router, useRouter } from 'next/router';
 import { signInWithCustomToken } from 'firebase/auth';
-import type { CasResponse } from '../api/cas'
+import type { CasResponse } from './api/cas'
 
 export async function getServerSideProps(req: any, res: any) {
   //Check if user exists (jwt on client)
