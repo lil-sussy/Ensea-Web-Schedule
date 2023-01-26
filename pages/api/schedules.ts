@@ -89,25 +89,6 @@ const updateAndSaveSchedule = async (scheduleID: string) => {
     }   
     resolve('done')
   })
-  //   for (const scheduleID of Array.from(scheduleIDs.keys())) {  // Iterate trough every known classes of ADE and save their schedules
-  //     const scheduleADEID = scheduleIDs.get(scheduleID)
-  //     const res = await axios.get(generateADEurl(scheduleADEID, '2022-09-01', '2023-08-09'))  // Get request of the entire shcedule of 1 year for every classe
-  //     const data = ADEisCringe(res.data)  // lol
-  //     const calendar = ical.parseICS(data)  // Calendar is not iterable :)
-  //     // Getting or Creating a class schedule to add it and save
-  //     const schedule = schedules.get(scheduleID) ? schedules.get(scheduleID) : {lastUpdate: null, weeks: new Map<number, Map<string, Course[]>>()}
-  //     if (!schedule.lastUpdate || new Date().getTime() - schedule.lastUpdate.getTime() < 5*60*1000) {  // If last update is older than 5min
-  //       console.log("last update of %s was at %s. Updating...", scheduleID, schedule.lastUpdate)
-  //       schedules = UpdateClassSchedule(calendar, schedules, schedule, scheduleID)
-  //     }      
-  //     progressBar.tick(1, {
-  //       schedule: scheduleID
-  //     })
-  //   }
-  //   fs.writeFileSync(scheduleJSONpath, JSON.stringify(schedules, replacer))  // Saved in 33ms 
-  //   console.log('Schedules were succesfully updated in %d ms', (new Date().getTime() - beginTime.getTime()));
-  //   resolve('done')
-  // })
 }
 
 function UpdateClassSchedule(calendar, schedules, schedule, scheduleID, progressBar) {
@@ -176,7 +157,7 @@ function ADEisCringe(ADEdata: string) {
       data += line + '\n'
     }
   }
-  return data
+  return ADEdata
 }
 
 function removeSpaces(str: String) {
@@ -215,7 +196,9 @@ function parseCourseFromCalEvent(event: any): Course {
   }
   const week = ['Lundi', 'Mardi', 'Mercredi', 'Jeudi', 'Vendredi', 'Samedi', 'Dimanche']
   const beginDate = (event.start as Date)
+  beginDate.setHours(beginDate.getHours() == 23 ? 0 : beginDate.getHours() + 1)
   const endDate = event.end as Date
+  endDate.setHours(endDate.getHours() == 23 ? 0 : endDate.getHours() + 1)
   const creationDate = event.created as Date
   const modifiedDate = event.lastmodified as Date
   const weekID = getWeekID(beginDate)
@@ -236,8 +219,10 @@ function parseCourseFromCalEvent(event: any): Course {
       modificationDate: modifiedDate as Date,
       exported: exportDate as string,
     }
-    // console.log('event', event)
-    // console.log('course', course)
+    if (courseData.week == 22 && courseData.dayOfWeek == "Vendredi") {
+      console.log(event)
+      console.log(courseData)
+    }
     for (let i = 0; i < classes.length; i++) {
       const classe = classes[i]
     }
