@@ -67,7 +67,7 @@ export default async function Handler(
         displayName: email.split("@")[0].replace(".", " "), // Yeah this is cringe, use : regex
         password: uname, // The password field is used to save the auth cas name of the user
       };
-      const userId = ticket + ""; // Custom userID
+      const userId = email + ""; // Custom userID
       const customToken = await getAuth().createCustomToken(userId);
       res
         .status(200)

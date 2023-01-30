@@ -38,9 +38,11 @@ function EWSIndex({ ticket, host }) {
   let userToken: string
   if (auth.currentUser) {// If the user is already signed in with an existing account
     auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
-      console.log("LOGGED IN user")
       const user = signInWithCustomToken(auth, userToken)
         .then(user => console.log('logged in user', user))  // user should always exist at this point
+        .catch((error) => {
+          console.log('error', error)
+        })
     })
   } else {
     if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
@@ -56,7 +58,8 @@ function EWSIndex({ ticket, host }) {
           signInWithCustomToken(auth, userToken).then((operation) => {
             const user = operation.user
             console.log('then user', user)  // user should always exist at this point
-          })
+          }).catch((error) => {
+            console.log('error', error)})
         }
       })
     } else {
