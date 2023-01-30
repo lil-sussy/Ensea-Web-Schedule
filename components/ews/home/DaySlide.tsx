@@ -7,6 +7,8 @@ import type { Course } from '../../../pages/api/schedules';
 
 export default function DaySlide({ actualDay, date, dayData, loading }) {
   const courses = dayData as Course[];
+  if (actualDay == 'Mardi')
+    console.log(dayData[0].courseData.name)
   const courseHourWrappers = emptyDayHourGrid()
   const divCourses = [];
   const courseHourWrapperList = []
@@ -24,7 +26,7 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
   } else if (courses != undefined) {  // It may be possible if a day is empty
     for (let i = 0; i < courses.length; i++) {
       const courseData = courses[i].courseData
-      divCourses.push(<Course courseData={courseData} />);
+      divCourses.push(<Course key={courseData.begin} courseData={courseData} />);
       courseHourWrappers.set(courseData.begin, CourseHours({ courseData: courseData, ending:false }));
       if (!courseHourWrappers.get(courseData.end))  // We only display the end hour of the course if there is another course that starts after
         courseHourWrappers.set(courseData.end, CourseHours({ courseData: courseData, ending:true }));

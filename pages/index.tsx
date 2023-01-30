@@ -38,6 +38,7 @@ function EWSIndex({ ticket, host }) {
   let userToken: string
   if (auth.currentUser) {// If the user is already signed in with an existing account
     auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
+      console.log("LOGGED IN user")
       const user = signInWithCustomToken(auth, userToken)
         .then(user => console.log('logged in user', user))  // user should always exist at this point
     })
@@ -64,7 +65,7 @@ function EWSIndex({ ticket, host }) {
   }
   
   return (
-    <React.StrictMode>
+    <>
       <Head>
         <title>Ensea Web Schedule</title>
         <meta name="description" content="Ensea Web Schedule" />
@@ -89,7 +90,7 @@ function EWSIndex({ ticket, host }) {
           <App/>
         </AppContainer>
       </>
-    </React.StrictMode>
+    </>
   );
 }
 

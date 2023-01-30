@@ -18,7 +18,7 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
     const classe = req.headers['classe'] as string
     if (classe) {
       updateAndSaveSchedule(classe) // Process takes 30s on average
-      const schedules = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver)
+      const schedules:SchoolSchedule = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver)
       res.status(200).json({totalSchedule: JSON.stringify(schedules.get(classe), replacer)})
     } else {
       res.status(404).json({ status: 404, message:'No classe schedule found for this classe '+classe })
@@ -34,30 +34,10 @@ function generateADEurl(schedule: number, begin: string, end: string) {
   return URL
 }
 
-export function replacer(key, value) {
-  if(value instanceof Map) {
-    return {
-      dataType: 'Map',
-      value: Array.from(value.entries()), // or with spread: value: [...value]
-    };
-  } else {
-    return value;
-  }
-}
-
-export function reviver(key, value) {
-  if(typeof value === 'object' && value !== null) {
-    if (value.dataType === 'Map') {
-      return new Map(value.value);
-    }
-  }
-  return value;
-}
-
 import ProgressBar from 'progress'
 
 export type ClassSchedule = {lastUpdate: Date, weeks: Map<number, Map<String, Course[]>>}
-export type SchoolSchedule = Map<String, {lastUpdate: Date, weeks: Map<number, Map<String, Course[]>>}>
+export type SchoolSchedule = Map<String, ClassSchedule>
 
 const REFRESH_TIME = 5*60*1000  // 5min
 const updateAndSaveSchedule = async (scheduleID: string) => {
@@ -105,7 +85,7 @@ function UpdateClassSchedule(calendar, schedules, schedule, scheduleID, progress
       }
     }
     if (!includes)
-      day.push(course)
+    day.push(course)
     week.set(course.courseData.dayOfWeek, day)
     schedule.weeks.set(course.courseData.week, week)
     schedules.set(scheduleID, schedule)
@@ -125,41 +105,41 @@ function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {
   
   // const currentWeekID = getWeekID(new Date())  // WeekID of this week
   // if (course.courseData.week < currentWeekID) {
-  //   const begin = course.courseData.begin
-  //   course.courseData.begin = ('0' + (Number(begin.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
-  //   course.courseData.begin += begin.slice(2, 5)
-  //   const end = course.courseData.end
-  //   course.courseData.end = ('0' + (Number(end.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
-  //   course.courseData.end += end.slice(2, 5)
-  // }
+    //   const begin = course.courseData.begin
+    //   course.courseData.begin = ('0' + (Number(begin.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
+    //   course.courseData.begin += begin.slice(2, 5)
+    //   const end = course.courseData.end
+    //   course.courseData.end = ('0' + (Number(end.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
+    //   course.courseData.end += end.slice(2, 5)
+    // }
 
-  // pls send help.
-  return course  // Apparently the problem has been handle on ADE side, I dont trust them this function stays there
-}
-
-function ADEisCringe(ADEdata: string) {
-  
-  const timezoneID = 'TZID=France/Paris'
-  let data = ""
-  const lines = ADEdata.split('\n') as string[]
-  for (let line of lines) {
-    if (line.startsWith('DTSTAMP') || line.startsWith('DTSTART') || line.startsWith('DTEND') || line.startsWith('LAST-MODIFIED')) {
-      const ICSKey = line.split(':')[0]
-      const ICSValue = line.split(':')[1]
-      const ADEHour = Number(/T+\d{2}/.exec(ICSValue)[0].slice(1))
-      const hourIndex = /T+\d{2}/.exec(ICSValue)[1]
-      let realHour = String(ADEHour + (new Date().getHours() - new Date().getUTCHours()) + 1)  // Ade is substracting 1 hour to every damn courses
-      realHour = Number(realHour) < 10 ? '0' + realHour : ''+realHour
-      // line = ICSKey + ';' + timezoneID + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
-      line = ICSKey + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
-      data += line
-    } else {
-      data += line + '\n'
-    }
+    // pls send help.
+    return course  // Apparently the problem has been handle on ADE side, I dont trust them this function stays there
   }
-  return ADEdata
-}
-
+  
+  function ADEisCringe(ADEdata: string) {
+  
+    const timezoneID = 'TZID=France/Paris'
+    let data = ""
+    const lines = ADEdata.split('\n') as string[]
+    for (let line of lines) {
+      if (line.startsWith('DTSTAMP') || line.startsWith('DTSTART') || line.startsWith('DTEND') || line.startsWith('LAST-MODIFIED')) {
+        const ICSKey = line.split(':')[0]
+        const ICSValue = line.split(':')[1]
+        const ADEHour = Number(/T+\d{2}/.exec(ICSValue)[0].slice(1))
+        const hourIndex = /T+\d{2}/.exec(ICSValue)[1]
+        let realHour = String(ADEHour + (new Date().getHours() - new Date().getUTCHours()) + 1)  // Ade is substracting 1 hour to every damn courses
+        realHour = Number(realHour) < 10 ? '0' + realHour : ''+realHour
+        // line = ICSKey + ';' + timezoneID + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
+        line = ICSKey + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
+        data += line
+      } else {
+        data += line + '\n'
+      }
+    }
+    return ADEdata
+  }
+  
 function removeSpaces(str: String) {
   let begin = 0
   let end = 0
@@ -179,7 +159,7 @@ function isClasseName(information: any) {
 function parseCourseFromCalEvent(event: any): Course {
   const SCHOOL_YEAR = 2022
   const name = event.summary
-
+  
   const teachers = [], classes = []
   const places = event.location.split(',')
   const informations = event.description.split('\n')
@@ -219,15 +199,35 @@ function parseCourseFromCalEvent(event: any): Course {
       modificationDate: modifiedDate as Date,
       exported: exportDate as string,
     }
-    if (courseData.week == 22 && courseData.dayOfWeek == "Vendredi") {
-      console.log(event)
-      console.log(courseData)
-    }
-    for (let i = 0; i < classes.length; i++) {
+    // if (courseData.week == 22 && courseData.dayOfWeek == "Vendredi") {
+      //   console.log(event)
+      //   console.log(courseData)
+      // }
+      for (let i = 0; i < classes.length; i++) {
       const classe = classes[i]
     }
     return { id: ID, courseData: courseData }
   }
+}
+
+export function replacer(key, value) {
+  if(value instanceof Map) {
+    return {
+      dataType: 'Map',
+      value: Array.from(value.entries()), // or with spread: value: [...value]
+    };
+  } else {
+    return value;
+  }
+}
+
+export function reviver(key, value) {
+  if(typeof value === 'object' && value !== null) {
+    if (value.dataType === 'Map') {
+      return new Map(value.value);
+    }
+  }
+  return value;
 }
 
 export type Course = {
