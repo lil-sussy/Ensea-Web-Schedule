@@ -7,7 +7,7 @@ import type { ServiceAccount } from "firebase-admin"
 
 type User = {
   email: string;
-  displayName: string;
+  fullName: string;
   password: string;
 };
 
@@ -54,20 +54,16 @@ export default async function Handler(
         .status(400)
         .json({ status: 400, message: "Cas auhtentification failed" });
     } else {
-      let list_user = textData.match(/(<cas:user>)(.+?)(<\/cas:user>)/i);
-      let uname = list_user[0];
-      uname = uname.replace("<cas:user>", "");
-      uname = uname.replace("</cas:user>", "");
-      let listEmail = textData.match(/(<cas:mail>)(.+?)(<\/cas:mail>)/i);
-      let email = listEmail[0];
-      email = email.replace("<cas:mail>", "");
-      email = email.replace("</cas:mail>", "");
-      const user: User = {
-        email: email,
-        displayName: email.split("@")[0].replace(".", " "), // Yeah this is cringe, use : regex
-        password: uname, // The password field is used to save the auth cas name of the user
-      };
-      const userId = email + ""; // Custom userID
+      const user = parseUserFromData(textData);
+      const userId = user.email + ""; // Custom userID
+      // if (getAuth().getUser(userId).then((user) => {
+      //   if (user) {
+      //     const customToken = await getAuth().createCustomToken(userId);
+      //     res
+      //       .status(200)
+      //       .json({ userToken: customToken, user: user } as CasResponse);
+      //   }
+      // })) {
       const customToken = await getAuth().createCustomToken(userId);
       res
         .status(200)
@@ -82,4 +78,20 @@ export default async function Handler(
           "This api is used to validate cas ticket, please provide a ticket",
       });
   }
+}
+
+function parseUserFromData(textData: string): User {
+  let list_user = textData.match(/(<cas:user>)(.+?)(<\/cas:user>)/i);
+  let uname = list_user[0];
+  uname = uname.replace("<cas:user>", "");
+  uname = uname.replace("</cas:user>", "");
+  let listEmail = textData.match(/(<cas:mail>)(.+?)(<\/cas:mail>)/i);
+  let email = listEmail[0];
+  email = email.replace("<cas:mail>", "");
+  email = email.replace("</cas:mail>", "");
+  return {
+    email: email,
+    fullName: email.split("@")[0].replace(".", " "), // Yeah this is cringe, use : regex
+    password: uname, // The password field is used to save the auth cas name of the user
+  };
 }

@@ -53,7 +53,6 @@ function EWSIndex({ ticket, host }) {
       }).then(res => res.json()).then(apiRes => {
         const res = apiRes as CasResponse
         userToken = res.userToken
-        console.log('token', userToken);
         if (userToken) {
           signInWithCustomToken(auth, userToken).then((operation) => {
             const user = operation.user
