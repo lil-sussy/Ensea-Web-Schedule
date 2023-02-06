@@ -7,8 +7,6 @@ import type { Course } from '../../../pages/api/schedules';
 
 export default function DaySlide({ actualDay, date, dayData, loading }) {
   const courses = dayData as Course[];
-  if (actualDay == 'Mardi')
-    console.log(dayData[0].courseData.name)
   const courseHourWrappers = emptyDayHourGrid()
   const divCourses = [];
   const courseHourWrapperList = []

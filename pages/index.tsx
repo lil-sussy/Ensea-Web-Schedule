@@ -55,7 +55,7 @@ function EWSIndex({ ticket, host }) {
         userToken = res.userToken
         if (userToken) {
           signInWithCustomToken(auth, userToken).then((operation) => {
-            const user = operation.user
+            const user = operation.user 
             console.log('then user', user)  // user should always exist at this point
           }).catch((error) => {
             console.log('error', error)})
