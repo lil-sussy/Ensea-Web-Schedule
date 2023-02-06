@@ -7,18 +7,13 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        'main-orange': '#ff8f00',
-        'main-orange-light': '#ffc046',
-        'main-orange-dark': '#c56000',
-        'main-purple': '#d500f9',
-        'main-purple-light': '#ff5bff',
-        'main-purple-dark': '#9e00c5',
-        'second-purple': '#7c1ea3',
-        'second-purple-light': '#af52d5',
-        'second-purple-dark': '#4a0073',
-        'third-purple': '#ffeeff',
-        'fourth-purple': 'ffebee',
-        'third-purple-light': '#ede7f6',
+        'bggray': '#F0F0F0',
+        'main-red': '#9D1C1F',
+        'main-red-dark': '#731522',
+        'main-red-light': '#C72A2D',
+        'gray-red': '#F1E8E9',
+        'black-red': '#423B3B',
+        'white': '#FFFFFF',
       },
       gridTemplateRows: {
         '25': 'repeat(25, 4%)',

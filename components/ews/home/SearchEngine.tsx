@@ -1,5 +1,5 @@
 import elasticlunr from 'elasticlunr'
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Children } from 'react';
 import { Scrollbar, EffectFade } from 'swiper';
 import { Swiper, SwiperSlide } from 'swiper/react';
 import { scheduleTree, scheduleIDs } from '../../../private/classesTree';
@@ -17,7 +17,7 @@ const index = elasticlunr(function () {
   })
 });
 
-export default function SearchBar({ scheduleID, setSchedule, className }) {
+export default function SearchBar({ scheduleID, setSchedule }) {
   const [displayedAnswers, setDisplayedAnswers] = useState([])
   const [textFieldValue, setTextFieldValue] = useState('')
   const focused = displayedAnswers.length != 0
@@ -33,21 +33,27 @@ export default function SearchBar({ scheduleID, setSchedule, className }) {
     setSchedule(scheduleID)
   }
   return (
-    <div className={" " + className}>
-      <div className="WhiteBorder bg-white w-full h-1"></div>
-      <div className="ClassSelection w-full h-full ">
-        <div className="SearchBarContainer h-full w-full flex justify-center 
-        items-center">
-          <TextInput focused={focused} setDisplayedAnswers={setDisplayedAnswers}
-            setSchedule={setScheduleAndValue} scheduleID={textFieldValue} />
+    <AthenaRedBar focused={focused} displayedAnswers={displayedAnswers} setScheduleAndValue={setScheduleAndValue} setDisplayedAnswers={setDisplayedAnswers}>
+      <TextInput focused={focused} setDisplayedAnswers={setDisplayedAnswers}
+        setSchedule={setScheduleAndValue} scheduleID={textFieldValue} />
+    </AthenaRedBar>
+  );
+}
+
+function AthenaRedBar({ focused, displayedAnswers, setScheduleAndValue, setDisplayedAnswers, children }) {
+  return (
+    <div className='SelectionsContainer relative from-main-red-dark to-main-red bg-gradient-to-l h-28 w-full flex-col align-center justify-center'>
+      <div className="bg-white w-full h-3"></div>
+      <div className="w-full h-full ">
+        <div className="h-full w-full flex justify-center items-center">
+        {children}
         </div>
       </div>
-      <div className="WhiteBorder h-1 absolute bottom-0 left-0 bg-white 
-      w-full"></div>
       <AnswerList focused={focused} fields={displayedAnswers} setSchedule={setScheduleAndValue} setDisplayedAnswers={setDisplayedAnswers} />
       <BlurMask focused={focused}/>
+      <div className="WhiteBorder h-3 absolute bottom-0 left-0 bg-white w-full"></div>
     </div>
-  );
+  )
 }
 
 function AnswerList({ fields, setSchedule, focused, setDisplayedAnswers }) {
@@ -78,6 +84,7 @@ function AnswerList({ fields, setSchedule, focused, setDisplayedAnswers }) {
       <Swiper className="h-full mt-24"
         modules={ [ Scrollbar, EffectFade ] }
         enabled={true}
+        mousewheel={true}
         direction="vertical"
         scrollbar={{ draggable: true }}
         spaceBetween={5}
@@ -129,13 +136,13 @@ function TextInput(props: TextFieldProps) {
       setValue(scheduleID)
   }, [focused, scheduleID])
   return (
-    <div className={'SearchBar flex flex-col justify-center items-center bg-gradient-to-r from-main-orange to-main-orange-light'
-    + (focused ? ' font-semibold -translate-y-[250%] border-[3px] shadow-lg z-40 duration-400 transition-all w-2/3'
+    <div className={'SearchBar h-7 bg-bggray bg-opacity-30 rounded-md text-white text-lg font-LexendDeca '
+    + (focused ? ' font-semibold -translate-y-[250%] border-[3px] shadow-lg z-40 duration-400 transition-all w-52'
     :
-    'from-transparent to-transparent translate-y-0 transition-all border-[1.5px] shadow-none duration-[200ms] w-2/3')}>
+    'from-transparent to-transparent translate-y-0 transition-all border-[1.5px] shadow-none duration-[200ms] w-52')}>
+      
       <input type="text" className={focused ?
-        " w-full translate-y-1/10 rounded-lg text-center   \
-        placeholder-white placeholder-opacity-60 transition-all bg-transparent duration-400"
+        " w-full translate-y-1/10 rounded-lg text-center placeholder-white placeholder-opacity-60 transition-all bg-transparent duration-400"
         :
         "placeholder-white w-full translate-y-1/10 rounded-lg bg-transparent text-center \
           duration-[600ms] " }

@@ -86,7 +86,7 @@ function EWSIndex({ ticket, host }) {
         <link rel="icon" href="/favicon.ico" />
       </Head>
       <>
-        <BackgroundENSEA />
+        <Bakckground />
         <AppContainer>
           <AthenaHeader />
           <App/>
@@ -118,10 +118,9 @@ function App() {
   }
   return (
     <>
-      <SearchBar scheduleID={scheduleID} setSchedule={setScheduleAndSave} className='SelectionsContainer relative from-main-orange 
-      to-main-orange-light bg-gradient-to-r h-20 w-full flex-col align-center justify-center'/>
-      <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek} />
+      <SearchBar scheduleID={scheduleID} setSchedule={setScheduleAndSave}/>
       <div className="WeekScheduleContainer w-full h-[69%]">
+        <WeekSelectionSwiper setWeek={setCurrentWeek} weekID={currentWeek} />
         {
           scheduleID ?
           <WeekDaySwiper schedule={scheduleID} currentWeek={currentWeek} />
@@ -140,19 +139,16 @@ function GetStarted() {
   )
 }
 
-function BackgroundENSEA() {
+function Bakckground() {
   return (
-    <div className="BackgroundENSEA bg-cover h-screen w-screen transition
-    blur-[2px] "
-    style={{ backgroundImage: ('url(' + background.src + ')') }}>
-      <div className="w-full h-full bg-opacity-30 bg-white"></div>
+    <div className='bg-bggray'>
     </div>
   )
 }
 
 function AppContainer(props) {
   return (
-    <div className="AppContainer text-zinc-800 w-full h-full
+    <div className="AppContainer text-black-red w-full h-full
     -translate-x-1/2 absolute left-1/2 top-0">
       {props.children}
     </div>
@@ -163,20 +159,10 @@ function AthenaHeader() {
   return (
     <div className="Header relative w-full top-0 left-0 backdrop-blur-sm">
       <div className="z-20 w-full mx-auto bg-white bg-opacity-[70%]">
-        <div className="BurgerMenuContainer absolute top-0 left:0 mx-2 
-      h-full w-10 flex-row flex justify-center items-center">
-          <div className="BurgerMenu w-6 h-8 flex justify-evenly 
-        items-center flex-col">
-            <div className="w-6 h-0.5 rounded-full bg-main-orange"></div>
-            <div className="w-6 h-0.5 rounded-full bg-main-orange"></div>
-            <div className="w-6 h-0.5 rounded-full bg-main-orange"></div>
-            <div className="w-6 h-0.5 rounded-full bg-main-orange"></div>
-          </div>
-        </div>
         <div className="h-full w-full py-1 pb-1">
-          <img src={logo.src}
-            alt="Logo of projet Athena"
-            className="Logo bg-local bg-cover shadow-0 my-auto w-60 mx-auto"></img>
+          <div className='font-blanka text-2xl text-center h-11'>
+            EWS
+          </div>
         </div>
       </div>
     </div>
