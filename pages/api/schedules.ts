@@ -8,7 +8,7 @@ import { getWeekID } from '../../components/ews/lib/schoolYear';
 import axios from 'axios'
 
 export default async function Handler(req: NextApiRequest, res: NextApiResponse) {
-  if (req.method == 'POST') {
+  if (req.method == 'POST') {  // No posts
     res.status(200).json({status: 401, data: "Data not succesfully loaded cuz it's automatique now mf :3"})
   } else if (req.method == 'GET') {
     if (req.headers['classe'] == undefined) {
