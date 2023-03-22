@@ -38,11 +38,16 @@ function EWSIndex({ ticket, host }) {
   let userToken: string  // Wtf
   if (auth.currentUser) {// If the user is already signed in with an existing account
     auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
-      const user = signInWithCustomToken(auth, userToken)
-        .then(user => console.log('logged in user', user))  // user should always exist at this point
-        .catch((error) => {
-          console.log('error', error)
-        })
+        // Custom token was converted into ID Token and needs to be passed to the backend
+      fetch('/api/cas', {
+        headers: {
+          tokenID: userToken
+        }
+      }).then(res => res.json()).then(apiRes => {
+        const user = apiRes.user  // The backend returned information about the signed in user
+      }).catch((error) => {
+        console.log('error', error)
+      })
     })
   } else {
     if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
@@ -55,8 +60,7 @@ function EWSIndex({ ticket, host }) {
         userToken = res.userToken
         if (userToken) {
           signInWithCustomToken(auth, userToken).then((operation) => {
-            const user = operation.user 
-            console.log('then user', user)  // user should always exist at this point
+            const user = operation.user   // Browser is now signed in with custom token creating an ID Token instead
           }).catch((error) => {
             console.log('error', error)})
         }

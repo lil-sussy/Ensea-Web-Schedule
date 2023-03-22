@@ -1,6 +1,6 @@
 import { NextApiRequest, NextApiResponse } from "next"
 import firebaseAdmin from "firebase-admin"
-import { getAuth, UserRecord } from "firebase-admin/auth"
+import { DecodedIdToken, getAuth, UserRecord } from "firebase-admin/auth"
 import { initializeApp, App, applicationDefault } from "firebase-admin/app"
 
 import type { ServiceAccount } from "firebase-admin"
@@ -11,10 +11,15 @@ type User = {
 	password: string
 }
 
-export type CasResponse = {
-	userToken: string
-	user: User
-}
+export type CasResponse =
+	| {
+			userToken: string
+			user: User
+	  }
+	| {
+      userToken: string
+			user: DecodedIdToken
+	  }
 
 //Firebase admin
 export const GOOGLE_APPLICATION_CREDENTIALS = process.cwd() + "/private/firebaseAdminPrivateKey.json"
@@ -35,6 +40,17 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
 	const cas_host = "https://identites.ensea.fr/cas"
 	const service = req.headers.host + ""
 	const ticket = req.headers.ticket
+	const tokenID = req.headers.tokenID
+	if (tokenID) {
+		getAuth()
+			.verifyIdToken(tokenID as string)
+			.then((userRecord) => {
+				res.status(200).json({ user: userRecord } as CasResponse)
+			})
+			.catch((error) => {
+				res.status(400).json({ status: 400, message: "TokenID is not valid" })
+			})
+	}
 	if (ticket) {
 		const data = await fetch(cas_host + "/serviceValidate?service=http://" + service + "&ticket=" + ticket)
 		let textData = await data.text()
@@ -43,14 +59,6 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
 		} else {
 			const user = parseUserFromData(textData)
 			const userId = user.email + "" // Custom userID
-			// if (getAuth().getUser(userId).then((user) => {
-			//   if (user) {
-			//     const customToken = await getAuth().createCustomToken(userId);
-			//     res
-			//       .status(200)
-			//       .json({ userToken: customToken, user: user } as CasResponse);
-			//   }
-			// })) {
 			const customToken = await getAuth().createCustomToken(userId)
 			res.status(200).json({ userToken: customToken, user: user } as CasResponse)
 		}
