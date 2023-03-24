@@ -14,7 +14,7 @@ import { hasCookie, setCookie, getCookie } from 'cookies-next';
 import Image from 'next/image';
 import { NextRouter, Router, useRouter } from 'next/router';
 import { signInWithCustomToken } from 'firebase/auth';
-import type { CasResponse } from './api/cas'
+import type { CasResponse } from './api/authentification'
 
 export async function getServerSideProps(req: any, res: any) {
   //Check if user exists (jwt on client)
@@ -39,7 +39,7 @@ function EWSIndex({ ticket, host }) {
   if (auth.currentUser) {// If the user is already signed in with an existing account
     auth.currentUser.getIdToken(/* forceRefresh */ true).then((userToken) => {
         // Custom token was converted into ID Token and needs to be passed to the backend
-      fetch('/api/cas', {
+      fetch('/api/authentification', {
         headers: {
           tokenID: userToken
         }
@@ -51,7 +51,7 @@ function EWSIndex({ ticket, host }) {
     })
   } else {
     if (ticket) {  // If there is a ticket (the user has been succesfully authed on cas server)
-      fetch('/api/cas', {
+      fetch('/api/authentification', {
         headers: {
           ticket: ticket
         }

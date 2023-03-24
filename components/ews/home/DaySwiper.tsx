@@ -16,7 +16,7 @@ import useSWR from "swr";
 
 import type { ClassSchedule } from "../../../pages/api/schedules";
 import type { Course } from "../../../pages/api/schedules";
-import { SchoolSchedule } from '../../../pages/api/schedules';
+import { ScheduleSet } from '../../../pages/api/schedules';
 
 function reviver(key, value) {  // Used to parse map from json stringified
   if(typeof value === 'object' && value !== null) {
