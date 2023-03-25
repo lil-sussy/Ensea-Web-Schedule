@@ -2,37 +2,36 @@ import ical from "ical"
 import { scheduleIDs, scheduleList } from "../../../private/classesTree"
 import axios from "axios"
 import type { ScheduleFetcher, Course, ClassSchedule, ScheduleSet } from "../../../pages/api/schedules"
-import { loadOrCreateScheduleSet, saveScheduleSet } from "../../../pages/api/schedules"
 import ProgressBar from "progress"
 import parseCourseFromCalEvent from './courseical'
 
 const ScheduleFetcher: ScheduleFetcher = {
-  fetchClassSchedule: async (classeID: string, refreshDuration: number) => {
-    const progressBar = new ProgressBar("Updating from ADE - :percent (:bar) :schedule.", {
-      total: Array.from(scheduleIDs.keys()).length,
-      complete: "#",
-      incomplete: " ",
-      width: 30,
-      clear: true,
-    })
-    return new Promise(async (resolve) => {
-      const beginTime = new Date() // Begining time of process
-      let scheduleSet: ScheduleSet = loadOrCreateScheduleSet()
-      const calendar = await fetchADE(classeID)
-      // Getting or Creating a class schedule to add it and save
-      const schedule = scheduleSet.get(classeID) ? scheduleSet.get(classeID) : { lastUpdate: null, weeks: new Map<number, Map<string, Course[]>>() }
-      if (!schedule.lastUpdate || new Date().getTime() - new Date(schedule.lastUpdate).getTime() > refreshDuration) {
-        // If last update is older than 5min
-				console.log("Starting new update for %s's schedule from ADE servers...", classeID)
-				console.log("last update of %s is older than 5min. Updating...", classeID, schedule.lastUpdate)
-				scheduleSet = UpdateClassSchedule(calendar, scheduleSet, schedule, classeID, progressBar)
-				saveScheduleSet(scheduleSet)
-				console.log("Schedule of class %s was succesfully updated in %d ms", classeID, new Date().getTime() - beginTime.getTime())
-			} else {
-        console.log("%s's schedule is up to date (%s)", classeID, schedule.lastUpdate)
+	fetchClassSchedule: async (schedule: ClassSchedule, classeID: string, progressBar: ProgressBar) => {
+		const calendar = await fetchADE(classeID) // Fetching data from ADE, return ical calendar
+    //Emptying schedule
+    schedule = { lastUpdate: new Date(), weeks: new Map() }  // Emptying schedule
+		for (const [key, value] of Object.entries(calendar)) {
+			// Iterate through every courses of the year
+			const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value)) // lol
+			schedule.lastUpdate = new Date()
+			const week = schedule.weeks.get(course.courseData.week) ? schedule.weeks.get(course.courseData.week) : new Map<String, Course[]>()
+			const day = week.get(course.courseData.dayOfWeek) ? week.get(course.courseData.dayOfWeek) : []
+			let includes = false
+			for (const otherCourse of day) {
+				// Check if this course already exists in this schedule (happens with multiclasses courses)
+				if (otherCourse.id == course.id) {
+					includes = true
+					break
+				}
 			}
-      resolve(scheduleSet.get(classeID))
-    })
+			if (!includes) day.push(course)
+			week.set(course.courseData.dayOfWeek, day)
+			schedule.weeks.set(course.courseData.week, week)
+			progressBar.tick(1, {
+				week: course.courseData.week,
+			})
+		}
+		return schedule
 	},
 }
 
@@ -54,32 +53,6 @@ async function fetchADE(classeID: string) {
 	const data = ADEisCringe(res.data) // lol
 	const calendar = ical.parseICS(data) // Calendar is not iterable :)
   return calendar
-}
-
-function UpdateClassSchedule(calendar, scheduleSet, schedule, scheduleID, progressBar) {
-	for (const [key, value] of Object.entries(calendar)) {
-		// Iterate through every courses of the year
-		const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value)) // lol
-		schedule.lastUpdate = new Date()
-		const week = schedule.weeks.get(course.courseData.week) ? schedule.weeks.get(course.courseData.week) : new Map<String, Course[]>()
-		const day = week.get(course.courseData.dayOfWeek) ? week.get(course.courseData.dayOfWeek) : []
-		let includes = false
-		for (const otherCourse of day) {
-			// Check if this course already exists in this schedule (happens with multiclasses courses)
-			if (otherCourse.id == course.id) {
-				includes = true
-				break
-			}
-		}
-		if (!includes) day.push(course)
-		week.set(course.courseData.dayOfWeek, day)
-		schedule.weeks.set(course.courseData.week, week)
-		scheduleSet.set(scheduleID, schedule)
-		progressBar.tick(1, {
-			week: course.courseData.week,
-		})
-	}
-	return scheduleSet
 }
 
 function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {

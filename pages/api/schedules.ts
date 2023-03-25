@@ -1,10 +1,13 @@
 import { NextApiRequest, NextApiResponse } from 'next'
 import fs from 'fs';
 import path from 'path';
+import ProgressBar from "progress"
 import scheduleFetcher from '../../components/ews/lib/ADEFetcher'
+import { scheduleIDs, scheduleList } from "../../private/classesTree"
+
 
 export type ScheduleFetcher = {
-	fetchClassSchedule: (classeID: string, refreshDuration: number) => Promise<ClassSchedule>
+	fetchClassSchedule: (schedule: ClassSchedule, classeID: string, progressBar: ProgressBar) => Promise<ClassSchedule>
 }
 
 export type Course = {
@@ -41,7 +44,7 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
     }
     const classe = req.headers['classe'] as string
     if (classe) {
-      scheduleFetcher.fetchClassSchedule(classe, REFRESH_DURATION)
+      refreshSchedules(classe, REFRESH_DURATION)
       const schedules:ScheduleSet = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver)
       res.status(200).json({totalSchedule: JSON.stringify(schedules.get(classe), replacer)})
     } else {
@@ -54,15 +57,42 @@ export default async function Handler(req: NextApiRequest, res: NextApiResponse)
 
 const scheduleJSONpath = path.join(process.cwd() + "/private/schedules.json") // Path of the schedule json to save the all thing
 
+async function refreshSchedules(classeID: string, refreshDuration: number) {
+  const progressBar = new ProgressBar("Updating from ADE - :percent (:bar) :schedule.", {
+		total: Array.from(scheduleIDs.keys()).length,
+		complete: "#",
+		incomplete: " ",
+		width: 30,
+		clear: true,
+	})
+	return new Promise(async (resolve) => {
+		const beginTime = new Date() // Begining time of process
+		let scheduleSet: ScheduleSet = loadOrCreateScheduleSet()
+		// Getting or Creating a class schedule to add it and save
+		let schedule = scheduleSet.get(classeID) ? scheduleSet.get(classeID) : { lastUpdate: null, weeks: new Map<number, Map<string, Course[]>>() }
+		if (!schedule.lastUpdate || new Date().getTime() - new Date(schedule.lastUpdate).getTime() > refreshDuration) {
+			// If last update is older than 5min
+			console.log("Starting new update for %s's schedule from ADE servers...", classeID)
+			console.log("last update of %s is older than 5min. Updating...", classeID, schedule.lastUpdate)
+			schedule = await scheduleFetcher.fetchClassSchedule(schedule, classeID, progressBar)
+      scheduleSet.set(classeID, schedule)
+			saveScheduleSet(scheduleSet)
+			console.log("Schedule of class %s was succesfully updated in %d ms", classeID, new Date().getTime() - beginTime.getTime())
+		} else {
+			console.log("%s's schedule is up to date (%s)", classeID, schedule.lastUpdate)
+		}
+		resolve(scheduleSet.get(classeID))
+	})
+}
 
-export function loadOrCreateScheduleSet(): ScheduleSet {
+function loadOrCreateScheduleSet(): ScheduleSet {
 	let scheduleSet: ScheduleSet
 	if (fs.existsSync(scheduleJSONpath)) JSON.parse(String(fs.readFileSync(scheduleJSONpath)), reviver)
 	else scheduleSet = new Map()
 	return scheduleSet
 }
 
-export function saveScheduleSet(scheduleSet: ScheduleSet) {
+function saveScheduleSet(scheduleSet: ScheduleSet) {
 	fs.writeFileSync(scheduleJSONpath, JSON.stringify(scheduleSet, replacer)) // Saved in 33ms
 }
 
