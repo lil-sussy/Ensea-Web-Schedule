@@ -86,7 +86,7 @@ function ADEisCringe(ADEdata: string) {
 			const ICSValue = line.split(":")[1]
 			const ADEHour = Number(/T+\d{2}/.exec(ICSValue)[0].slice(1))
 			const hourIndex = /T+\d{2}/.exec(ICSValue)[1]
-			let realHour = String(ADEHour + (new Date().getHours() - new Date().getUTCHours()) + 1) // Ade is substracting 1 hour to every damn courses
+			let realHour = String(ADEHour + (new Date().getHours() - new Date().getUTCHours()) + 2) // Ade is substracting 1 hour to every damn courses
 			realHour = Number(realHour) < 10 ? "0" + realHour : "" + realHour
 			// line = ICSKey + ';' + timezoneID + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
 			line = ICSKey + ":" + ICSValue.replace("T" + ADEHour, "T" + realHour) + "\n"

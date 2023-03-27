@@ -86,9 +86,11 @@ async function refreshSchedules(classeID: string, refreshDuration: number) {
 }
 
 function loadOrCreateScheduleSet(): ScheduleSet {
-	let scheduleSet: ScheduleSet
-	if (fs.existsSync(scheduleJSONpath)) JSON.parse(String(fs.readFileSync(scheduleJSONpath)), reviver)
-	else scheduleSet = new Map()
+	let scheduleSet: ScheduleSet;
+  if (fs.existsSync(scheduleJSONpath))
+    scheduleSet = JSON.parse(String(fs.readFileSync(scheduleJSONpath)), reviver)
+	else
+    scheduleSet = new Map()
 	return scheduleSet
 }
 
