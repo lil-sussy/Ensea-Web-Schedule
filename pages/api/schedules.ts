@@ -4,7 +4,11 @@ import path from 'path';
 import ProgressBar from "progress"
 import scheduleFetcher from '../../components/ews/lib/ADEFetcher'
 import { scheduleIDs, scheduleList } from "../../private/classesTree"
+//test
+import readline from 'readline'
+import testICal from '../../tests/testICal'
 
+export const testEnvironement = false
 
 export type ScheduleFetcher = {
 	fetchClassSchedule: (schedule: ClassSchedule, classeID: string, progressBar: ProgressBar) => Promise<ClassSchedule>
@@ -31,7 +35,7 @@ export type ClassSchedule = { lastUpdate: Date; weeks: Map<number, Map<String, C
 
 export type ScheduleSet = Map<String, ClassSchedule>  // What is saved, the database structure
 
-const REFRESH_DURATION = 5 * 60 * 1000 // 5min
+const REFRESH_DURATION = testEnvironement ? 1 * 1000 : 5 * 60 * 1000 // 5min or 1s (test)
 
 //Api Handler
 export default async function Handler(req: NextApiRequest, res: NextApiResponse) {
@@ -74,7 +78,13 @@ async function refreshSchedules(classeID: string, refreshDuration: number) {
 			// If last update is older than 5min
 			console.log("Starting new update for %s's schedule from ADE servers...", classeID)
 			console.log("last update of %s is older than 5min. Updating...", classeID, schedule.lastUpdate)
-			schedule = await scheduleFetcher.fetchClassSchedule(schedule, classeID, progressBar)
+      if (testEnvironement) {
+        schedule = await testICal.fetchClassSchedule(schedule, classeID, progressBar)
+        listenToConsole()
+      }
+      else
+        schedule = await scheduleFetcher.fetchClassSchedule(schedule, classeID, progressBar)
+			// schedule = await scheduleFetcher.fetchClassSchedule(schedule, classeID, progressBar)
       scheduleSet.set(classeID, schedule)
 			saveScheduleSet(scheduleSet)
 			console.log("Schedule of class %s was succesfully updated in %d ms", classeID, new Date().getTime() - beginTime.getTime())
@@ -82,6 +92,21 @@ async function refreshSchedules(classeID: string, refreshDuration: number) {
 			console.log("%s's schedule is up to date (%s)", classeID, schedule.lastUpdate)
 		}
 		resolve(scheduleSet.get(classeID))
+	})
+}
+
+async function listenToConsole() {
+  const terminal = readline.createInterface({
+		input: process.stdin,
+		output: process.stdout,
+	})
+
+	terminal.question("", (command) => {
+    console.log('test')
+    if (command == "r") {  // refresh
+    }
+		terminal.close()
+    listenToConsole()
 	})
 }
 

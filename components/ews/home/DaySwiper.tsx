@@ -56,11 +56,6 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   if (!isMounted) {  // To use server side rendering with nextjs without anay pb
     return null;
   }
-  if (yearScheduleData)
-  if (yearScheduleData.weeks.get(23).get('Mardi'))
-    console.log('SWIPER', yearScheduleData.weeks.get(23).get('Mardi')[0].courseData.name)
-  else
-    console.log(yearScheduleData.weeks.get(23).get('Mardi'))
   if (loading||error)
     return spiningLoadingAniamtion()
     

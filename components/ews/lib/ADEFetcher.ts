@@ -2,42 +2,53 @@ import ical from "ical"
 import { scheduleIDs, scheduleList } from "../../../private/classesTree"
 import axios from "axios"
 import type { ScheduleFetcher, Course, ClassSchedule, ScheduleSet } from "../../../pages/api/schedules"
-import ProgressBar from "progress"
+import type { ProgressBar } from "progress"
 import parseCourseFromCalEvent from './courseical'
 
 const ScheduleFetcher: ScheduleFetcher = {
 	fetchClassSchedule: async (schedule: ClassSchedule, classeID: string, progressBar: ProgressBar) => {
-		const calendar = await fetchADE(classeID) // Fetching data from ADE, return ical calendar
-    //Emptying schedule
-    schedule = { lastUpdate: new Date(), weeks: new Map() }  // Emptying schedule
-		for (const [key, value] of Object.entries(calendar)) {
-			// Iterate through every courses of the year
-			const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value)) // lol
-			schedule.lastUpdate = new Date()
-			const week = schedule.weeks.get(course.courseData.week) ? schedule.weeks.get(course.courseData.week) : new Map<String, Course[]>()
-			const day = week.get(course.courseData.dayOfWeek) ? week.get(course.courseData.dayOfWeek) : []
-			let includes = false
-			for (const otherCourse of day) {
-				// Check if this course already exists in this schedule (happens with multiclasses courses)
-				if (otherCourse.id == course.id) {
-					includes = true
-					break
-				}
-			}
-			if (!includes) day.push(course)
-			week.set(course.courseData.dayOfWeek, day)
-			schedule.weeks.set(course.courseData.week, week)
-			progressBar.tick(1, {
-				week: course.courseData.week,
-			})
-		}
-		return schedule
+		const res = await fetchADE(classeID) // Fetching data from ADE, return ical calendar
+		const data = ADEisCringe(res.data) // lol
+		const calendar = ical.parseICS(data) // data is not iterable :)
+		return parseCalendar(calendar, schedule, classeID, progressBar)
 	},
+}
+
+export function  parseCalendar(calendar, schedule: ClassSchedule, classeID: string, progressBar: ProgressBar): ClassSchedule {
+	//Emptying schedule
+	schedule = { lastUpdate: new Date(), weeks: new Map() } // Emptying schedule
+	for (const [key, value] of Object.entries(calendar)) {
+		// Iterate through every courses of the year
+		const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value)) // lol
+		schedule.lastUpdate = new Date()
+		const week = schedule.weeks.get(course.courseData.week) ? schedule.weeks.get(course.courseData.week) : new Map<String, Course[]>()
+		const day = week.get(course.courseData.dayOfWeek) ? week.get(course.courseData.dayOfWeek) : []
+		let includes = false
+		for (const otherCourse of day) {
+			// Check if this course already exists in this schedule (happens with multiclasses courses)
+			if (otherCourse.id == course.id) {
+				includes = true
+				break
+			} else if (otherCourse.courseData.begin == course.courseData.begin) {
+        if (otherCourse.courseData.name == course.courseData.name) {
+          includes = true
+          break
+        }
+      }
+		}
+		if (!includes) day.push(course)
+		week.set(course.courseData.dayOfWeek, day)
+		schedule.weeks.set(course.courseData.week, week)
+		progressBar.tick(1, {
+			week: course.courseData.week,
+		})
+	}
+	return schedule
 }
 
 export default ScheduleFetcher
 
-async function fetchADE(classeID: string) {
+export async function fetchADE(classeID: string) {
 	const scheduleADEID = scheduleIDs.get(classeID)
   const begin = "2022-09-01",
 		end = "2023-08-09"
@@ -50,9 +61,7 @@ async function fetchADE(classeID: string) {
 		"&lastDate=" +
 		end
 	const res = await axios.get(URL) // Get request of the entire shcedule of 1 year for every classe
-	const data = ADEisCringe(res.data) // lol
-	const calendar = ical.parseICS(data) // Calendar is not iterable :)
-  return calendar
+  return res
 }
 
 function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {
@@ -76,7 +85,7 @@ function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {
 	return course // Apparently the problem has been handle on ADE side, I dont trust them this function stays there
 }
 
-function ADEisCringe(ADEdata: string) {
+export function ADEisCringe(ADEdata: string) {
 	const timezoneID = "TZID=France/Paris"
 	let data = ""
 	const lines = ADEdata.split("\n") as string[]
