@@ -40,7 +40,7 @@ function createCalendar(classeID: string) {
   return calendarString
 }
 
-const ScheduleFetcher: ScheduleFetcher = {
+const scheduleFetcher: ScheduleFetcher = {
 	fetchClassSchedule: async (schedule: ClassSchedule, classeID: string, progressBar: ProgressBar) => {
 		const res = createCalendar(classeID) // Fetching data from ADE, return ical calendar
 		const data = ADEisCringe(res) // lol
@@ -49,7 +49,7 @@ const ScheduleFetcher: ScheduleFetcher = {
 	},
 }
 
-export default ScheduleFetcher
+export default scheduleFetcher
 
 
 

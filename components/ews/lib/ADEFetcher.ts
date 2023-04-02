@@ -5,7 +5,7 @@ import type { ScheduleFetcher, Course, ClassSchedule, ScheduleSet } from "../../
 import type { ProgressBar } from "progress"
 import parseCourseFromCalEvent from './courseical'
 
-const ScheduleFetcher: ScheduleFetcher = {
+const scheduleFetcher: ScheduleFetcher = {
 	fetchClassSchedule: async (schedule: ClassSchedule, classeID: string, progressBar: ProgressBar) => {
 		const res = await fetchADE(classeID) // Fetching data from ADE, return ical calendar
 		const data = ADEisCringe(res.data) // lol
@@ -46,7 +46,7 @@ export function  parseCalendar(calendar, schedule: ClassSchedule, classeID: stri
 	return schedule
 }
 
-export default ScheduleFetcher
+export default scheduleFetcher
 
 export async function fetchADE(classeID: string) {
 	const scheduleADEID = scheduleIDs.get(classeID)
@@ -95,7 +95,7 @@ export function ADEisCringe(ADEdata: string) {
 			const ICSValue = line.split(":")[1]
 			const ADEHour = Number(/T+\d{2}/.exec(ICSValue)[0].slice(1))
 			const hourIndex = /T+\d{2}/.exec(ICSValue)[1]
-			let realHour = String(ADEHour + (new Date().getHours() - new Date().getUTCHours()) + 3) // Ade is substracting 1 hour to every damn courses
+			let realHour = String(ADEHour + (new Date().getHours() - new Date().getUTCHours()) + 2) // Ade is substracting 1 hour to every damn courses
 			realHour = Number(realHour) < 10 ? "0" + realHour : "" + realHour
 			// line = ICSKey + ';' + timezoneID + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
 			line = ICSKey + ":" + ICSValue.replace("T" + ADEHour, "T" + realHour) + "\n"
