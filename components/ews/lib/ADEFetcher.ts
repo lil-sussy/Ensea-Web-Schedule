@@ -14,11 +14,36 @@ const scheduleFetcher: ScheduleFetcher = {
 	},
 }
 
-export function  parseCalendar(calendar, schedule: ClassSchedule, classeID: string, progressBar: ProgressBar): ClassSchedule {
+export type Calendar = {
+  [key: string]: {
+    created: Date,
+    description: string,
+    dtstamp: Date,
+    end: Date,
+    lastModified: Date,
+    location: string,
+    sequence: string,
+    start: Date,
+    summary: string,
+    uid: string,
+    type: string,
+    params: any[]
+  }
+}
+
+export function parseCalendar(calendar: Calendar, schedule: ClassSchedule, classeID: string, progressBar: ProgressBar): ClassSchedule {
 	//Emptying schedule
 	schedule = { lastUpdate: new Date(), weeks: new Map() } // Emptying schedule
 	for (const [key, value] of Object.entries(calendar)) {
 		// Iterate through every courses of the year
+      // if (value.start.getUTCHours() != 8)
+      // if (value.start.getUTCHours() != 10)
+      // if (value.start.getUTCHours() != 13)
+      // if (value.start.getUTCHours() != 15)
+      // console.log(value.start.getUTCHours())
+    const HOURDIFF = new Date().getTimezoneOffset() -1
+    value.start.setHours(value.start.getHours() + HOURDIFF)
+    value.end.setHours(value.end.getHours() + HOURDIFF)
 		const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value)) // lol
 		schedule.lastUpdate = new Date()
 		const week = schedule.weeks.get(course.courseData.week) ? schedule.weeks.get(course.courseData.week) : new Map<String, Course[]>()
@@ -86,23 +111,26 @@ function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {
 }
 
 export function ADEisCringe(ADEdata: string) {
+  return ADEdata
 	const timezoneID = "TZID=France/Paris"
 	let data = ""
 	const lines = ADEdata.split("\n") as string[]
 	for (let line of lines) {
+		// Example "DTSTAMP:20230406T105014Z"
+    //                    year    T
 		if (line.startsWith("DTSTAMP") || line.startsWith("DTSTART") || line.startsWith("DTEND") || line.startsWith("LAST-MODIFIED")) {
 			const ICSKey = line.split(":")[0]
 			const ICSValue = line.split(":")[1]
 			const ADEHour = Number(/T+\d{2}/.exec(ICSValue)[0].slice(1))
 			const hourIndex = /T+\d{2}/.exec(ICSValue)[1]
-			let realHour = String(ADEHour + (new Date().getHours() - new Date().getUTCHours()) + 3) // Ade is substracting 1 hour to every damn courses
-			realHour = Number(realHour) < 10 ? "0" + realHour : "" + realHour
+			let realHour = ADEHour + (new Date().getHours() - new Date().getUTCHours()) // Ade is substracting 1 hour to every damn courses
+			let realHourstr = realHour < 10 ? "0" + String(realHour) : "" + String(realHour)
 			// line = ICSKey + ';' + timezoneID + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
-			line = ICSKey + ":" + ICSValue.replace("T" + ADEHour, "T" + realHour) + "\n"
+			line = ICSKey + ":" + ICSValue.replace("T" + ADEHour, "T" + realHourstr) + "\n"
 			data += line
 		} else {
 			data += line + "\n"
 		}
 	}
-	return ADEdata
+	return data
 }

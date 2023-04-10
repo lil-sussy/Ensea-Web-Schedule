@@ -6,6 +6,7 @@ import type { ScheduleFetcher, Course, ClassSchedule, ScheduleSet } from "../pag
 import { parseCalendar, ADEisCringe } from "../components/ews/lib/ADEFetcher"
 import ProgressBar from "progress"
 import ical from "ical"
+import { testParseADE } from "./testAdeExport"
 
 
 function createCalendar(classeID: string) {
@@ -15,9 +16,11 @@ function createCalendar(classeID: string) {
     for (let hour = 8; hour < 18; hour += 2) {
       const startTime = new Date()
       startTime.setHours(hour)
+      startTime.setMinutes(0)
       startTime.setDate(dayOfMonth)
       const endTime = new Date()
       endTime.setDate(dayOfMonth)
+      endTime.setMinutes(0)
       endTime.setHours(startTime.getHours() + 2)
       const name = faker.vehicle.vehicle()
       calendar.createEvent({
@@ -43,6 +46,7 @@ function createCalendar(classeID: string) {
 const scheduleFetcher: ScheduleFetcher = {
 	fetchClassSchedule: async (schedule: ClassSchedule, classeID: string, progressBar: ProgressBar) => {
 		const res = createCalendar(classeID) // Fetching data from ADE, return ical calendar
+    testParseADE()
 		const data = ADEisCringe(res) // lol
 		const calendar = ical.parseICS(data) // data is not iterable :)
 		return parseCalendar(calendar, schedule, classeID, progressBar)
