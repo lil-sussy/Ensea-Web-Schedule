@@ -1,10 +1,12 @@
 import fs from 'fs'
 import ical from "ical"
 
+import type { Calendar } from '../components/ews/lib/ADEFetcher'
+
 export function testParseADE() {
   const file = fs.readFileSync("./tests/ADECal.ics")
   const lines = file.toString()
-  const calendar = ical.parseICS(lines)
+  const calendar: Calendar = ical.parseICS(lines)
   for (const [key, value] of Object.entries(calendar)) {
     const test: string =""
     const test2 = test.search("TP")
