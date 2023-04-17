@@ -81,7 +81,11 @@ async function refreshSchedules(classeID: string, refreshDuration: number) {
 		if (!schedule.lastUpdate || new Date().getTime() - new Date(schedule.lastUpdate).getTime() > refreshDuration) {
 			// If last update is older than 5min
 			console.log("Starting new update for %s's schedule from ADE servers...", classeID)
-			console.log("last update of %s is older than 5min. Updating...", classeID, schedule.lastUpdate)
+			console.log(
+				"last update of %s is older than 5min. Updating...",
+				classeID,
+				new Date(schedule.lastUpdate).toLocaleString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })
+			)
       if (testEnvironement) {
         schedule = await testICal.fetchClassSchedule(schedule, classeID, progressBar)
         listenToConsole()
@@ -93,7 +97,11 @@ async function refreshSchedules(classeID: string, refreshDuration: number) {
 			saveScheduleSet(scheduleSet)
 			console.log("Schedule of class %s was succesfully updated in %d ms", classeID, new Date().getTime() - beginTime.getTime())
 		} else {
-			console.log("%s's schedule is up to date (%s)", classeID, schedule.lastUpdate)
+			console.log(
+				"%s's schedule is up to date (%s)",
+				classeID,
+				new Date(schedule.lastUpdate).toLocaleString("fr-FR", { day: "numeric", month: "long", hour: "2-digit", minute: "2-digit" })
+			)
 		}
 		resolve(scheduleSet.get(classeID))
 	})
