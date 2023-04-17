@@ -69,7 +69,7 @@ function EWSIndex({ ticket, host }) {
       router.push('https://identites.ensea.fr/cas/login?service=http://'+host)  // after the auth, the server will send the user back to this page (index)
     }
   }
-  
+  // return Index()
   return (
     <>
       <Head>
@@ -89,8 +89,8 @@ function EWSIndex({ ticket, host }) {
       <Head>
         <link rel="icon" href="/favicon.ico" />
       </Head>
-      <>
-        <BackgroundENSEA />
+        <>
+          <BackgroundENSEA />
         <AppContainer>
           <AthenaHeader />
           <App/>
@@ -98,6 +98,138 @@ function EWSIndex({ ticket, host }) {
       </>
     </>
   );
+}
+
+function Index() {
+  const frame91Data = { children: "A210" }
+	const amphiMicrop1Data = { frame9Props: frame91Data }
+	const frame92Data = { children: "AMPHI" }
+	const amphiMicrop2Data = { frame9Props: frame92Data }
+	return (
+		<div className="frame-1screen">
+			{" "}
+			<img className="logo" src="logo.png" alt="Logo" />{" "}
+			<header className="header">
+				{" "}
+				<div className="searchbar">
+					{" "}
+					<div className="x1-g1-td3valign-text-middle"> 1G1 TD3 </div>{" "}
+					<img className="icon-magnifying-glass" src="-icon-magnifying-glass.png" alt="icon &#34;magnifying glass&#34;" />{" "}
+				</div>{" "}
+				<img className="athena" src="athena.png" alt="ATHENA" />{" "}
+			</header>{" "}
+			<div className="monday">
+				{" "}
+				<div className="day-header">
+					{" "}
+					<img className="vector" src="vector.svg" alt="Vector" />{" "}
+					<div className="frame-9-2">
+						{" "}
+						<div className="semaine-9valign-text-middle"> Semaine 9 </div> <div className="rectangle-12"></div>{" "}
+					</div>{" "}
+					<img className="vector" src="vector-1.svg" alt="Vector" />{" "}
+				</div>{" "}
+				<div className="day-content">
+					{" "}
+					<div className="day-title">
+						{" "}
+						<div className="day-buttons">
+							{" "}
+							<h1 className="titlevalign-text-middle"> MARDI </h1>{" "}
+							<div className="group-9">
+								{" "}
+								<div className="overlap-group">
+									{" "}
+									<div className="rectangle-7"></div> <div className="addressvalign-text-middle"> 24 Jan 2023 </div>{" "}
+								</div>{" "}
+							</div>{" "}
+							<div className="group-10">
+								{" "}
+								<img className="vector-1" src="vector-2.svg" alt="Vector" />{" "}
+								<img className="icon-chevron-left" src="-icon-chevron-left.png" alt="icon &#34;chevron left&#34;" />{" "}
+							</div>{" "}
+						</div>{" "}
+						<div className="underline"></div>{" "}
+					</div>{" "}
+					<div className="day-grid">
+						{" "}
+						<div className="grid">
+							{" "}
+							<div className="frame-11">
+								{" "}
+								<div className="rectangle"></div> <div className="rectangle"></div> <div className="rectangle"></div> <div className="rectangle"></div>{" "}
+								<div className="rectangle"></div> <div className="rectangle"></div> <div className="rectangle"></div> <div className="rectangle"></div>{" "}
+								<div className="rectangle"></div> <div className="rectangle"></div> <div className="rectangle"></div> <div className="rectangle"></div>{" "}
+								<div className="rectangle"></div>{" "}
+							</div>{" "}
+							<div className="rectangle-22"></div>{" "}
+						</div>{" "}
+						<div className="heures">
+							{" "}
+							<div className="flex-collexenddeca-normal-black-64px">
+								{" "}
+								<div className="x8hvalign-text-middle"> 8h </div> <div className="x9hvalign-text-middle"> 9h </div>{" "}
+								<div className="x10hvalign-text-middle"> 10h </div> <div className="x11hvalign-text-middle"> 11h </div>{" "}
+								<div className="flex-col-itemvalign-text-middle"> 12h </div> <div className="x13hvalign-text-middle"> 13h </div>{" "}
+								<div className="x14hvalign-text-middle"> 14h </div> <div className="x15hvalign-text-middle"> 15h </div>{" "}
+								<div className="flex-col-itemvalign-text-middle"> 16h </div> <div className="x17hvalign-text-middle"> 17h </div>{" "}
+								<div className="x18hvalign-text-middle"> 18h </div> <div className="flex-col-itemvalign-text-middle"> 19h </div>{" "}
+								<div className="x20hvalign-text-middle"> 20h </div>{" "}
+							</div>{" "}
+						</div>{" "}
+						<div className="schedule">
+							{" "}
+							<div className="amphi-microp-2">
+								{" "}
+								<div className="td-analyse-de-fourriervalign-text-middlelexenddeca-normal-white-48px"> TD Analyse de Fourrier </div>{" "}
+								<div className="rectangle-13-1"></div>{" "}
+								<div className="frame-9-3">
+									{" "}
+									<Frame9>A210</Frame9>{" "}
+									<div className="frame-10-1">
+										{" "}
+										<div className="namevalign-text-middlelexenddeca-normal-white-48px"> Nicolas Papazoglou </div>{" "}
+									</div>{" "}
+								</div>{" "}
+							</div>{" "}
+							<div className="amphi-microp-container">
+								{" "}
+								<AmphiMicrop tdMicroprocesseur="TD Microprocesseur" frame9Props={amphiMicrop1Data.frame9Props} />{" "}
+								<AmphiMicrop tdMicroprocesseur="CM Microprocesseur" className="amphi-microp-1" frame9Props={amphiMicrop2Data.frame9Props} />{" "}
+							</div>{" "}
+						</div>{" "}
+					</div>{" "}
+				</div>{" "}
+			</div>{" "}
+		</div>
+	)
+}
+
+function Frame9(props) {
+	const { children } = props
+	return (
+		<div className="frame-9">
+			{" "}
+			<div className="a210valign-text-middlelexenddeca-medium-white-64px"> {children} </div>{" "}
+		</div>
+	)
+}
+function AmphiMicrop(props) {
+	const { tdMicroprocesseur, className, frame9Props } = props
+	return (
+		<div className={`amphi-microp ${className || ""}`}>
+			{" "}
+			<div className="x-microprocesseurvalign-text-middlelexenddeca-normal-white-48px"> {tdMicroprocesseur} </div> <div className="rectangle-13"></div>{" "}
+			<div className="frame-9-1">
+				{" "}
+				<Frame9>{frame9Props.children}</Frame9>{" "}
+				<div className="frame-10">
+					{" "}
+					<div className="monchal-laurentvalign-text-middlelexenddeca-normal-white-48px"> Monchal Laurent </div>{" "}
+				</div>{" "}
+			</div>{" "}
+		</div>
+	)
 }
 
 
