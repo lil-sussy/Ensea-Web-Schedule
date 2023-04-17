@@ -3,7 +3,7 @@ import { useState, useEffect, useMemo, Attributes, Key, ReactElement } from 'rea
 import { Swiper, SwiperSlide, SwiperProps } from "swiper/react";
 import "swiper/swiper-bundle.min.css";
 
-import type { Course } from '../../../pages/api/schedules';
+import type { Course, CourseData } from '../../../pages/api/schedules';
 
 export default function DaySlide({ actualDay, date, dayData, loading }) {
   const courses = dayData as Course[];
@@ -24,10 +24,10 @@ export default function DaySlide({ actualDay, date, dayData, loading }) {
   } else if (courses != undefined) {  // It may be possible if a day is empty
     for (let i = 0; i < courses.length; i++) {
       const courseData = courses[i].courseData
-      divCourses.push(<Course key={courseData.begin} courseData={courseData} />);
-      courseHourWrappers.set(courseData.begin, CourseHours({ courseData: courseData, ending:false }));
-      if (!courseHourWrappers.get(courseData.end))  // We only display the end hour of the course if there is another course that starts after
-        courseHourWrappers.set(courseData.end, CourseHours({ courseData: courseData, ending:true }));
+      divCourses.push(<Course key={courseData.beginHour} courseData={courseData} />);
+      courseHourWrappers.set(courseData.beginHour, CourseHours(courseData, false))
+      if (!courseHourWrappers.get(courseData.endHour))  // We only display the end hour of the course if there is another course that starts after
+        courseHourWrappers.set(courseData.endHour, CourseHours(courseData, true));
     }
     courseHourWrappers.forEach((value, key) => courseHourWrapperList.push(value))
   } else {
@@ -78,64 +78,67 @@ function DayMask() {
   )
 }
 
-function CourseHours({ courseData: course, ending }) {
-  const beginHour = Number(course.begin.slice(0, 2))
-  const endHour = Number(course.end.slice(0, 2))
-  const wrpRowBegin = (beginHour - 7) * 2 + (course.begin.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am
-  const wrpRowEnd = (endHour - 7) * 2 + (course.end.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am
+interface CourseHoursProps extends React.ComponentProps<'div'> {
+  courseData: CourseData,
+  ending: boolean
+}
+function CourseHours(course: CourseData, ending: boolean) {
+  const beginHour = Number(course.beginHour.slice(0, 2))
+  const endHour = Number(course.endHour.slice(0, 2))
+  const wrpRowBegin = (beginHour - 7) * 2 + (course.beginHour.slice(3, 5) == "30" ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am
+  const wrpRowEnd = (endHour - 7) * 2 + (course.endHour.slice(3, 5) == "30" ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am
   if (!ending)
     return (
-      <div key={beginHour} className={clsx(" w-full h- row-start-" + wrpRowBegin + " col-span-1 font-bold relative")}
-        style={{ gridRowStart: wrpRowBegin }}>
-        <div className="w-12 ml-1 bg-third-purple rounded-md text-main-purple-light h-full flex flex-col z-20">
-          <h3 className="text-center items-center text-[0.65rem] leading-[0.7rem] my-auto z-20">
-            {course.begin}
-          </h3>
-        </div>
-        <div className="w-full absolute top-1/2 h-[0.15rem] bg-gradient-to-r from-main-purple-light to-main-purple -z-10"></div>
-      </div>
-    )
+			<div key={beginHour} className={clsx(" h- row-start- w-full" + wrpRowBegin + " relative col-span-1 font-bold")} style={{ gridRowStart: wrpRowBegin }}>
+				<div className="z-20 ml-1 flex h-full w-12 flex-col rounded-md bg-third-purple text-main-purple-light">
+					<h3 className="z-20 my-auto items-center text-center text-[0.65rem] leading-[0.7rem]">{course.beginHour}</h3>
+				</div>
+				<div className="absolute top-1/2 -z-10 h-[0.15rem] w-full bg-gradient-to-r from-main-purple-light to-main-purple"></div>
+			</div>
+		)
   else
     return (
       <div key={endHour} className={clsx(" w-full h- row-start-" + wrpRowEnd + " col-span-1 font-bold relative \
       w-12 ml-1 rounded-md text-main-purple-light h-full flex flex-col ")}
       style={{ gridRowStart: wrpRowEnd }}>
         <h3 className="text-center items-center text-[0.65rem] leading-[0.7rem] my-auto z-20">
-          {course.end}
+          {course.endHour}
         </h3>
       </div>
     )
 }
 
-function Course({ courseData }) {
-  const course = courseData
-  const beginHour = Number(course.begin.slice(0, 2))
-  const endHour = Number(course.end.slice(0, 2))
-  const rowBegin = (beginHour - 7) * 2 + (course.begin.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am + 1 if half hour
-  const rowEnd = (endHour - 7) * 2 + (course.end.slice(3, 5) == '30' ? 1 : 0)   // Half hours are 1 row in length and the day starts at 7am + if half hour
-  if (course.teachers[0] == '')
-    course.teachers.shift()   // Remove first element of list
-  return (
-    <div key={course.begin} className={clsx(
-      "Course w-full  text-gray-700 outline-2 outline-white relative font-marianne bg-third-purple\
-      row-start-" + rowBegin + " row-end-" + rowEnd + " flex flex-row items-center")}
-      style={{
-        gridRowStart: rowBegin, gridRowEnd: rowEnd,  // Because it doesnt work with tailwind
-      }}>
-      <CoursePlace place={course.locations}/>
-      <div className="inline-block w-[80%] h-full bg-third-purple">
-        <div className="w-full h-full flex items-start flex-col justify-evenly">
-          <h3 className="font-normal text-base font-dinCondensed overflow-hidden whitespace-nowrap">
-            {course.name}
-          </h3>
-          <h4 className="text-[0.68rem] leading-3 font-Charter ">
-            {course.teachers.join(', ')}
-          </h4>
-          {/* <h4 className="overflow-hidden text-[0.5rem] text-end"> {course.classes} </h4> */}
-        </div>
-      </div>
-    </div>
-  )
+const Course: React.FC<{courseData: CourseData}> = ({ courseData: course }) => {
+	const beginHour = Number(course.beginHour.slice(0, 2))
+	const endHour = Number(course.endHour.slice(0, 2))
+	const rowBegin = (beginHour - 7) * 2 + (course.beginHour.slice(3, 5) == "30" ? 1 : 0) // Half hours are 1 row in length and the day starts at 7am + 1 if half hour
+	const rowEnd = (endHour - 7) * 2 + (course.endHour.slice(3, 5) == "30" ? 1 : 0) // Half hours are 1 row in length and the day starts at 7am + if half hour
+	if (course.teachers[0] == "") course.teachers.shift() // Remove first element of list
+	return (
+		<div
+			key={course.beginHour}
+			className={clsx(
+				"Course row-start-  relative w-full bg-third-purple font-marianne text-gray-700 outline-2      outline-white" +
+					rowBegin +
+					" row-end-" +
+					rowEnd +
+					" flex flex-row items-center"
+			)}
+			style={{
+				gridRowStart: rowBegin,
+				gridRowEnd: rowEnd, // Because it doesnt work with tailwind
+			}}
+		>
+			<CoursePlace place={course.locations} />
+			<div className="inline-block h-full w-[80%] bg-third-purple">
+				<div className="flex h-full w-full flex-col items-start justify-evenly">
+					<h3 className="overflow-hidden whitespace-nowrap font-dinCondensed text-base font-normal">{course.name}</h3>
+					<h4 className="font-Charter text-[0.68rem] leading-3 ">{course.teachers.join(", ")}</h4>
+					{/* <h4 className="overflow-hidden text-[0.5rem] text-end"> {course.classes} </h4> */}
+				</div>
+			</div>
+		</div>
+	)
 }
 
 function CoursePlace({ place }) {

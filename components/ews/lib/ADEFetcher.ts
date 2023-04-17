@@ -14,37 +14,31 @@ const scheduleFetcher: ScheduleFetcher = {
 	},
 }
 
+export type CalendarEvent = {
+  created: Date,
+  description: string,
+  dtstamp: Date,
+  end: Date,
+  lastModified: Date,
+  location: string,
+  sequence: string,
+  start: Date,
+  summary: string,
+  uid: string,
+  type: string,
+  params: any[]
+}
+
 export type Calendar = {
-  [key: string]: {
-    created: Date,
-    description: string,
-    dtstamp: Date,
-    end: Date,
-    lastModified: Date,
-    location: string,
-    sequence: string,
-    start: Date,
-    summary: string,
-    uid: string,
-    type: string,
-    params: any[]
-  }
+  [key: string]: CalendarEvent
 }
 
 export function parseCalendar(calendar: Calendar, schedule: ClassSchedule, classeID: string, progressBar: ProgressBar): ClassSchedule {
 	//Emptying schedule
 	schedule = { lastUpdate: new Date(), weeks: new Map() } // Emptying schedule
-	for (const [key, value] of Object.entries(calendar)) {
-		// Iterate through every courses of the year
-      // if (value.start.getUTCHours() != 8)
-      // if (value.start.getUTCHours() != 10)
-      // if (value.start.getUTCHours() != 13)
-      // if (value.start.getUTCHours() != 15)
-      // console.log(value.start.getUTCHours())
-    const HOURDIFF = new Date().getTimezoneOffset() -1
-    value.start.setHours(value.start.getHours() + HOURDIFF)
-    value.end.setHours(value.end.getHours() + HOURDIFF)
-		const course = ADE_IS_OMEGA_FUCKING_CRINGE(parseCourseFromCalEvent(value)) // lol
+	for (let [key, value] of Object.entries(calendar)) {
+		value = ADE_IS_OMEGA_FUCKING_CRINGE(value) // lol
+    const course = parseCourseFromCalEvent(value)
 		schedule.lastUpdate = new Date()
 		const week = schedule.weeks.get(course.courseData.week) ? schedule.weeks.get(course.courseData.week) : new Map<String, Course[]>()
 		const day = week.get(course.courseData.dayOfWeek) ? week.get(course.courseData.dayOfWeek) : []
@@ -54,7 +48,7 @@ export function parseCalendar(calendar: Calendar, schedule: ClassSchedule, class
 			if (otherCourse.id == course.id) {
 				includes = true
 				break
-			} else if (otherCourse.courseData.begin == course.courseData.begin) {
+			} else if (otherCourse.courseData.beginDate == course.courseData.beginDate) {
         if (otherCourse.courseData.name == course.courseData.name) {
           includes = true
           break
@@ -89,25 +83,19 @@ export async function fetchADE(classeID: string) {
   return res
 }
 
-function ADE_IS_OMEGA_FUCKING_CRINGE(course: Course): Course {
-	// You might wonder : what is going on ?
-	// Well this is simple, see aparently for every course dated before today are MODIFIED by ADE
-	// I attended to some of those courses and I can confirm that every courses's hours are MODIFIED.
-	// But this is not the case for the courses of the current week and the courses of every weeks after :)))
-	// At this point I just wanna die I dont even want to continue typing this function this is just too CRINGE.
-
-	// const currentWeekID = getWeekID(new Date())  // WeekID of this week
-	// if (course.courseData.week < currentWeekID) {
-	//   const begin = course.courseData.begin
-	//   course.courseData.begin = ('0' + (Number(begin.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
-	//   course.courseData.begin += begin.slice(2, 5)
-	//   const end = course.courseData.end
-	//   course.courseData.end = ('0' + (Number(end.slice(0, 2)) + 1)).slice(-2)  // I'm having so much fun right now. Btw this slice(-2) jutsu is from here https://www.folkstalk.com/2022/09/add-leading-zeros-to-number-javascript-with-code-examples.html#:~:text=JavaScript%20doesn't%20keep%20insignificant,padded%20with%20leading%20zeros%20string.
-	//   course.courseData.end += end.slice(2, 5)
-	// }
-
-	// pls send help.
-	return course // Apparently the problem has been handle on ADE side, I dont trust them this function stays there
+function ADE_IS_OMEGA_FUCKING_CRINGE(calCourse: CalendarEvent): CalendarEvent {
+	// Iterate through every courses of the year
+	// if (value.start.getUTCHours() != 8)
+	// if (value.start.getUTCHours() != 10)
+	// if (value.start.getUTCHours() != 13)
+	// if (value.start.getUTCHours() != 15)
+	// console.log(value.start.getUTCHours())
+	const HOURDIFF = new Date().getTimezoneOffset()/60
+	calCourse.start.setHours(calCourse.start.getHours() )
+	calCourse.end.setHours(calCourse.end.getHours() )
+	// calCourse.start.setUTCHours(9)
+	// calCourse.end.setUTCHours(11)
+	return calCourse // Apparently the problem has been handle on ADE side, I dont trust them this function stays there
 }
 
 export function ADEisCringe(ADEdata: string) {

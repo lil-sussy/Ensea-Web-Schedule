@@ -41,9 +41,7 @@ export default function parseCourseFromCalEvent(event: any): Course {
 	}
 	const week = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi", "Samedi", "Dimanche"]
 	const beginDate = event.start as Date
-	beginDate.setHours(beginDate.getHours() == 23 ? 0 : beginDate.getHours() + 1)
 	const endDate = event.end as Date
-	endDate.setHours(endDate.getHours() == 23 ? 0 : endDate.getHours() + 1)
 	const creationDate = event.created as Date
 	const modifiedDate = event.lastmodified as Date
 	const weekID = getWeekID(beginDate)
@@ -56,8 +54,10 @@ export default function parseCourseFromCalEvent(event: any): Course {
 			dayOfWeek: week[beginDate.getDay() - 1] as string,
 			date: beginDate.toLocaleString("fr-FR", { year: "numeric", month: "2-digit", day: "2-digit" }) as string,
 			week: weekID as number,
-			begin: beginDate.toLocaleString("fr-FR", { hour: "2-digit", minute: "2-digit" }) as string,
-			end: endDate.toLocaleString("fr-FR", { hour: "2-digit", minute: "2-digit" }) as string,
+      beginDate: JSON.parse(JSON.stringify(beginDate)),
+      endDate: JSON.parse(JSON.stringify(endDate)),
+      beginHour: '',
+      endHour: '',
 			teachers: teachers as string[],
 			locations: places as string[],
 			creationDate: creationDate as Date,

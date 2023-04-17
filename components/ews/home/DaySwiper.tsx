@@ -58,7 +58,7 @@ export default function WeekDaySwiper({ schedule: scheduleID, currentWeek: curre
   }
   if (loading||error)
     return spiningLoadingAniamtion()
-    
+  
   const dayList = generateDayDataList(currentWeekID, (yearScheduleData as ClassSchedule))
   return (<Swiper key={1} id='daySwiper'
     modules={ [ Pagination, Navigation ]  }
@@ -128,10 +128,12 @@ function generateDayDataList(currentWeekID: number, schedule: ClassSchedule) {
     if (schedule.weeks) {
       const yearSchedule = schedule.weeks
       if (yearSchedule.get(currentWeekID)) {  // Not holidays or data still loading
-        const data = yearSchedule.get(currentWeekID).get(dayName)
+        let data = yearSchedule.get(currentWeekID).get(dayName)
         if ((dayName === "Samedi" || dayName === "Dimanche") && data == undefined) {
-    
+          
         } else {
+          if (data != undefined)
+            data = parseHourOfCourses(data)
           dayList.push({ name: dayName, date: weekDates[i], data: data })
         }
       } else {  // Holidays !!!
@@ -140,6 +142,35 @@ function generateDayDataList(currentWeekID: number, schedule: ClassSchedule) {
     }
   }
   return dayList
+}
+
+function parseHourOfCourses(courseOfDay: Course[]): Course[] {
+  for (let i = 0; i < courseOfDay.length; i++) {
+    const course = courseOfDay[i]
+    const begin = new Date(course.courseData.beginDate)
+    const end = new Date(course.courseData.endDate)
+    const beginHour = begin.getUTCHours() - begin.getTimezoneOffset()/60 // Dates are actually unsedable with string, timezeon is changed :/
+    const endHour = end.getUTCHours() - begin.getTimezoneOffset() / 60// Displaying hour in France timezeon wherever the browther is 
+    if (beginHour.toString() === "NaN") {
+      console.log("ratio")
+      console.log(begin.getTime().toString() === "NaN")
+    }
+    course.courseData.beginHour = hourToString(beginHour, begin.getUTCMinutes())
+    course.courseData.endHour = hourToString(endHour, end.getUTCMinutes())
+  }
+  return courseOfDay
+}
+
+function hourToString(hours: number, minutes: number) {
+  let hourString: string = hours.toString()
+  let minuteString: string = minutes.toString()
+  if (hours < 10) {
+    hourString = "0" + hours.toString()
+  }
+  if (minutes < 10) {
+    minuteString = "0" + minutes.toString()
+  }
+  return hourString + "h" + minuteString
 }
 
 const onInit = (swiper: any) => {  // On swipper initialization

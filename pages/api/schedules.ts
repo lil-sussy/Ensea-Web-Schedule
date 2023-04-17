@@ -14,21 +14,25 @@ export type ScheduleFetcher = {
 	fetchClassSchedule: (schedule: ClassSchedule, classeID: string, progressBar: ProgressBar) => Promise<ClassSchedule>
 }
 
+export type CourseData = {
+  name: string
+  dayOfWeek: string
+  date: string
+  week: number
+  beginDate: string  // Cuz we cant json stringify a Date
+  endDate: string
+  beginHour: string
+  endHour: string
+  teachers: string[]
+  locations: string[]
+  creationDate: Date
+  modificationDate: Date
+  exported: string
+}
+
 export type Course = {
 	id: string
-	courseData: {
-		name: string
-		dayOfWeek: string
-		date: string
-		week: number
-		begin: string
-		end: string
-		teachers: string[]
-		locations: string[]
-		creationDate: Date
-		modificationDate: Date
-		exported: string
-	}
+	courseData: CourseData
 }
 
 export type ClassSchedule = { lastUpdate: Date; weeks: Map<number, Map<String, Course[]>> }  // One year of a classe schedule
