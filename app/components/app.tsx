@@ -1,22 +1,45 @@
-"use client"
+"use client";
 
 import React, { useState } from "react";
 import { Layout, Input, Typography, AutoComplete } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import DayDisplay from "./DayDisplay";
 import { AthenaLogo, AthenaTextLogo } from "../icons/icons";
-import { classesID } from "../types/onlineAdeObjects"; // Assuming this is the correct path
+import { fetchSchedule } from "../request";
 
 const { Header } = Layout;
 
 interface ClassOption {
-  value: string;
-  label: string;
+	value: string;
+	label: string;
 }
+
 
 export default function Dashboard() {
 	const [searchResults, setSearchResults] = useState<ClassOption[]>([]);
 	const [selectedClass, setSelectedClass] = useState<ClassOption | null>(null);
+	const [classesID, setClassesID] = useState<{ [key: string]: string }>({});
+
+	React.useEffect(() => {
+		const fetchClassesID = async () => {
+			try {
+				const response = await fetch("/api/classes");
+				const data = await response.json();
+				const classesID = Object.fromEntries(data.classesID as [string, string][]);
+				setClassesID(classesID);
+				setSearchResults(data.classesID.map(([key, val]: [string, string]) => ({ value: key, label: key })));
+			} catch (error) {
+				console.error("Error fetching classes ID:", error);
+			}
+		};
+
+		fetchClassesID();
+	}, []);
+
+	React.useEffect(() => {
+    if (selectedClass)
+      fetchSchedule(selectedClass.value);
+	}, [selectedClass]);
 
 	const weekNumber = 42; // Example week number
 	const schedule = [
@@ -50,18 +73,8 @@ export default function Dashboard() {
 					<div className="absolute -left-16 top-4">
 						<AthenaLogo width={200} height={100} color="white" />
 					</div>
-					<AutoComplete
-						options={searchResults}
-						onSearch={handleSearch}
-						onSelect={handleSelect}
-						style={{ width: "100%" }}
-					>
-						<Input
-							size="large"
-							placeholder="Search for a class"
-							className="bg-[#f1e8e9]/30 focus-within:bg-[#f1e8e9]/60 hover:bg-[#f1e8e9]/50 text-white rounded-3xl border-2 border-white text-xl w-full"
-							prefix={<SearchOutlined />}
-						/>
+					<AutoComplete options={searchResults} onSearch={handleSearch} onSelect={handleSelect} style={{ width: "100%" }}>
+						<Input size="large" placeholder="Search for a class" className="bg-[#f1e8e9]/30 focus-within:bg-[#f1e8e9]/60 hover:bg-[#f1e8e9]/50 text-white rounded-3xl border-2 border-white text-xl w-full" prefix={<SearchOutlined />} />
 					</AutoComplete>
 				</div>
 			</Header>

@@ -42,7 +42,9 @@ export function handleLogin(router: any) {
 		})
 			.then((res) => {
 				if (res.status === 400) {
-					router.push(`https://identites.ensea.fr/cas/login?service=${encodeURIComponent(host)}`);
+          const newUrl = new URL(host);
+          newUrl.searchParams.delete("ticket");
+					router.push(`https://identites.ensea.fr/cas/login?service=${encodeURIComponent(newUrl.toString())}`);
 				} else {
 					return res.json();
 				}
@@ -57,3 +59,15 @@ export function handleLogin(router: any) {
 		router.push(`https://identites.ensea.fr/cas/login?service=${encodeURIComponent(host)}`);
 	}
 }
+
+
+export const fetchSchedule = async (classID: string) => {
+	try {
+		const response = await fetch(`/api/schedule?classID=${classID}`);
+		const data = await response.json();
+		console.log(data);
+		// setSchedule(data.schedule);
+	} catch (error) {
+		console.error("Error fetching schedule:", error);
+	}
+};

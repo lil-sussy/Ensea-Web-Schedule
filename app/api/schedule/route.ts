@@ -2,10 +2,10 @@ import { NextRequest, NextResponse } from 'next/server';
 import fs from 'fs';
 import path from 'path';
 import ProgressBar from "progress";
-import scheduleFetcher from '../../../components/ews/lib/ADEFetcher';
+import { scheduleFetcher } from './adeFetcher';
 import { classesID, classList } from "../../types/onlineAdeObjects";
 import readline from 'readline';
-import testICal from '../../../tests/testICal';
+import testICal from './testIcal';
 
 import type { ClassSchedule, Course, ScheduleSet } from '../../types/Schedule';
 
@@ -18,16 +18,21 @@ export type ScheduleFetcher = {
 const REFRESH_DURATION = testEnvironement ? 1 * 1000 : 5 * 60 * 1000; // 5min or 1s (test)
 
 export async function GET(request: NextRequest) {
-  if (!request.headers.get('classe')) {
-    return NextResponse.json({ status: 400, message: "Unsupported headers" }, { status: 400 });
+  const { searchParams } = new URL(request.url);
+  const classID = searchParams.get('classID');
+
+  if (!classID) {
+    return NextResponse.json({ status: 400, message: "Missing classID query parameter" }, { status: 400 });
   }
-  const classe = request.headers.get('classe') as string;
-  if (classe) {
-    await refreshSchedules(classe, REFRESH_DURATION);
-    const schedules: ScheduleSet = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver);
-    return NextResponse.json({ totalSchedule: JSON.stringify(schedules.get(classe), replacer) });
+
+  await refreshSchedules(classID, REFRESH_DURATION);
+  const schedules: ScheduleSet = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver);
+  const classSchedule = schedules.get(classID);
+
+  if (classSchedule) {
+    return NextResponse.json({ totalSchedule: JSON.stringify(classSchedule, replacer) });
   } else {
-    return NextResponse.json({ status: 404, message: 'No classe schedule found for this classe ' + classe }, { status: 404 });
+    return NextResponse.json({ status: 404, message: 'No schedule found for classID ' + classID }, { status: 404 });
   }
 }
 
