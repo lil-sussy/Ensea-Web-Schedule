@@ -3,6 +3,7 @@ import { getFirestore } from "firebase/firestore";
 import { getAnalytics } from "firebase/analytics";
 import { getAuth } from "firebase/auth"; // New import
 import { signInWithCustomToken } from "firebase/auth";
+import Cookies from "js-cookie";
 
 const firebaseConfig = {
 	apiKey: "AIzaSyAH1WvRPNDwIOwuS7fRodexNiJW6k-uvPs",
@@ -18,32 +19,20 @@ export const firebase = initializeApp(firebaseConfig);
 export const database = getFirestore(firebase);
 export const auth = getAuth(firebase);
 
-export function handleLogin(router: any) {
+function casLogin(router: any) {
 	const urlParams = new URLSearchParams(window.location.search);
 	const ticket = urlParams.get("ticket");
 	const host = window.location.href;
 
-	if (auth.currentUser) {
-		auth.currentUser.getIdToken(true).then((userToken) => {
-			fetch("/api/auth", {
-				method: "POST",
-				body: JSON.stringify({ tokenID: userToken }),
-			})
-				.then((res) => res.json())
-				.then((apiRes) => {
-					const user = apiRes.user;
-				})
-				.catch((error) => console.log("error", error));
-		});
-	} else if (ticket) {
+	if (ticket) {
 		fetch("/api/auth", {
 			method: "GET",
 			headers: { ticket: ticket },
 		})
 			.then((res) => {
 				if (res.status === 400) {
-          const newUrl = new URL(host);
-          newUrl.searchParams.delete("ticket");
+					const newUrl = new URL(host);
+					newUrl.searchParams.delete("ticket");
 					router.push(`https://identites.ensea.fr/cas/login?service=${encodeURIComponent(newUrl.toString())}`);
 				} else {
 					return res.json();
@@ -52,7 +41,14 @@ export function handleLogin(router: any) {
 			.then((apiRes) => {
 				const { userToken } = apiRes;
 				if (userToken) {
-					signInWithCustomToken(auth, userToken).catch((error) => console.log("error", error));
+					Cookies.set("accessToken", userToken, { expires: 7, secure: true });
+					signInWithCustomToken(auth, userToken)
+						.then((userCredential) => {
+							return userCredential.user.getIdToken();
+						}).then((idToken) => {
+              Cookies.set("idToken", idToken, { expires: 7, secure: true });
+            })
+						.catch((error) => console.log("error", error));
 				}
 			});
 	} else {
@@ -60,12 +56,34 @@ export function handleLogin(router: any) {
 	}
 }
 
+export function handleLogin(router: any) {
+	if (Cookies.get("accessToken")) {
+		const userToken = Cookies.get("accessToken");
+		signInWithCustomToken(auth, userToken!)
+			.then((userCredential) => {
+				return userCredential.user.getIdToken();
+			})
+			.then((idToken) => {
+				Cookies.set("idToken", idToken, { expires: 7, secure: true });
+			})
+			.catch((error) => {
+				casLogin(router);
+			});
+	} else {
+		casLogin(router);
+	}
+}
 
 export const fetchSchedule = async (classID: string) => {
+	const userToken = Cookies.get("idToken");
 	try {
-		const response = await fetch(`/api/schedule?classID=${classID}`);
+		const response = await fetch(`/api/schedule?classID=${classID}`, {
+			headers: {
+				Authorization: `Bearer ${userToken}`,
+			},
+		});
 		const data = await response.json();
-    return data.totalSchedule;
+		return data.totalSchedule;
 	} catch (error) {
 		console.error("Error fetching schedule:", error);
 	}
