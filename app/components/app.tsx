@@ -1,12 +1,12 @@
 "use client";
 
 import React, { useState } from "react";
-import { Layout, Input, Typography, AutoComplete } from "antd";
-import { SearchOutlined } from "@ant-design/icons";
+import { Layout, Input, AutoComplete, Carousel, Spin, Alert } from "antd";
+import { SearchOutlined, LeftOutlined, RightOutlined } from "@ant-design/icons";
 import DayDisplay from "./DayDisplay";
 import { AthenaLogo, AthenaTextLogo } from "../icons/icons";
 import { fetchSchedule } from "../request";
-
+import type { Schedule } from "../types/types";
 const { Header } = Layout;
 
 interface ClassOption {
@@ -14,20 +14,21 @@ interface ClassOption {
 	label: string;
 }
 
-
 export default function Dashboard() {
 	const [searchResults, setSearchResults] = useState<ClassOption[]>([]);
 	const [selectedClass, setSelectedClass] = useState<ClassOption | null>(null);
-	const [classesID, setClassesID] = useState<{ [key: string]: string }>({});
+	const [classesID, setClassesID] = useState<ClassOption[]>([]);
+	const [currentScheduleWeeks, setCurrentScheduleWeeks] = useState<Schedule["weeks"] | null>(null);
+	const [currentWeekID, setCurrentWeekID] = useState(3);
 
 	React.useEffect(() => {
 		const fetchClassesID = async () => {
 			try {
 				const response = await fetch("/api/classes");
 				const data = await response.json();
-				const classesID = Object.fromEntries(data.classesID as [string, string][]);
-				setClassesID(classesID);
-				setSearchResults(data.classesID.map(([key, val]: [string, string]) => ({ value: val, label: key })));
+				const classesIDList = data.classesID.map(([key, val]: [string, string]) => ({ value: val, label: key }));
+				setClassesID(classesIDList);
+				setSearchResults(classesIDList);
 			} catch (error) {
 				console.error("Error fetching classes ID:", error);
 			}
@@ -37,22 +38,31 @@ export default function Dashboard() {
 	}, []);
 
 	React.useEffect(() => {
-    if (selectedClass)
-      fetchSchedule(selectedClass.value);
+		function reviver(key: any, value: any) {
+			// Used to parse map from json stringified
+			if (typeof value === "object" && value !== null) {
+				if (value.dataType === "Map") {
+					return new Map(value.value);
+				}
+			}
+			return value;
+		}
+
+		if (selectedClass) {
+			fetchSchedule(selectedClass.value)
+				.then((data) => {
+					const schedule = JSON.parse(data, reviver);
+					setCurrentScheduleWeeks(schedule.weeks as Schedule["weeks"]);
+				})
+				.catch((error) => {
+					console.error("Error fetching schedule:", error);
+				});
+		}
 	}, [selectedClass]);
 
-	const weekNumber = 42; // Example week number
-	const schedule = [
-		{ time: "08:00", title: "CM Microprocesseur", location: "AMPHI", instructor: "Monchal Laurent", color: "bg-blue-500", duration: 2 },
-		{ time: "10:00", title: "TD Microprocesseur", location: "A210", instructor: "Monchal Laurent", color: "bg-green-500", duration: 2 },
-		{ time: "13:30", title: "TD Analyse de Fourier", location: "A213", instructor: "Nicolas Papazoglou", color: "bg-red-500", duration: 2 },
-	];
-
-	const handleSearch = (value: string) => {
-		if (value) {
-			const results = Object.entries(classesID)
-				.filter(([key, val]) => val.toLowerCase().includes(value.toLowerCase()))
-				.map(([key, val]) => ({ value: key, label: val }));
+	const handleSearch = (label: string) => {
+		if (label) {
+			const results = classesID.filter((option) => option.label.toLowerCase().includes(label.toLowerCase()));
 			setSearchResults(results);
 		} else {
 			setSearchResults([]);
@@ -60,9 +70,42 @@ export default function Dashboard() {
 	};
 
 	const handleSelect = (value: string, option: ClassOption) => {
-		setSelectedClass({ value, label: option.label });
+		setSelectedClass(option);
 	};
 
+	const handlePrevWeek = () => {
+		setCurrentWeekID(currentWeekID - 1);
+	};
+
+	const handleNextWeek = () => {
+		setCurrentWeekID(currentWeekID + 1);
+	};
+
+  const DayCarousel = () => {
+    if (!currentScheduleWeeks) {
+      return <div className="flex justify-center items-center h-full">
+        <Alert message={<><Spin size="small" /> Loading schedule...</>} type="info" showIcon />
+      </div>;
+    }
+    
+    const frenchWeekDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
+    if (currentScheduleWeeks!.get(currentWeekID)!.has("Samedi")) {
+        frenchWeekDays.push("Samedi");
+    }
+    if (currentScheduleWeeks!.get(currentWeekID)!.has("Dimanche")) {
+        frenchWeekDays.push("Dimanche");
+    }
+    
+    return (
+      <Carousel>
+        {frenchWeekDays.map((dayLabel, index) => (
+          <div key={index}>
+            <DayDisplay scheduleOfTheDay={currentScheduleWeeks!.get(currentWeekID)!.get(dayLabel) || []} dayLabel={dayLabel} />
+          </div>
+        ))}
+      </Carousel>
+    );
+  }
 	return (
 		<Layout className="h-screen w-screen bg-[#f0f0f0]">
 			<div className="my-4 flex flex-col items-center">
@@ -78,7 +121,18 @@ export default function Dashboard() {
 					</AutoComplete>
 				</div>
 			</Header>
-			<DayDisplay weekNumber={weekNumber} schedule={schedule} />
+			<div className="px-4 py-4">
+				<Carousel afterChange={(current) => setCurrentWeekID(currentWeekID + current)}>
+					<div>
+						<div className="bg-[#9d1c1f]/60 py-2 px-2 rounded-tl-3xl rounded-tr-3xl flex justify-between items-center">
+							<LeftOutlined onClick={handlePrevWeek} className="text-white text-xl cursor-pointer" />
+							<div className="text-center text-white text-xl font-normal mx-4">Semaine {currentWeekID}</div>
+							<RightOutlined onClick={handleNextWeek} className="text-white text-xl cursor-pointer" />
+						</div>
+					</div>
+				</Carousel>
+        <DayCarousel />
+			</div>
 		</Layout>
 	);
 }

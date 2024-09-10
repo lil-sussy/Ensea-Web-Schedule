@@ -65,8 +65,7 @@ export const fetchSchedule = async (classID: string) => {
 	try {
 		const response = await fetch(`/api/schedule?classID=${classID}`);
 		const data = await response.json();
-		console.log(data);
-		// setSchedule(data.schedule);
+    return data.totalSchedule;
 	} catch (error) {
 		console.error("Error fetching schedule:", error);
 	}

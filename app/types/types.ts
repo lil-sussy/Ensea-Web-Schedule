@@ -18,6 +18,10 @@ export type CasResponse =
 			user: DecodedIdToken;
 	  };
 
+export interface Schedule {
+  lastUpdate: string;
+  weeks: Map<number, Map<string, Course[]>>;
+}
 
 
 export type CourseData = {
@@ -27,8 +31,6 @@ export type CourseData = {
 	week: number;
 	beginDate: string; // Cuz we cant json stringify a Date
 	endDate: string;
-	beginHour: string;
-	endHour: string;
 	teachers: string[];
 	locations: string[];
 	creationDate: Date;

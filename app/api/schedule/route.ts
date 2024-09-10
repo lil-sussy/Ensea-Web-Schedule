@@ -7,7 +7,7 @@ import { classesID, classList } from "../../types/onlineAdeObjects";
 import readline from 'readline';
 import testICal from './testIcal';
 
-import type { ClassSchedule, Course, ScheduleSet } from '../../types/Schedule';
+import type { ClassSchedule, Course, ScheduleSet } from '../../types/types';
 
 export const testEnvironement = false;
 
@@ -16,6 +16,7 @@ export type ScheduleFetcher = {
 };
 
 const REFRESH_DURATION = testEnvironement ? 1 * 1000 : 5 * 60 * 1000; // 5min or 1s (test)
+const scheduleJSONpath = path.join(process.cwd() + "/app/data/schedules.json"); // Path of the schedule json to save the all thing
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -26,7 +27,7 @@ export async function GET(request: NextRequest) {
   }
 
   await refreshSchedules(classID, REFRESH_DURATION);
-  const schedules: ScheduleSet = JSON.parse(String(fs.readFileSync(path.join(process.cwd(), '/private/schedules.json'))), reviver);
+  const schedules: ScheduleSet = JSON.parse(String(fs.readFileSync(scheduleJSONpath)), reviver);
   const classSchedule = schedules.get(classID);
 
   if (classSchedule) {
@@ -40,7 +41,6 @@ export async function POST(request: NextRequest) {
   return NextResponse.json({ status: 401, data: "Data not successfully loaded because it's automatic now" }, { status: 401 });
 }
 
-const scheduleJSONpath = path.join(process.cwd() + "/private/schedules.json"); // Path of the schedule json to save the all thing
 
 async function refreshSchedules(classeID: string, refreshDuration: number): Promise<ClassSchedule | undefined> {
   const progressBar = new ProgressBar("Updating from ADE - :percent (:bar) :schedule.", {

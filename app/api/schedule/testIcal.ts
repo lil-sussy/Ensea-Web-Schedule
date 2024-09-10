@@ -6,9 +6,9 @@ import { parseCalendar, ADEisCringe } from "./adeFetcher";
 import ProgressBar from "progress";
 import ical from "ical";
 import { testParseADE } from "./adeFetcher";
-import type { ScheduleFetcher, Calendar } from "../../types/Schedule";
+import type { ScheduleFetcher, Calendar } from "../../types/types";
 
-import type { Course, ClassSchedule, ScheduleSet } from "../../types/Schedule";
+import type { Course, ClassSchedule, ScheduleSet } from "../../types/types";
 
 
 function createCalendar(classeID: string) {

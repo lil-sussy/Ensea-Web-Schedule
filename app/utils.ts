@@ -27,10 +27,18 @@ export function getWeekDatesByID(weekID: number) {
 }
 
 // https://bobbyhadz.com/blog/javascript-get-monday-of-current-week#:~:text=function%20getMondayOfCurrentWeek()%20%7B%20const%20today,Mon%20Jan%2017%202022%20console.
+
+const currentYear = new Date().getFullYear();
+const currentMonth = new Date().getMonth();
+const schoolYear = currentMonth >= 6 ? currentYear : currentYear - 1;
+const firstSeptember = new Date(`01 Sep ${schoolYear} 02:00:00 GMT`);
+const firstMonday = new Date(firstSeptember.setDate(firstSeptember.getDate() - ((firstSeptember.getDay() + 6) % 7)));
+const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = firstMonday.getMonth() === 7 ? firstMonday : new Date(`29 Aug ${schoolYear} 02:00:00 GMT`);
+
 export function getWeekID(day: Date) {
-	const FIRST_MONDAY_OF_THE_SCHOOL_YEAR = new Date("29 Aug 2022 02:00:00 GMT"); // First monday of first week, France is in GMT+2 zone
-	const diff = dateDiffInDays(FIRST_MONDAY_OF_THE_SCHOOL_YEAR, day);
-	return Math.floor(Math.abs(diff) / 7) + 1;
+	const diffInDay = dateDiffInDays(FIRST_MONDAY_OF_THE_SCHOOL_YEAR, day);
+  const diffInWeeks = Math.floor(diffInDay / 7) + 1;
+	return diffInWeeks
 }
 
 /**

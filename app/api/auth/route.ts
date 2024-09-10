@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { getAuth } from "firebase-admin/auth";
-import type { CasResponse, User } from "../../types/Schedule";
+import type { CasResponse, User } from "../../types/types";
 import admin from "firebase-admin";
 import type { ServiceAccount } from "firebase-admin";
 

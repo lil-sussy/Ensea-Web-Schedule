@@ -1,26 +1,26 @@
 import fs from "fs";
-import type { Calendar } from "../../types/Schedule";
+import type { Calendar } from "../../types/types";
 import ical from "ical";
 import { classesID, classList } from "../../types/onlineAdeObjects";
 import axios from "axios";
 import { getWeekID } from "../../utils";
 
-import type { ScheduleFetcher, Course, ClassSchedule, ScheduleSet, CalendarEvent } from "../../types/Schedule";
+import type { ScheduleFetcher, Course, ClassSchedule, ScheduleSet, CalendarEvent } from "../../types/types";
 import type ProgressBar from "progress";
 import type { CalendarComponent } from "ical";
 
 
-export function testParseADE() {
-	const file = fs.readFileSync("./tests/ADECal.ics");
-	const lines = file.toString();
-	const parsedCalendar = ical.parseICS(lines);
-  const calendar = { ...(parsedCalendar as { [uid: string]: CalendarComponent }) };
-	for (const [key, value] of Object.entries(calendar)) {
-		const test: string = "";
-		const test2 = test.search("TP");
-		if (value.description!.search("TP") != -1) console.log(new Date(value.start!).getHours());
-	}
-}
+// export function testParseADE() {
+// 	const file = fs.readFileSync("./tests/ADECal.ics");
+// 	const lines = file.toString();
+// 	const parsedCalendar = ical.parseICS(lines);
+//   const calendar = { ...(parsedCalendar as { [uid: string]: CalendarComponent }) };
+// 	for (const [key, value] of Object.entries(calendar)) {
+// 		const test: string = "";
+// 		const test2 = test.search("TP");
+// 		if (value.description!.search("TP") != -1) console.log(new Date(value.start!).getHours());
+// 	}
+// }
 
 
 export const scheduleFetcher: ScheduleFetcher = {
@@ -69,10 +69,10 @@ export function parseCalendar(calendar: Calendar, schedule: ClassSchedule, class
 }
 
 export async function fetchADE(classeID: string) {
-	const scheduleADEID = classesID.get(classeID);
-	const begin = "2022-09-01",
-		end = "2023-08-09";
-	const URL = "https://ade.ensea.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?" + "resources=" + scheduleADEID + "&projectId=1&calType=ical&firstDate=" + begin + "&lastDate=" + end;
+	const scheduleADEID = classeID;
+	const begin = "2024-09-01",
+		end = "2025-08-09";
+	const URL = "https://ade.ensea.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?" + "resources=" + scheduleADEID + "&projectId=15&calType=ical&firstDate=" + begin + "&lastDate=" + end;
 	const res = await axios.get(URL); // Get request of the entire shcedule of 1 year for every classe
 	return res;
 }
@@ -171,8 +171,6 @@ export function parseCourseFromCalEvent(event: any): Course|undefined {
 			week: weekID as number,
 			beginDate: JSON.parse(JSON.stringify(beginDate)),
 			endDate: JSON.parse(JSON.stringify(endDate)),
-			beginHour: "",
-			endHour: "",
 			teachers: teachers as string[],
 			locations: places as string[],
 			creationDate: creationDate as Date,
