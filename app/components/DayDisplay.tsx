@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Card, DatePicker, Typography, Carousel, Divider } from "antd";
+import { Card, DatePicker, Typography, Carousel, Divider, Alert } from "antd";
 import { LeftOutlined, RightOutlined } from "@ant-design/icons";
 import dayjs from "dayjs";
 import { Row, Col } from "antd";
@@ -41,12 +41,20 @@ const DayDisplay: React.FC<DayDisplayProps> = ({ dayLabel, scheduleOfTheDay }) =
 	const timeSlots = generateTimeSlots();
 	const skippedSlots = new Set();
 
+  if (!scheduleOfTheDay.length || scheduleOfTheDay.length === 0) {
+    return <Alert message="No schedule for this day" type="info" />;
+  }
+
+  const _Date = () => {
+    return <DatePicker defaultValue={dayjs(scheduleOfTheDay[0].courseData.beginDate)} className="text-xl text-[#423b3b]" format="DD/MM/YYYY"/>
+  }
+
 	return (
 		<div className="bg-white rounded-bl-3xl rounded-br-3xl p-2">
 			{/* Day Title */}
 			<div className="flex justify-between items-center mb-2">
 				<h1 className="text-xl text-[#413a3a]">{dayLabel}</h1>
-				<DatePicker defaultValue={dayjs()} className="text-xl text-[#423b3b]" />
+				<_Date />
 			</div>
 			<Divider className="my-2" />
 
