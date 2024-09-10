@@ -1,7 +1,7 @@
 import icalgen from "ical-generator";
 import http from "http";
 import { faker } from "@faker-js/faker";
-import { scheduleIDs, scheduleList } from "./scheduleTree";
+import { classesID, classList } from "../../types/onlineAdeObjects";
 import { parseCalendar, ADEisCringe } from "./adeFetcher";
 import ProgressBar from "progress";
 import ical from "ical";

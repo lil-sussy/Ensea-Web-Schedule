@@ -1,39 +1,39 @@
 {
-  "name": "ews",
-  "version": "0.1.0",
-  "private": true,
-  "scripts": {
-    "dev": "next dev",
-    "build": "next build",
-    "start": "next start",
-    "lint": "next lint"
-  },
-  "dependencies": {
-    "@ant-design/icons": "^5.4.0",
-    "@faker-js/faker": "^9.0.0",
-    "@fontsource/lexend-deca": "^5.0.15",
-    "@types/ical": "^0.8.3",
-    "@types/progress": "^2.0.7",
-    "antd": "^5.20.6",
-    "axios": "^1.7.7",
-    "dayjs": "^1.11.13",
-    "faker": "^6.6.6",
-    "faker-js": "^1.0.0",
-    "firebase": "^10.13.1",
-    "firebase-admin": "^12.4.0",
-    "ical": "^0.8.0",
-    "ical-generator": "^8.0.0",
-    "next": "14.2.8",
-    "progress": "^2.0.3",
-    "react": "^18",
-    "react-dom": "^18"
-  },
-  "devDependencies": {
-    "@types/node": "^20",
-    "@types/react": "^18",
-    "@types/react-dom": "^18",
-    "postcss": "^8",
-    "tailwindcss": "^3.4.1",
-    "typescript": "^5"
-  }
+	"name": "ews",
+	"version": "0.1.0",
+	"private": true,
+	"scripts": {
+		"dev": "NODE_OPTIONS='--inspect' next dev",
+		"build": "next build",
+		"start": "next start",
+		"lint": "next lint"
+	},
+	"dependencies": {
+		"@ant-design/icons": "^5.4.0",
+		"@faker-js/faker": "^9.0.0",
+		"@fontsource/lexend-deca": "^5.0.15",
+		"@types/ical": "^0.8.3",
+		"@types/progress": "^2.0.7",
+		"antd": "^5.20.6",
+		"axios": "^1.7.7",
+		"dayjs": "^1.11.13",
+		"faker": "^5.5.3",
+		"faker-js": "^1.0.0",
+		"firebase": "^10.13.1",
+		"firebase-admin": "^12.4.0",
+		"ical": "^0.8.0",
+		"ical-generator": "^8.0.0",
+		"next": "^14.2.9",
+		"progress": "^2.0.3",
+		"react": "^18",
+		"react-dom": "^18"
+	},
+	"devDependencies": {
+		"@types/node": "^20",
+		"@types/react": "^18",
+		"@types/react-dom": "^18",
+		"postcss": "^8",
+		"tailwindcss": "^3.4.1",
+		"typescript": "^5"
+	}
 }

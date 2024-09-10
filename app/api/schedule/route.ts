@@ -3,7 +3,7 @@ import fs from 'fs';
 import path from 'path';
 import ProgressBar from "progress";
 import scheduleFetcher from '../../../components/ews/lib/ADEFetcher';
-import { scheduleIDs, scheduleList } from "./scheduleTree";
+import { classesID, classList } from "../../types/onlineAdeObjects";
 import readline from 'readline';
 import testICal from '../../../tests/testICal';
 
@@ -39,7 +39,7 @@ const scheduleJSONpath = path.join(process.cwd() + "/private/schedules.json"); /
 
 async function refreshSchedules(classeID: string, refreshDuration: number): Promise<ClassSchedule | undefined> {
   const progressBar = new ProgressBar("Updating from ADE - :percent (:bar) :schedule.", {
-    total: Array.from(scheduleIDs.keys()).length,
+    total: Array.from(classesID.keys()).length,
     complete: "#",
     incomplete: " ",
     width: 30,

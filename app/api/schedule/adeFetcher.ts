@@ -1,7 +1,7 @@
 import fs from "fs";
 import type { Calendar } from "../../types/Schedule";
 import ical from "ical";
-import { scheduleIDs, scheduleList } from "./scheduleTree";
+import { classesID, classList } from "../../types/onlineAdeObjects";
 import axios from "axios";
 import { getWeekID } from "../../utils";
 
@@ -69,7 +69,7 @@ export function parseCalendar(calendar: Calendar, schedule: ClassSchedule, class
 }
 
 export async function fetchADE(classeID: string) {
-	const scheduleADEID = scheduleIDs.get(classeID);
+	const scheduleADEID = classesID.get(classeID);
 	const begin = "2022-09-01",
 		end = "2023-08-09";
 	const URL = "https://ade.ensea.fr/jsp/custom/modules/plannings/anonymous_cal.jsp?" + "resources=" + scheduleADEID + "&projectId=1&calType=ical&firstDate=" + begin + "&lastDate=" + end;
@@ -130,7 +130,7 @@ function removeSpaces(str: String) {
 }
 
 function isClasseName(information: any) {
-	return scheduleList.includes(information);
+	return classList.includes(information);
 }
 
 export function parseCourseFromCalEvent(event: any): Course|undefined {
