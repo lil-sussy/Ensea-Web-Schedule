@@ -27,7 +27,7 @@ export default function Dashboard() {
 				const data = await response.json();
 				const classesID = Object.fromEntries(data.classesID as [string, string][]);
 				setClassesID(classesID);
-				setSearchResults(data.classesID.map(([key, val]: [string, string]) => ({ value: key, label: key })));
+				setSearchResults(data.classesID.map(([key, val]: [string, string]) => ({ value: val, label: key })));
 			} catch (error) {
 				console.error("Error fetching classes ID:", error);
 			}
