@@ -1,37 +1,75 @@
-"use client"
+"use client";
+import { useRouter } from "next/navigation";
+import { signInWithCustomToken } from "firebase/auth";
+import { useEffect, useState } from "react";
+import App from "./components/app";
+import { initializeApp } from "firebase/app";
+import { getFirestore } from "firebase/firestore";
+import { getAnalytics } from "firebase/analytics";
+import { getAuth } from "firebase/auth"; // New import
 
-import React from "react";
-import { Layout, Menu, Button, Card, DatePicker, Input, Typography } from "antd";
-import { SearchOutlined, UserOutlined } from "@ant-design/icons";
-import dayjs from "dayjs";
-import DayDisplay from "./components/DayDisplay";
-import { AthenaLogo, AthenaTextLogo } from "./icons/icons";
+const firebaseConfig = {
+	apiKey: "AIzaSyAH1WvRPNDwIOwuS7fRodexNiJW6k-uvPs",
+	authDomain: "ensea-web-schedule.firebaseapp.com",
+	projectId: "ensea-web-schedule",
+	storageBucket: "ensea-web-schedule.appspot.com",
+	messagingSenderId: "199059616108",
+	appId: "1:199059616108:web:02eab45e13ac597e638349",
+	measurementId: "G-DFMX68CNV4",
+};
 
-const { Header, Content } = Layout;
-const { Title } = Typography;
+export const firebase = initializeApp(firebaseConfig);
+export const database = getFirestore(firebase);
+export const auth = getAuth(firebase);
 
-export default function Dashboard() {
-	const weekNumber = 42; // Example week number
-	const schedule = [
-		{ time: "08:00", title: "CM Microprocesseur", location: "AMPHI", instructor: "Monchal Laurent", color: "bg-blue-500", duration: 2 },
-		{ time: "10:00", title: "TD Microprocesseur", location: "A210", instructor: "Monchal Laurent", color: "bg-green-500", duration: 2 },
-		{ time: "13:30", title: "TD Analyse de Fourier", location: "A213", instructor: "Nicolas Papazoglou", color: "bg-red-500", duration: 2 },
-	];
+// Main component
+export default function EWSIndex() {
+	const [isMounted, setIsMounted] = useState(false);
+	const router = useRouter();
+
+	useEffect(() => {
+		const urlParams = new URLSearchParams(window.location.search);
+		const ticket = urlParams.get("ticket");
+		const host = window.location.href;
+
+		if (auth.currentUser) {
+			auth.currentUser.getIdToken(true).then((userToken) => {
+				fetch("/api/auth", {
+          method: "POST",
+					body: JSON.stringify({ tokenID: userToken }),
+				})
+					.then((res) => res.json())
+					.then((apiRes) => {
+						const user = apiRes.user;
+					})
+					.catch((error) => console.log("error", error));
+			});
+		} else if (ticket) {
+			fetch("/api/auth", {
+        method: "GET",
+				headers: { ticket: ticket },
+			})
+				.then((res) => {
+					if (res.status === 400) {
+						router.push(`https://identites.ensea.fr/cas/login?service=${encodeURIComponent(host)}`);
+					} else {
+						return res.json();
+					}
+				})
+				.then((apiRes) => {
+					const { userToken } = apiRes;
+					if (userToken) {
+						signInWithCustomToken(auth, userToken).catch((error) => console.log("error", error));
+					}
+				});
+		} else {
+			router.push(`https://identites.ensea.fr/cas/login?service=${encodeURIComponent(host)}`);
+		}
+	}, [router]);
 
 	return (
-		<Layout className="h-screen w-screen bg-[#f0f0f0]">
-			<div className="my-4 flex flex-col items-center">
-				<AthenaTextLogo width={100} height={20} color="#9d1c1f" />
-			</div>
-			<Header className="bg-gradient-to-r from-[#9d1c1f] to-[#731422] border-t-4 border-b-4 border-white flex justify-between items-center h-[7rem] relative">
-				<div className="flex items-center gap-4 w-full h-full">
-					<div className="absolute -left-16 top-4">
-						<AthenaLogo width={200} height={100} color="white" />
-					</div>
-					<Input size="large" placeholder="Search for a class" className="bg-[#f1e8e9]/30 focus-within:bg-[#f1e8e9]/60 hover:bg-[#f1e8e9]/50 text-white rounded-3xl border-2 border-white text-xl w-full" prefix={<SearchOutlined />} />
-				</div>
-			</Header>
-			<DayDisplay weekNumber={weekNumber} schedule={schedule} />
-		</Layout>
+		<>
+			<App />
+		</>
 	);
 }

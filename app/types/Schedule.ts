@@ -1,4 +1,24 @@
 import type ProgressBar from "progress"
+import type { DecodedIdToken } from "firebase-admin/auth"
+
+
+export type User = {
+	email: string;
+	fullName: string;
+	password: string;
+};
+
+export type CasResponse =
+	| {
+			userToken: string;
+			user: User;
+	  }
+	| {
+			userToken: string;
+			user: DecodedIdToken;
+	  };
+
+
 
 export type CourseData = {
 	name: string;
