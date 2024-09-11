@@ -211,7 +211,7 @@ const DayCarousel = React.forwardRef<CarouselRef, DayCarouselProps>(
 		}
 
 		return (
-			<Carousel draggable ref={ref} initialSlide={initialDayIndex}>
+			<Carousel draggable ref={ref} initialSlide={initialDayIndex} dotPosition="top">
 				{frenchWeekDays.map((dayLabel, index) => (
 					<div key={index}>
 						<DayDisplay scheduleOfTheDay={currentScheduleWeeks!.get(currentWeekID)!.get(dayLabel) || []} dayLabel={dayLabel} changeToDate={changeToDate} />
