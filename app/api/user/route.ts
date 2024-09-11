@@ -8,7 +8,7 @@ if (!admin.apps.length) {
 		type: "service_account",
 		project_id: "ensea-web-schedule",
 		private_key_id: "a71aa00a3c5a5edd302d8f7e27b649eb9698b2e4",
-		private_key: process.env.FIREBASE_PRIVATE_KEY!.replace(/\\n/g, "\n"),
+		private_key: process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, "\n"),
 		client_email: "firebase-adminsdk-rj3fb@ensea-web-schedule.iam.gserviceaccount.com",
 		client_id: "105461477154085530102",
 		auth_uri: "https://accounts.google.com/o/oauth2/auth",
