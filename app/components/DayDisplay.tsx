@@ -84,8 +84,8 @@ const DayDisplay: React.FC<DayDisplayProps> = ({ dayLabel, scheduleOfTheDay, cha
 									<div className="col-span-10 p-1 rounded-lg font-['Lexend_Deca']" style={{ backgroundColor: itemColor, gridRow: `span ${Math.ceil(duration)}`, height: `${Math.ceil(duration) * 3}rem`, maxHeight: `${Math.ceil(duration) * 3}rem` }}>
 										<h4 className="text-white text-md h-[20%] font-['Lexend_Deca'] overflow-y-scroll">{scheduleItem.courseData.name}</h4>
 										<Divider className="bg-white my-1 h-0.5" />
-										<div className="flex justify-between items-center mt-2 h-[60%]">
-											<div className="overflow-y-scroll h-full">
+										<div className="flex justify-between items-center mt-2 h-[60%] gap-2">
+											<div className="overflow-y-scroll h-full min-w-[20%] max-w-[30%]">
 												<div className="text-white text-xl font-medium font-bold leading-2">{scheduleItem.courseData.locations.join(", ")}</div>
 											</div>
 											<div className="overflow-y-scroll h-full">
