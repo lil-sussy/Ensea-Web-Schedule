@@ -126,7 +126,17 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
   };
 
 	const handleWeekSwipe = (current: number) => {
-		setCurrentWeekID(current + weekOffset);
+		setCurrentWeekID((prevWeekID) => {
+      const newWeekID = current + weekOffset;
+      if (newWeekID == prevWeekID)
+        return newWeekID;
+      if (newWeekID - prevWeekID > 0) {
+        dayCarouselRef.current?.goTo(0); // Go to Monday
+      } else {
+        dayCarouselRef.current?.goTo(4); // Go to Friday
+      }
+      return newWeekID;
+    });
 	};
 
 	return (
