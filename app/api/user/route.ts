@@ -69,7 +69,7 @@ export async function GET(request: NextRequest) {
 
 		const userData = userDoc.data();
 
-		return NextResponse.json({ status: 200, userScheduleSetting: userData?.lastSchedule }, { status: 200 });
+		return NextResponse.json({ status: 200, classID: userData?.lastSchedule }, { status: 200 });
 	} catch (error) {
 		return NextResponse.json({ status: 500, message: "Internal Server Error", error: (error as Error).message }, { status: 500 });
 	}

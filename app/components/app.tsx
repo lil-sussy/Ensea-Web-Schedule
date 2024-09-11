@@ -40,25 +40,26 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 			try {
 				const response = await fetch("/api/classes");
 				const data = await response.json();
-				const classesIDList = data.classesID.map(([key, val]: [string, string]) => ({ value: val, label: key }));
+				const classesIDList:ClassOption[] = data.classesID.map(([key, val]: [string, string]) => ({ value: String(val), label: String(key) }));
 				setClassesID(classesIDList);
 				setSearchResults(classesIDList);
+        getUserScheduleSetting()
+					.then((classID) => {
+						if (classID) {
+							const classOption = classesIDList.find((option) => option.value === classID) || null;
+							setSelectedClass(classOption);
+              setSearchTerm(classOption?.label || "");
+						}
+					})
+					.catch((error) => {
+						console.error("Error getting user schedule setting:", error);
+					});
 			} catch (error) {
 				console.error("Error fetching classes ID:", error);
 			}
 		};
 
 		fetchClassesID();
-		getUserScheduleSetting()
-			.then((classID) => {
-				if (classID) {
-					const classOption = classesID.find((option) => option.value === classID) || null;
-					setSelectedClass(classOption);
-				}
-			})
-			.catch((error) => {
-				console.error("Error getting user schedule setting:", error);
-			});
 	}, []);
 
 	React.useEffect(() => {
