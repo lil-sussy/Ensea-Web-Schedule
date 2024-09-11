@@ -88,3 +88,33 @@ export const fetchSchedule = async (classID: string) => {
 		console.error("Error fetching schedule:", error);
 	}
 };
+
+export const postUserScheduleSetting = async (classID: string) => {
+  const userToken = Cookies.get("idToken");
+  try {
+    await fetch("/api/user", {
+			method: "POST",
+			headers: {
+				Authorization: `Bearer ${userToken}`,
+			},
+			body: JSON.stringify({ classID }),
+		});
+  } catch (error) {
+    console.error("Error posting user schedule setting:", error);
+  }
+};
+
+export const getUserScheduleSetting = async () => {
+  const userToken = Cookies.get("idToken");
+  try {
+    const response = await fetch("/api/user", {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    const data = await response.json();
+    return data.classID;
+  } catch (error) {
+    console.error("Error fetching user schedule setting:", error);
+  }
+}

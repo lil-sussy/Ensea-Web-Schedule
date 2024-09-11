@@ -6,8 +6,11 @@ import { SearchOutlined } from "@ant-design/icons";
 import DayDisplay from "./DayDisplay";
 import { AthenaLogo, AthenaTextLogo } from "../icons/icons";
 import { fetchSchedule } from "../request";
+import { getUserScheduleSetting, postUserScheduleSetting } from "../request";
+
 import type { Schedule } from "../types/types";
 import type { CarouselRef } from "antd/es/carousel";
+
 const { Header } = Layout;
 
 interface ClassOption {
@@ -25,8 +28,7 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 	const [classesID, setClassesID] = useState<ClassOption[]>([]);
 	const [currentScheduleWeeks, setCurrentScheduleWeeks] = useState<Schedule["weeks"] | null>(null);
 	const [currentWeekID, setCurrentWeekID] = useState(initialWeekID);
-  const [weekOffset, setWeekOffset] = useState(0);
-
+	const [weekOffset, setWeekOffset] = useState(0);
 
 	React.useEffect(() => {
 		const fetchClassesID = async () => {
@@ -42,6 +44,16 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 		};
 
 		fetchClassesID();
+		getUserScheduleSetting()
+			.then((classID) => {
+				if (classID) {
+					const classOption = classesID.find((option) => option.value === classID) || null;
+					setSelectedClass(classOption);
+				}
+			})
+			.catch((error) => {
+				console.error("Error getting user schedule setting:", error);
+			});
 	}, []);
 
 	React.useEffect(() => {
@@ -64,14 +76,14 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 				.catch((error) => {
 					console.error("Error fetching schedule:", error);
 				});
+			postUserScheduleSetting(selectedClass.value);
 		}
 	}, [selectedClass]);
 
-  React.useEffect(() => {
-    if (!currentScheduleWeeks)
-      return
-    setWeekOffset(Array.from(currentScheduleWeeks.keys()).sort((a, b) => a - b)[0]);
-  }, [currentScheduleWeeks]);
+	React.useEffect(() => {
+		if (!currentScheduleWeeks) return;
+		setWeekOffset(Array.from(currentScheduleWeeks.keys()).sort((a, b) => a - b)[0]);
+	}, [currentScheduleWeeks]);
 
 	const handleSearch = (label: string) => {
 		if (label) {
@@ -196,7 +208,7 @@ const WeekSelectorCarousel = ({ currentScheduleWeeks, handleWeekSwipe }: WeekSel
 	return (
 		<Carousel draggable afterChange={(current) => handleWeekSwipe(current)} dots={false} arrows initialSlide={0}>
 			{Array.from(currentScheduleWeeks.keys())
-				.sort((a, b ) => a - b)
+				.sort((a, b) => a - b)
 				.map((weekID, index) => (
 					<div key={index}>
 						<div className="bg-[#9d1c1f]/60 py-2 px-2 rounded-tl-3xl rounded-tr-3xl flex justify-between items-center">
