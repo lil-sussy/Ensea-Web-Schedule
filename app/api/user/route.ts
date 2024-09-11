@@ -25,7 +25,7 @@ if (!admin.apps.length) {
 
 export async function POST(request: NextRequest) {
 	try {
-		const { userScheduleSetting } = await request.json();
+		const { classID } = await request.json();
 		const authHeader = request.headers.get('Authorization');
 
 		if (!authHeader || !authHeader.startsWith('Bearer ')) {
@@ -36,9 +36,12 @@ export async function POST(request: NextRequest) {
 		const decodedToken = await admin.auth().verifyIdToken(userToken);
 		const uid = decodedToken.uid;
 
-		await admin.firestore().collection('users').doc(uid).set({
-			lastSchedule: userScheduleSetting
-		}, { merge: true });
+		await admin.firestore().collection("users").doc(uid).set(
+			{
+				lastSchedule: classID,
+			},
+			{ merge: true }
+		);
 
 		return NextResponse.json({ status: 200, message: "User schedule setting updated successfully" }, { status: 200 });
 	} catch (error) {

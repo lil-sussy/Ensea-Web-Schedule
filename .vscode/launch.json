@@ -15,6 +15,17 @@
     },
     {
       "name": "Next.js: debug full stack",
+      "type": "node-terminal",
+      "request": "launch",
+      "command": "npm run dev",
+      "serverReadyAction": {
+        "pattern": "- Local:.+(https?://.+)",
+        "uriFormat": "%s",
+        "action": "debugWithChrome"
+      }
+    },
+    {
+      "name": "Next.js: debug full stack 2",
       "type": "node",
       "request": "launch",
       "program": "${workspaceFolder}/node_modules/.bin/next",

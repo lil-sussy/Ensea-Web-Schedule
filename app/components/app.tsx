@@ -76,7 +76,7 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 				.catch((error) => {
 					console.error("Error fetching schedule:", error);
 				});
-			postUserScheduleSetting(selectedClass.value);
+			postUserScheduleSetting(`${selectedClass.value}`);
 		}
 	}, [selectedClass]);
 
