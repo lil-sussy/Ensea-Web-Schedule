@@ -1,11 +1,11 @@
 import fs from "fs";
-import type { Calendar } from "../../types/types";
+import type { Calendar } from "./types/types";
 import ical from "ical";
-import { classesID, classList } from "../../types/onlineAdeObjects";
+import { classesID, classList } from "./types/onlineAdeObjects";
 import axios from "axios";
-import { getWeekID } from "../../utils";
+import { getWeekID } from "./utils";
 
-import type { ScheduleFetcher, Course, ClassSchedule, ScheduleSet, CalendarEvent } from "../../types/types";
+import type { ScheduleFetcher, Course, ClassSchedule, ScheduleSet, CalendarEvent } from "./types/types";
 import type ProgressBar from "progress";
 import type { CalendarComponent } from "ical";
 
@@ -94,27 +94,27 @@ function ADE_IS_OMEGA_FUCKING_CRINGE(calCourse: CalendarEvent): CalendarEvent {
 
 export function ADEisCringe(ADEdata: string) {
 	return ADEdata;
-	const timezoneID = "TZID=France/Paris";
-	let data = "";
-	const lines = ADEdata.split("\n") as string[];
-	for (let line of lines) {
-		// Example "DTSTAMP:20230406T105014Z"
-		//                    year    T
-		if (line.startsWith("DTSTAMP") || line.startsWith("DTSTART") || line.startsWith("DTEND") || line.startsWith("LAST-MODIFIED")) {
-			const ICSKey = line.split(":")[0];
-			const ICSValue = line.split(":")[1];
-			const ADEHour = Number(/T+\d{2}/.exec(ICSValue)[0].slice(1));
-			const hourIndex = /T+\d{2}/.exec(ICSValue)[1];
-			let realHour = ADEHour + (new Date().getHours() - new Date().getUTCHours()); // Ade is substracting 1 hour to every damn courses
-			let realHourstr = realHour < 10 ? "0" + String(realHour) : "" + String(realHour);
-			// line = ICSKey + ';' + timezoneID + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
-			line = ICSKey + ":" + ICSValue.replace("T" + ADEHour, "T" + realHourstr) + "\n";
-			data += line;
-		} else {
-			data += line + "\n";
-		}
-	}
-	return data;
+	// const timezoneID = "TZID=France/Paris";
+	// let data = "";
+	// const lines = ADEdata.split("\n") as string[];
+	// for (let line of lines) {
+	// 	// Example "DTSTAMP:20230406T105014Z"
+	// 	//                    year    T
+	// 	if (line.startsWith("DTSTAMP") || line.startsWith("DTSTART") || line.startsWith("DTEND") || line.startsWith("LAST-MODIFIED")) {
+	// 		const ICSKey = line.split(":")[0];
+	// 		const ICSValue = line.split(":")[1];
+	// 		const ADEHour = Number(/T+\d{2}/.exec(ICSValue)[0].slice(1));
+	// 		const hourIndex = /T+\d{2}/.exec(ICSValue)[1];
+	// 		let realHour = ADEHour + (new Date().getHours() - new Date().getUTCHours()); // Ade is substracting 1 hour to every damn courses
+	// 		let realHourstr = realHour < 10 ? "0" + String(realHour) : "" + String(realHour);
+	// 		// line = ICSKey + ';' + timezoneID + ':' + ICSValue.replace('T'+ADEHour, 'T'+realHour) + '\n'
+	// 		line = ICSKey + ":" + ICSValue.replace("T" + ADEHour, "T" + realHourstr) + "\n";
+	// 		data += line;
+	// 	} else {
+	// 		data += line + "\n";
+	// 	}
+	// }
+	// return data;
 }
 
 function removeSpaces(str: String) {

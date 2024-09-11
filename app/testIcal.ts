@@ -1,14 +1,14 @@
 import icalgen from "ical-generator";
 import http from "http";
 import { faker } from "@faker-js/faker";
-import { classesID, classList } from "../../types/onlineAdeObjects";
+import { classesID, classList } from "./types/onlineAdeObjects";
 import { parseCalendar, ADEisCringe } from "./adeFetcher";
 import ProgressBar from "progress";
 import ical from "ical";
 import { testParseADE } from "./adeFetcher";
-import type { ScheduleFetcher, Calendar } from "../../types/types";
+import type { ScheduleFetcher, Calendar } from "./types/types";
 
-import type { Course, ClassSchedule, ScheduleSet } from "../../types/types";
+import type { Course, ClassSchedule, ScheduleSet } from "./types/types";
 
 
 function createCalendar(classeID: string) {
