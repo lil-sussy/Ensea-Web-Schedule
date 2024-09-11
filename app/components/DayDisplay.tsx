@@ -9,8 +9,9 @@ import { Course } from "../types/types";
 const { Title } = Typography;
 
 interface DayDisplayProps {
-  dayLabel: string;
+	dayLabel: string;
 	scheduleOfTheDay: Course[];
+	changeToDate: (date: Date) => void;
 }
 
 function hashCode(str: string) {
@@ -21,7 +22,7 @@ function hashCode(str: string) {
 	return hash;
 }
 
-const DayDisplay: React.FC<DayDisplayProps> = ({ dayLabel, scheduleOfTheDay }) => {
+const DayDisplay: React.FC<DayDisplayProps> = ({ dayLabel, scheduleOfTheDay, changeToDate }) => {
 	const generateTimeSlots = () => {
 		const slots = [];
 		for (let hour = 8; hour < 13; hour++) {
@@ -33,7 +34,7 @@ const DayDisplay: React.FC<DayDisplayProps> = ({ dayLabel, scheduleOfTheDay }) =
 		return slots;
 	};
 
-  function generateColor(str: string) {
+	function generateColor(str: string) {
 		const hue = Math.abs(hashCode(str) % 360);
 		return `hsl(${hue}, 75%, 50%)`;
 	}
@@ -41,13 +42,13 @@ const DayDisplay: React.FC<DayDisplayProps> = ({ dayLabel, scheduleOfTheDay }) =
 	const timeSlots = generateTimeSlots();
 	const skippedSlots = new Set();
 
-  if (!scheduleOfTheDay.length || scheduleOfTheDay.length === 0) {
-    return <Alert message="No schedule for this day" type="info" />;
-  }
+	if (!scheduleOfTheDay.length || scheduleOfTheDay.length === 0) {
+		return <Alert message="No schedule for this day" type="info" />;
+	}
 
-  const _Date = () => {
-    return <DatePicker defaultValue={dayjs(scheduleOfTheDay[0].courseData.beginDate)} className="text-xl text-[#423b3b]" format="DD/MM/YYYY"/>
-  }
+	const _Date = () => {
+		return <DatePicker defaultValue={dayjs(scheduleOfTheDay[0].courseData.beginDate)} className="text-xl text-[#423b3b]" format="DD/MM/YYYY" onChange={(date) => changeToDate(date.toDate())} />;
+	};
 
 	return (
 		<div className="bg-white rounded-bl-3xl rounded-br-3xl p-2">
@@ -66,9 +67,9 @@ const DayDisplay: React.FC<DayDisplayProps> = ({ dayLabel, scheduleOfTheDay }) =
 					}
 
 					const scheduleItem = scheduleOfTheDay.find((item) => dayjs(item.courseData.beginDate).format("HH:mm") === time);
-					const duration = scheduleItem ? dayjs(scheduleItem.courseData.endDate).diff(dayjs(scheduleItem.courseData.beginDate), 'hour', true) : 1;
+					const duration = scheduleItem ? dayjs(scheduleItem.courseData.endDate).diff(dayjs(scheduleItem.courseData.beginDate), "hour", true) : 1;
 
-          const itemColor = scheduleItem ? `${generateColor(scheduleItem.courseData.name)}` : "#f0f0f0";
+					const itemColor = scheduleItem ? `${generateColor(scheduleItem.courseData.name)}` : "#f0f0f0";
 
 					if (scheduleItem) {
 						for (let i = 1; i < duration; i++) {

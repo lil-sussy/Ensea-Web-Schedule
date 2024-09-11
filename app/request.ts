@@ -118,3 +118,20 @@ export const getUserScheduleSetting = async () => {
     console.error("Error fetching user schedule setting:", error);
   }
 }
+
+
+export const fetchWeekID = async (date: Date) => {
+  const userToken = Cookies.get("idToken");
+  const encodedDate = encodeURIComponent(date.toISOString());
+  try {
+    const response = await fetch(`/api/schedule/weekID?date=${encodedDate}`, {
+      headers: {
+        Authorization: `Bearer ${userToken}`,
+      },
+    });
+    const data = await response.json();
+    return data.weekID;
+  } catch (error) {
+    console.error("Error fetching weekID:", error);
+  }
+};

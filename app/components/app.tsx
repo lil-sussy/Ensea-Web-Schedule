@@ -5,7 +5,7 @@ import { Layout, Input, AutoComplete, Carousel, Spin, Alert } from "antd";
 import { SearchOutlined } from "@ant-design/icons";
 import DayDisplay from "./DayDisplay";
 import { AthenaLogo, AthenaTextLogo } from "../icons/icons";
-import { fetchSchedule } from "../request";
+import { fetchSchedule, fetchWeekID } from "../request";
 import { getUserScheduleSetting, postUserScheduleSetting } from "../request";
 
 import type { Schedule } from "../types/types";
@@ -30,6 +30,10 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 	const [currentWeekID, setCurrentWeekID] = useState(initialWeekID);
 	const [weekOffset, setWeekOffset] = useState(0);
   const [searchTerm, setSearchTerm] = useState("");
+  const dayCarouselRef = React.useRef<CarouselRef>(null);
+  const weekCarouselRef = React.useRef<CarouselRef>(null);
+  const [initialDayIndex, setInitialDayIndex] = useState(0);
+  const [initialWeekIndex, setInitialWeekIndex] = useState(0);
 
 	React.useEffect(() => {
 		const fetchClassesID = async () => {
@@ -86,6 +90,10 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 		setWeekOffset(Array.from(currentScheduleWeeks.keys()).sort((a, b) => a - b)[0]);
 	}, [currentScheduleWeeks]);
 
+  React.useEffect(() => {
+    changeToDate(new Date());
+  }, [weekOffset]);
+
 	const handleSearch = (label: string) => {
 		if (label) {
 			const results = classesID.filter((option) => option.label.toLowerCase().includes(label.toLowerCase()));
@@ -94,6 +102,19 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 			setSearchResults([]);
 		}
 	};
+
+  const changeToDate = (date: Date) => {
+    fetchWeekID(date).then((weekID) => {
+      setCurrentWeekID(weekID);
+      weekCarouselRef.current?.goTo(weekID - weekOffset);
+      setInitialWeekIndex(weekID - weekOffset);
+      const dayOfWeek = date.getDay() - 1;
+      dayCarouselRef.current?.goTo(dayOfWeek);
+      setInitialDayIndex(dayOfWeek);
+    }).catch((error) => {
+      console.error("Error fetching week ID:", error);
+    })
+  }
 
 	const handleSelect = (value: string, option: ClassOption) => {
 		setSelectedClass(option);
@@ -124,8 +145,8 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 				</div>
 			</Header>
 			<div className="px-4 py-4">
-				<WeekSelectorCarousel currentScheduleWeeks={currentScheduleWeeks} currentWeekID={currentWeekID} handleWeekSwipe={handleWeekSwipe} />
-				<DayCarousel currentScheduleWeeks={currentScheduleWeeks} currentWeekID={currentWeekID} />
+				<WeekSelectorCarousel currentScheduleWeeks={currentScheduleWeeks} currentWeekID={currentWeekID} handleWeekSwipe={handleWeekSwipe} ref={weekCarouselRef} initialWeekIndex={initialWeekIndex} />
+				<DayCarousel currentScheduleWeeks={currentScheduleWeeks} currentWeekID={currentWeekID} ref={dayCarouselRef} changeToDate={changeToDate} initialDayIndex={initialDayIndex} />
 			</div>
 		</Layout>
 	);
@@ -134,86 +155,110 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 interface DayCarouselProps {
 	currentScheduleWeeks: Schedule["weeks"] | null;
 	currentWeekID: number;
+	changeToDate: (date: Date) => void;
+	initialDayIndex: number;
 }
 
-const DayCarousel = ({ currentScheduleWeeks, currentWeekID }: DayCarouselProps) => {
-	if (!currentScheduleWeeks) {
-		return (
-			<div className="flex justify-center items-center h-full">
-				<Alert
-					message={
-						<>
-							<Spin size="small" /> Loading schedule...
-						</>
-					}
-					type="info"
-					showIcon
-				/>
-			</div>
-		);
-	}
+const DayCarousel = React.forwardRef<CarouselRef, DayCarouselProps>(
+	({ currentScheduleWeeks, currentWeekID, changeToDate, initialDayIndex }, ref) => {
 
-	if (!currentScheduleWeeks.get(currentWeekID)) {
-		return (
-			<div className="flex justify-center items-center h-full">
-				<Alert message="No schedule for this week" type="info" showIcon />
-			</div>
-		);
-	}
+		React.useEffect(() => {
+			if (ref && (ref as React.RefObject<CarouselRef>).current) {
+				(ref as React.RefObject<CarouselRef>).current!.goTo(initialDayIndex);
+			}
+		}, [initialDayIndex, ref]);
 
-	const frenchWeekDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
-	if (currentScheduleWeeks!.get(currentWeekID)!.has("Samedi")) {
-		frenchWeekDays.push("Samedi");
-	}
-	if (currentScheduleWeeks!.get(currentWeekID)!.has("Dimanche")) {
-		frenchWeekDays.push("Dimanche");
-	}
-
-	return (
-		<Carousel draggable>
-			{frenchWeekDays.map((dayLabel, index) => (
-				<div key={index}>
-					<DayDisplay scheduleOfTheDay={currentScheduleWeeks!.get(currentWeekID)!.get(dayLabel) || []} dayLabel={dayLabel} />
+		if (!currentScheduleWeeks) {
+			return (
+				<div className="flex justify-center items-center h-full">
+					<Alert
+						message={
+							<>
+								<Spin size="small" /> Loading schedule...
+							</>
+						}
+						type="info"
+						showIcon
+					/>
 				</div>
-			))}
-		</Carousel>
-	);
-};
+			);
+		}
+
+		if (!currentScheduleWeeks.get(currentWeekID)) {
+			return (
+				<div className="flex justify-center items-center h-full">
+					<Alert message="No schedule for this week" type="info" showIcon />
+				</div>
+			);
+		}
+
+		const frenchWeekDays = ["Lundi", "Mardi", "Mercredi", "Jeudi", "Vendredi"];
+		if (currentScheduleWeeks!.get(currentWeekID)!.has("Samedi")) {
+			frenchWeekDays.push("Samedi");
+		}
+		if (currentScheduleWeeks!.get(currentWeekID)!.has("Dimanche")) {
+			frenchWeekDays.push("Dimanche");
+		}
+
+		return (
+			<Carousel draggable ref={ref} initialSlide={initialDayIndex}>
+				{frenchWeekDays.map((dayLabel, index) => (
+					<div key={index}>
+						<DayDisplay scheduleOfTheDay={currentScheduleWeeks!.get(currentWeekID)!.get(dayLabel) || []} dayLabel={dayLabel} changeToDate={changeToDate} />
+					</div>
+				))}
+			</Carousel>
+		);
+	}
+);
+
+DayCarousel.displayName = "DayCarousel";
 
 interface WeekSelectorCarouselProps {
 	currentScheduleWeeks: Schedule["weeks"] | null;
 	currentWeekID: number;
 	handleWeekSwipe: (current: number) => void;
+	initialWeekIndex: number;
 }
 
-const WeekSelectorCarousel = ({ currentScheduleWeeks, handleWeekSwipe }: WeekSelectorCarouselProps) => {
-	if (!currentScheduleWeeks) {
+const WeekSelectorCarousel = React.forwardRef<CarouselRef, WeekSelectorCarouselProps>(
+	({ currentScheduleWeeks, currentWeekID, handleWeekSwipe, initialWeekIndex }, ref) => {
+		React.useEffect(() => {
+			if (ref && (ref as React.RefObject<CarouselRef>).current) {
+				(ref as React.RefObject<CarouselRef>).current!.goTo(initialWeekIndex);
+			}
+		}, [initialWeekIndex, ref]);
+
+		if (!currentScheduleWeeks) {
+			return (
+				<div className="flex justify-center items-center h-full">
+					<Alert
+						message={
+							<>
+								<Spin size="small" /> Loading schedule...
+							</>
+						}
+						type="info"
+						showIcon
+					/>
+				</div>
+			);
+		}
+
 		return (
-			<div className="flex justify-center items-center h-full">
-				<Alert
-					message={
-						<>
-							<Spin size="small" /> Loading schedule...
-						</>
-					}
-					type="info"
-					showIcon
-				/>
-			</div>
+			<Carousel draggable afterChange={(current) => handleWeekSwipe(current)} dots={false} arrows initialSlide={initialWeekIndex} ref={ref}>
+				{Array.from(currentScheduleWeeks.keys())
+					.sort((a, b) => a - b)
+					.map((weekID, index) => (
+						<div key={index}>
+							<div className="bg-[#9d1c1f]/60 py-2 px-2 rounded-tl-3xl rounded-tr-3xl flex justify-between items-center">
+								<div className="text-center text-white text-xl font-normal mx-4">Semaine {weekID}</div>
+							</div>
+						</div>
+					))}
+			</Carousel>
 		);
 	}
+);
 
-	return (
-		<Carousel draggable afterChange={(current) => handleWeekSwipe(current)} dots={false} arrows initialSlide={0}>
-			{Array.from(currentScheduleWeeks.keys())
-				.sort((a, b) => a - b)
-				.map((weekID, index) => (
-					<div key={index}>
-						<div className="bg-[#9d1c1f]/60 py-2 px-2 rounded-tl-3xl rounded-tr-3xl flex justify-between items-center">
-							<div className="text-center text-white text-xl font-normal mx-4">Semaine {weekID}</div>
-						</div>
-					</div>
-				))}
-		</Carousel>
-	);
-};
+WeekSelectorCarousel.displayName = "WeekSelectorCarousel";
