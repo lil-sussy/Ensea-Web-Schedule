@@ -10,17 +10,17 @@ import type ProgressBar from "progress";
 import type { CalendarComponent } from "ical";
 
 
-// export function testParseADE() {
-// 	const file = fs.readFileSync("./tests/ADECal.ics");
-// 	const lines = file.toString();
-// 	const parsedCalendar = ical.parseICS(lines);
-//   const calendar = { ...(parsedCalendar as { [uid: string]: CalendarComponent }) };
-// 	for (const [key, value] of Object.entries(calendar)) {
-// 		const test: string = "";
-// 		const test2 = test.search("TP");
-// 		if (value.description!.search("TP") != -1) console.log(new Date(value.start!).getHours());
-// 	}
-// }
+export function testParseADE() {
+	const file = fs.readFileSync("./tests/ADECal.ics");
+	const lines = file.toString();
+	const parsedCalendar = ical.parseICS(lines);
+  const calendar = { ...(parsedCalendar as { [uid: string]: CalendarComponent }) };
+	for (const [key, value] of Object.entries(calendar)) {
+		const test: string = "";
+		const test2 = test.search("TP");
+		if (value.description!.search("TP") != -1) console.log(new Date(value.start!).getHours());
+	}
+}
 
 
 export const scheduleFetcher: ScheduleFetcher = {

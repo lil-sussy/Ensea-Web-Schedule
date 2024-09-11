@@ -29,6 +29,7 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 	const [currentScheduleWeeks, setCurrentScheduleWeeks] = useState<Schedule["weeks"] | null>(null);
 	const [currentWeekID, setCurrentWeekID] = useState(initialWeekID);
 	const [weekOffset, setWeekOffset] = useState(0);
+  const [searchTerm, setSearchTerm] = useState("");
 
 	React.useEffect(() => {
 		const fetchClassesID = async () => {
@@ -96,15 +97,12 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 
 	const handleSelect = (value: string, option: ClassOption) => {
 		setSelectedClass(option);
+    setSearchTerm(option.label);
 	};
-
-	const handlePrevWeek = () => {
-		setCurrentWeekID(currentWeekID - 1);
-	};
-
-	const handleNextWeek = () => {
-		setCurrentWeekID(currentWeekID + 1);
-	};
+  
+  const handleSearchChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setSearchTerm(e.target.value);
+  };
 
 	const handleWeekSwipe = (current: number) => {
 		setCurrentWeekID(current + weekOffset);
@@ -120,8 +118,8 @@ export default function Dashboard({ initialWeekID = 3 }: DashboardProps) {
 					<div className="absolute -left-16 top-4">
 						<AthenaLogo width={200} height={100} color="white" />
 					</div>
-					<AutoComplete options={searchResults} onSearch={handleSearch} onSelect={handleSelect} style={{ width: "100%" }}>
-						<Input size="large" placeholder="Search for a class" className="bg-[#f1e8e9]/30 focus-within:bg-[#f1e8e9]/60 hover:bg-[#f1e8e9]/50 text-white rounded-3xl border-2 border-white text-xl w-full" prefix={<SearchOutlined />} />
+					<AutoComplete options={searchResults} onSearch={handleSearch} onSelect={handleSelect} style={{ width: "100%" }} value={searchTerm}>
+						<Input value={searchTerm} onChange={(e) => handleSearchChange(e)} size="large" placeholder="Search for a class" className="bg-[#f1e8e9]/30 focus-within:bg-[#f1e8e9]/60 hover:bg-[#f1e8e9]/50 text-white rounded-3xl border-2 border-white text-xl w-full" prefix={<SearchOutlined />} />
 					</AutoComplete>
 				</div>
 			</Header>
